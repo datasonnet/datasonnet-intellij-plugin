@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.modusbox.portx.jsonnet.editor.JsonnetEditorUI">
+  <grid id="27dc6" binding="rootPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
+    <constraints>
+      <xy x="20" y="20" width="1017" height="618"/>
+    </constraints>
+    <properties/>
+    <border type="empty"/>
+    <children>
+      <splitpane id="7b6af">
+        <constraints border-constraint="Center"/>
+        <properties>
+          <continuousLayout value="true"/>
+          <dividerLocation value="338"/>
+          <dividerSize value="9"/>
+          <doubleBuffered value="true"/>
+          <oneTouchExpandable value="true"/>
+          <preferredSize width="18" height="100"/>
+          <resizeWeight value="0.33"/>
+        </properties>
+        <border type="empty"/>
+        <children>
+          <grid id="1102f" binding="sourcePanel" layout-manager="BorderLayout" hgap="0" vgap="0">
+            <constraints>
+              <splitpane position="left"/>
+            </constraints>
+            <properties>
+              <enabled value="false"/>
+              <minimumSize width="0" height="0"/>
+              <requestFocusEnabled value="false"/>
+            </properties>
+            <border type="empty"/>
+            <children/>
+          </grid>
+          <grid id="20809" binding="jsonnetPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
+            <constraints>
+              <splitpane position="right"/>
+            </constraints>
+            <properties/>
+            <border type="empty"/>
+            <children>
+              <splitpane id="c42a0">
+                <constraints border-constraint="Center"/>
+                <properties>
+                  <continuousLayout value="true"/>
+                  <dividerLocation value="400"/>
+                  <dividerSize value="9"/>
+                  <doubleBuffered value="true"/>
+                  <enabled value="true"/>
+                  <preferredSize width="9" height="10000"/>
+                  <requestFocusEnabled value="false"/>
+                  <resizeWeight value="0.8"/>
+                  <verifyInputWhenFocusTarget value="false"/>
+                </properties>
+                <border type="empty">
+                  <font/>
+                </border>
+                <children>
+                  <grid id="e6475" binding="editorPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
+                    <constraints>
+                      <splitpane position="left"/>
+                    </constraints>
+                    <properties>
+                      <preferredSize width="10" height="10"/>
+                    </properties>
+                    <border type="none"/>
+                    <children/>
+                  </grid>
+                  <grid id="c8950" binding="outputPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
+                    <constraints>
+                      <splitpane position="right"/>
+                    </constraints>
+                    <properties>
+                      <opaque value="true"/>
+                      <preferredSize width="10" height="10"/>
+                    </properties>
+                    <border type="empty"/>
+                    <children/>
+                  </grid>
+                </children>
+              </splitpane>
+            </children>
+          </grid>
+        </children>
+      </splitpane>
+    </children>
+  </grid>
+</form>

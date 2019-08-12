@@ -1,0 +1,100 @@
+<idea-plugin version="2">
+    <id>com.modusbox.portx.jsonnet</id>
+    <name>Jsonnet Mapper</name>
+    <version>0.1</version>
+    <vendor email="eugene.berman@modusbox.com" url="">Eugene Berman</vendor>
+    <description><![CDATA[
+     Jsonnet Plugin for IntelliJ. This plugin allows to edit and preview Jsonnet mappings in the editor pane. It is based on the Databricks Jsonnet plugin but provides additional functionality
+    ]]></description>
+
+    <!--<depends>com.databricks</depends>-->
+
+    <idea-version since-build="145.*"/>
+
+    <change-notes><![CDATA[
+
+    <h1>v0.1</h1>
+      <ul>
+       <li>
+          <p>Initial implementation</p>
+          <ul>
+            <li>Preview editor pane</li>
+            <li></li>
+            <li></li>
+          </ul>
+        </li>
+      </ul>
+    ]]>
+    </change-notes>
+
+    <extensions defaultExtensionNs="com.intellij">
+
+        <fileEditorProvider implementation="com.modusbox.portx.jsonnet.editor.JsonnetEditorProvider"/>
+        <fileTypeFactory implementation="com.modusbox.portx.jsonnet.language.JsonnetFileTypeFactory"/>
+
+        <projectConfigurable groupId="tools" displayName="Jsonnet" id="com.modusbox.portx.jsonnet.configurable"
+                             instance="com.modusbox.portx.jsonnet.config.JsonnetConfigurable" nonDefaultProject="true"/>
+        <applicationService serviceImplementation="com.modusbox.portx.jsonnet.config.JsonnetSettingsComponent"/>
+        <projectService serviceImplementation="com.modusbox.portx.jsonnet.config.JsonnetProjectSettingsComponent"/>
+
+        <lang.parserDefinition language="Jsonnet" implementationClass="com.modusbox.portx.jsonnet.language.JsonnetParserDefinition"/>
+        <lang.syntaxHighlighterFactory language="Jsonnet" implementationClass="com.modusbox.portx.jsonnet.language.JsonnetSyntaxHighlighterFactory"/>
+        <fileTypeFactory implementation="com.modusbox.portx.jsonnet.language.JsonnetFileTypeFactory"/>
+        <lang.commenter language="Jsonnet" implementationClass="com.modusbox.portx.jsonnet.language.JsonnetCommenter"/>
+        <completion.contributor language="Jsonnet" implementationClass="com.modusbox.portx.jsonnet.language.JsonnetCompletionContributor"/>
+        <lang.foldingBuilder language="Jsonnet" implementationClass="com.modusbox.portx.jsonnet.language.JsonnetFoldingBuilder"/>
+        <psi.referenceContributor implementation="com.modusbox.portx.jsonnet.language.JsonnetReferenceContributor"/>
+
+        <!--<configurationType implementation="org.mule.tooling.lang.dw.launcher.configuration.WeaveConfigurationType"/>-->
+        <!--<runConfigurationProducer implementation="org.mule.tooling.lang.dw.launcher.configuration.WeaveConfigurationProducer"/>-->
+
+        <!--<lang.parserDefinition language="Weave" implementationClass="org.mule.tooling.lang.dw.parser.WeaveParserDefinition"/>-->
+        <!--<lang.syntaxHighlighterFactory language="Weave"-->
+                                       <!--implementationClass="org.mule.tooling.lang.dw.highlighter.WeaveSyntaxHighlighterFactory"/>-->
+        <!--<colorSettingsPage implementation="org.mule.tooling.lang.dw.highlighter.WeaveColorSettingsPage"/>-->
+        <!--<lang.commenter language="Weave" implementationClass="org.mule.tooling.lang.dw.WeaveCommenter"/>-->
+        <!--<lang.braceMatcher language="Weave" implementationClass="org.mule.tooling.lang.dw.WeavePairedBraceMatcher"/>-->
+        <!--<quoteHandler fileType="Weave" className="org.mule.tooling.lang.dw.WeaveQuoteHandler"/>-->
+
+        <!--<lang.refactoringSupport language="Weave"-->
+                                 <!--implementationClass="org.mule.tooling.lang.dw.refactor.WeaveRefactoringSupportProvider"/>-->
+        <!--<lang.elementManipulator forClass="org.mule.tooling.lang.dw.parser.psi.WeaveNamedElement"-->
+                                 <!--implementationClass="org.mule.tooling.lang.dw.parser.psi.WeaveNamedElementManipulator"/>-->
+        <!--<lang.findUsagesProvider language="Weave"-->
+                                 <!--implementationClass="org.mule.tooling.lang.dw.parser.psi.WeaveFindUsagesProvider"/>-->
+        <!--<lang.foldingBuilder language="Weave" implementationClass="org.mule.tooling.lang.dw.folding.WeaveFolding"/>-->
+        <!--<annotator language="Weave" implementationClass="org.mule.tooling.lang.dw.annotator.WeaveAnnotator"/>-->
+        <!--<lang.psiStructureViewFactory language="Weave"-->
+                                      <!--implementationClass="org.mule.tooling.lang.dw.structure.WeaveStructureViewBuilderFactory"/>-->
+        <!--<completion.contributor language="Weave"-->
+                                <!--implementationClass="org.mule.tooling.lang.dw.completion.WeaveCompletionContributor"/>-->
+
+        <!--<xdebugger.breakpointType implementation="org.mule.tooling.lang.dw.debug.breakpoint.WeaveBreakpointType"/>-->
+
+        <!--<programRunner id="WeaveDebug" implementation="org.mule.tooling.lang.dw.debug.WeaveDebuggerRunner" order="last"/>-->
+
+
+        <!--<lang.substitutor implementationClass="org.mule.tooling.lang.dw.editor.JsonnetEditor$WeaveIOSubstitutor" language="JSON"/>-->
+        <!--<lang.substitutor implementationClass="org.mule.tooling.lang.dw.editor.JsonnetEditor$WeaveIOSubstitutor" language="XML"/>-->
+        <!--<lang.substitutor implementationClass="org.mule.tooling.lang.dw.editor.JsonnetEditor$WeaveIOSubstitutor" language="TEXT"/>-->
+
+    </extensions>
+
+    <project-components>
+        <component>
+            <implementation-class>com.modusbox.portx.jsonnet.editor.ScenarioManager</implementation-class>
+        </component>
+    </project-components>
+
+    <application-components>
+        <!--<component>-->
+            <!--<implementation-class>com.modusbox.portx.jsonnet.config.JsonnetSettingsComponent</implementation-class>-->
+        <!--</component>-->
+    </application-components>
+
+
+    <actions>
+
+    </actions>
+
+</idea-plugin>
