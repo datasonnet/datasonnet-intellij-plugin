@@ -4,7 +4,7 @@
     <version>0.1</version>
     <vendor email="eugene.berman@modusbox.com" url="">Eugene Berman</vendor>
     <description><![CDATA[
-     Jsonnet Plugin for IntelliJ. This plugin allows to edit and preview Jsonnet mappings in the editor pane. It is based on the Databricks Jsonnet plugin but provides additional functionality
+     DataSonnet Plugin for IntelliJ. This plugin allows to edit and preview DataSonnet mappings in the editor pane. It is based on the Databricks Jsonnet plugin but provides additional functionality
     ]]></description>
 
     <!--<depends>com.databricks</depends>-->
