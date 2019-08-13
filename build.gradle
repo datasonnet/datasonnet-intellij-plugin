@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'org.jetbrains.intellij' version '0.4.9'
+    id "org.datlowe.maven-publish-auth" version "2.0.2"
 }
 
 group 'com.datasonnet'
@@ -20,6 +21,20 @@ sourceSets {
 repositories {
     mavenCentral()
     mavenLocal()
+    maven {
+        name "portx-repository-releases"
+        url "https://portx.jfrog.io/portx/portx-snapshots"
+        mavenContent {
+            snapshotsOnly()
+        }
+    }
+    maven {
+        name "portx-repository-snapshots"
+        url "https://portx.jfrog.io/portx/portx-releases"
+        mavenContent {
+            releasesOnly()
+        }
+    }
 }
 
 dependencies {
