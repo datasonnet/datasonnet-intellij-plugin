@@ -1,6 +1,6 @@
 <idea-plugin version="2">
     <id>com.modusbox.portx.jsonnet</id>
-    <name>Jsonnet Mapper</name>
+    <name>Datasonnet Mapper</name>
     <version>0.1</version>
     <vendor email="eugene.berman@modusbox.com" url="">Eugene Berman</vendor>
     <description><![CDATA[

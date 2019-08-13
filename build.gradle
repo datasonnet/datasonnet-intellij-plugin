@@ -24,7 +24,7 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    compile group: 'com.datasonnet', name: 'datasonnet-library', version: 'Functions-Libraries-SNAPSHOT'
+    compile group: 'com.datasonnet', name: 'datasonnet-mapper', version: '1.0-SNAPSHOT'
 }
 
 intellij {

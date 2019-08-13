@@ -1,5 +1,6 @@
 package com.modusbox.portx.jsonnet.editor;
 
+import com.datasonnet.wrap.Mapper;
 import com.intellij.codeHighlighting.BackgroundEditorHighlighter;
 import com.intellij.icons.AllIcons;
 import com.intellij.json.JsonLanguage;
@@ -14,11 +15,13 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
-import com.intellij.openapi.editor.markup.*;
+import com.intellij.openapi.editor.markup.EffectType;
+import com.intellij.openapi.editor.markup.HighlighterTargetArea;
+import com.intellij.openapi.editor.markup.RangeHighlighter;
+import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.fileEditor.*;
 import com.intellij.openapi.fileEditor.impl.text.PsiAwareTextEditorImpl;
 import com.intellij.openapi.fileEditor.impl.text.TextEditorProvider;
-import com.intellij.openapi.fileTypes.PlainTextLanguage;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.options.ShowSettingsUtil;
@@ -34,16 +37,12 @@ import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.ui.EditorNotificationPanel;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.JBTabsPaneImpl;
-import com.intellij.ui.UIBundle;
 import com.intellij.ui.tabs.TabInfo;
-import com.intellij.ui.tabs.impl.JBTabsImpl;
 import com.intellij.util.Alarm;
-import com.intellij.util.ui.UIUtil;
 import com.modusbox.portx.jsonnet.config.JsonnetProjectSettingsComponent;
 import com.modusbox.portx.jsonnet.config.JsonnetSettingsComponent;
 import com.modusbox.portx.jsonnet.language.JsonnetFileType;
 import com.modusbox.portx.jsonnet.language.psi.JsonnetFile;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -56,13 +55,8 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
-
-import com.datasonnet.wrap.Mapper;
+import java.util.*;
 
 /**
  * Created by eberman on 11/3/16.
@@ -102,7 +96,8 @@ public class JsonnetEditor implements FileEditor {
         gui = new JsonnetEditorUI(textEditor);
 
         inputTabs = new JBTabsPaneImpl(project, SwingConstants.TOP, this);
-        ((JBTabsImpl) inputTabs.getTabs()).setSideComponentVertical(true);
+        inputTabs.getTabs().getPresentation().setSideComponentVertical(true);
+
         gui.getSourcePanel().add(inputTabs.getComponent(), BorderLayout.CENTER);
 
         DefaultActionGroup actionGroup = new DefaultActionGroup();
@@ -134,7 +129,8 @@ public class JsonnetEditor implements FileEditor {
 //        gui.getSourcePanel().setMinimumSize(new Dimension(toolbar.getComponent().getWidth(), 0));
 
         outputTabs = new JBTabsPaneImpl(project, SwingConstants.TOP, this);
-        ((JBTabsImpl) outputTabs.getTabs()).setSideComponentVertical(true);
+        outputTabs.getTabs().getPresentation().setSideComponentVertical(true);
+        //((JBTabsImpl) outputTabs.getTabs()).setSideComponentVertical(true);
         gui.getOutputPanel().add(outputTabs.getComponent(), BorderLayout.CENTER);
         gui.getOutputPanel().setSize(1000, 1000);
 
@@ -293,7 +289,7 @@ public class JsonnetEditor implements FileEditor {
 
         String jsonnetScript = this.textEditor.getEditor().getDocument().getText();
 
-        String tlf = "function(payload";
+        //String tlf = "function(payload";
         String payload = "{}";
 
         Map<String, VirtualFile> inputFiles = currentScenario.getInputFiles();
@@ -308,17 +304,17 @@ public class JsonnetEditor implements FileEditor {
                     payload = contents;
                 else {
                     variables.put(f.getKey(), contents);
-                    tlf = tlf + ", " + f.getKey();
+                    //tlf = tlf + ", " + f.getKey();
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
 
-        tlf = tlf + ") " + jsonnetScript;
+        //tlf = tlf + ") " + jsonnetScript;
 
         try {
-            Mapper mapper = new Mapper(tlf, variables);
+            Mapper mapper = new Mapper(jsonnetScript, variables, true);
             return mapper.transform(payload);
         } catch (Exception e) {
             return e.getMessage();
@@ -525,8 +521,9 @@ public class JsonnetEditor implements FileEditor {
         DefaultActionGroup actionGroup = new DefaultActionGroup();
         actionGroup.add(new AutoSyncAction(this));
         actionGroup.add(new RefreshAction(this));
-        tabInfo.setActions(actionGroup, "JsonnetPreview");
+        tabInfo.setActions(actionGroup, "DataSonnetPreview");
 
+        outputTabs.getTabs().getPresentation().setSideComponentVertical(true);
         outputTabs.getTabs().addTab(tabInfo);
     }
 

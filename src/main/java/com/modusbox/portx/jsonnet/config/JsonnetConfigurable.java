@@ -1,11 +1,7 @@
 package com.modusbox.portx.jsonnet.config;
 
 import com.intellij.openapi.Disposable;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.components.ApplicationComponent;
-import com.intellij.openapi.components.ComponentManager;
 import com.intellij.openapi.components.ServiceManager;
-import com.intellij.openapi.components.ex.ComponentManagerEx;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
