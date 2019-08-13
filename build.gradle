@@ -3,7 +3,7 @@ plugins {
     id 'org.jetbrains.intellij' version '0.4.9'
 }
 
-group 'com.modusbox.portx'
+group 'com.datasonnet'
 version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
