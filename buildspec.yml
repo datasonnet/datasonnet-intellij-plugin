@@ -18,6 +18,7 @@ phases:
         esac
       - ./gradlew :version -q
       - ./gradlew test
+      - ./gradlew buildPlugin
       - |
         case "$CODEBUILD_WEBHOOK_TRIGGER" in
           pr/*) echo "pull request, not uploaded" ;;
