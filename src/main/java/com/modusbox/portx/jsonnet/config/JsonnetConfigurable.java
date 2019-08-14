@@ -28,13 +28,13 @@ public class JsonnetConfigurable implements SearchableConfigurable, Configurable
     @Nls(capitalization = Nls.Capitalization.Title)
     @Override
     public String getDisplayName() {
-        return "Jsonnet";
+        return "Datasonnet";
     }
 
     @NotNull
     @Override
     public String getId() {
-        return "jsonnet";
+        return "datasonnet";
     }
 
     @Nullable

@@ -339,11 +339,11 @@ public class JsonnetEditor implements FileEditor {
                 StringUtils.isEmpty(pathToJsonnet) ||
                 !(new File(pathToJsonnet).exists() && !new File(pathToJsonnet).isDirectory())) {
             EditorNotificationPanel panel = new EditorNotificationPanel();
-            panel.setText("Unable to find Jsonnet executable in path.");
+            panel.setText("Unable to find Datasonnt/Jsonnet executable in path.");
             panel.createActionLabel("Configure Jsonnet path", new Runnable() {
                 @Override
                 public void run() {
-                    ShowSettingsUtil.getInstance().showSettingsDialog(project, "jsonnet");
+                    ShowSettingsUtil.getInstance().showSettingsDialog(project, "datasonnet");
                 }
             });
 

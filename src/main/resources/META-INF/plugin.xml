@@ -32,7 +32,7 @@
         <fileEditorProvider implementation="com.modusbox.portx.jsonnet.editor.JsonnetEditorProvider"/>
         <fileTypeFactory implementation="com.modusbox.portx.jsonnet.language.JsonnetFileTypeFactory"/>
 
-        <projectConfigurable groupId="tools" displayName="Jsonnet" id="com.modusbox.portx.jsonnet.configurable"
+        <projectConfigurable groupId="tools" displayName="Datasonnet" id="com.modusbox.portx.jsonnet.configurable"
                              instance="com.modusbox.portx.jsonnet.config.JsonnetConfigurable" nonDefaultProject="true"/>
         <applicationService serviceImplementation="com.modusbox.portx.jsonnet.config.JsonnetSettingsComponent"/>
         <projectService serviceImplementation="com.modusbox.portx.jsonnet.config.JsonnetProjectSettingsComponent"/>
