@@ -97,6 +97,7 @@ public class JsonnetEditor implements FileEditor {
 
         inputTabs = new JBTabsPaneImpl(project, SwingConstants.TOP, this);
         inputTabs.getTabs().getPresentation().setSideComponentVertical(true);
+        inputTabs.getTabs().getPresentation().setEmptyText("No inputs available for the current scenario.\nAdd new input by clicking the + button.");
 
         gui.getSourcePanel().add(inputTabs.getComponent(), BorderLayout.CENTER);
 
@@ -108,6 +109,10 @@ public class JsonnetEditor implements FileEditor {
                 AddScenarioDialog dialog = new AddScenarioDialog(project, manager, psiFile, (scenario) -> {
                     manager.setCurrentScenario(psiFile.getVirtualFile().getCanonicalPath(), scenario);
                     loadScenario(scenario);
+                    if (gui.getInputsSplitter().getProportion() == 0 || !gui.getInputsSplitter().isEnabled()) {
+                        gui.getInputsSplitter().setProportion(0.3f);
+                        gui.getInputsSplitter().setEnabled(true);
+                    }
                 });
                 dialog.show();
             }
@@ -179,6 +184,7 @@ public class JsonnetEditor implements FileEditor {
                 manager.setCurrentScenario(psiFile.getVirtualFile().getCanonicalPath(), first);
                 loadScenario(first);
                 gui.getInputsSplitter().setEnabled(true);
+                gui.getInputsSplitter().setProportion(0.3f);
             } else {
                 gui.getInputsSplitter().setEnabled(false);
                 gui.getInputsSplitter().setProportion(0);
@@ -205,7 +211,7 @@ public class JsonnetEditor implements FileEditor {
     @NotNull
     @Override
     public String getName() {
-        return "Jsonnet Editor";
+        return "Datasonnet Editor";
     }
 
     @Override
