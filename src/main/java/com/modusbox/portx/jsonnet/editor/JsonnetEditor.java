@@ -15,6 +15,8 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
+import com.intellij.openapi.editor.event.DocumentEvent;
+import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.editor.markup.EffectType;
 import com.intellij.openapi.editor.markup.HighlighterTargetArea;
 import com.intellij.openapi.editor.markup.RangeHighlighter;
@@ -84,6 +86,7 @@ public class JsonnetEditor implements FileEditor {
     private final static long PREVIEW_DELAY = 500;
 
     Alarm myDocumentAlarm = new Alarm(Alarm.ThreadToUse.SWING_THREAD, this);
+    DocumentListener refreshPreview;
 
     private boolean autoSync = false;
 
@@ -129,18 +132,44 @@ public class JsonnetEditor implements FileEditor {
 
         gui.getRootPanel().add(toolbar.getComponent(), BorderLayout.WEST);
 
-//        gui.getSourcePanel().add(toolbar.getComponent(), BorderLayout.WEST);
-//        gui.getSourcePanel().setSize(toolbar.getComponent().getWidth(), 0);
-//        gui.getSourcePanel().setMinimumSize(new Dimension(toolbar.getComponent().getWidth(), 0));
-
         outputTabs = new JBTabsPaneImpl(project, SwingConstants.TOP, this);
         outputTabs.getTabs().getPresentation().setSideComponentVertical(true);
         //((JBTabsImpl) outputTabs.getTabs()).setSideComponentVertical(true);
         gui.getOutputPanel().add(outputTabs.getComponent(), BorderLayout.CENTER);
         gui.getOutputPanel().setSize(1000, 1000);
 
+        refreshPreview = new DocumentListener() {
+            @Override
+            public void documentChanged(@NotNull DocumentEvent event) {
+                if (myDocumentAlarm.isDisposed())
+                    return;
+
+                myDocumentAlarm.cancelAllRequests();
+                myDocumentAlarm.addRequest(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            new WriteCommandAction.Simple(project, psiFile) {
+                                @Override
+                                protected void run() throws Throwable {
+                                    runPreview(false);
+                                }
+                            }.execute();
+                        } catch (Exception e) {
+                            logger.error(e);
+                        }
+
+                    }
+                }, PREVIEW_DELAY);
+            }
+        };
+
+        this.textEditor.getEditor().getDocument().addDocumentListener(refreshPreview);
+
         psiFile = PsiManager.getInstance(project).findFile(virtualFile);
+
         if (psiFile != null && psiFile.getFileType() == JsonnetFileType.INSTANCE) {
+        /*
             final JsonnetFile jsonnetFile = (JsonnetFile) psiFile;
 
             PsiManager.getInstance(project).addPsiTreeChangeListener(new PsiTreeChangeAdapter() {
@@ -175,6 +204,7 @@ public class JsonnetEditor implements FileEditor {
                     }, PREVIEW_DELAY);
                 }
             });
+            */
 
             //TODO - list scenarios for file, if there are any, load first one and display
             ScenarioManager manager = ScenarioManager.getInstance(project);
@@ -572,6 +602,8 @@ public class JsonnetEditor implements FileEditor {
             TabInfo tabInfo = createTabInfo(inputsFolder, input, file, editor);
             inputTabs.getTabs().addTab(tabInfo);
             inputTabs.setSelectedIndex(0);
+
+            editor.getDocument().addDocumentListener(refreshPreview);
         }
     }
 
