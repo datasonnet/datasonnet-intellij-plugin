@@ -40,7 +40,7 @@ public class JsonnetEditorProvider extends TextEditorProvider { //implements Fil
     @NotNull
     @Override
     public String getEditorTypeId() {
-        return "Jsonnet-Editor";
+        return "Datasonnet-Editor";
     }
 
     @NotNull

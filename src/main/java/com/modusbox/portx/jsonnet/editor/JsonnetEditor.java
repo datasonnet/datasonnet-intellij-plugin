@@ -97,7 +97,7 @@ public class JsonnetEditor implements FileEditor {
 
         inputTabs = new JBTabsPaneImpl(project, SwingConstants.TOP, this);
         inputTabs.getTabs().getPresentation().setSideComponentVertical(true);
-        inputTabs.getTabs().getPresentation().setEmptyText("No inputs available for the current scenario.\nAdd new input by clicking the + button.");
+        //inputTabs.getTabs().getPresentation().setEmptyText("No inputs available for the current scenario.\nAdd new input by clicking the + button.");
 
         gui.getSourcePanel().add(inputTabs.getComponent(), BorderLayout.CENTER);
 

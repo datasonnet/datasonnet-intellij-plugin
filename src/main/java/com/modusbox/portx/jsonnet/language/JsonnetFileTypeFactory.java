@@ -11,13 +11,13 @@ public class JsonnetFileTypeFactory extends FileTypeFactory {
                 new FileNameMatcher() {
                     @Override
                     public boolean accept(@NotNull String fileName) {
-                        return fileName.endsWith(".jsonnet");
+                        return fileName.endsWith(".ds");
                     }
 
                     @NotNull
                     @Override
                     public String getPresentableString() {
-                        return ".jsonnet";
+                        return ".ds";
                     }
                 },
                 new FileNameMatcher() {
@@ -36,13 +36,13 @@ public class JsonnetFileTypeFactory extends FileTypeFactory {
 
                     @Override
                     public boolean accept(@NotNull String fileName) {
-                        return fileName.endsWith(".jsonnet.TEMPLATE");
+                        return fileName.endsWith(".ds.TEMPLATE");
                     }
 
                     @NotNull
                     @Override
                     public String getPresentableString() {
-                        return ".jsonnet.TEMPLATE";
+                        return ".ds.TEMPLATE";
                     }
                 }
         );

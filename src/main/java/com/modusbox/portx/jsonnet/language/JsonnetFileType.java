@@ -17,19 +17,19 @@ public class JsonnetFileType extends LanguageFileType {
     @NotNull
     @Override
     public String getName() {
-        return "Jsonnet file";
+        return "Datasonnet file";
     }
 
     @NotNull
     @Override
     public String getDescription() {
-        return "Jsonnet language file";
+        return "Datasonnet language file";
     }
 
     @NotNull
     @Override
     public String getDefaultExtension() {
-        return "jsonnet";
+        return "ds";
     }
 
     @Nullable
@@ -40,9 +40,9 @@ public class JsonnetFileType extends LanguageFileType {
 
     public List<String> getExtensions() {
         List<String> extensions = new ArrayList<>();
-        extensions.add("jsonnet");
+        extensions.add("ds");
         extensions.add("libsonnet");
-        extensions.add("jsonnet.TEMPLATE");
+        extensions.add("ds.TEMPLATE");
 
         return extensions;
     }

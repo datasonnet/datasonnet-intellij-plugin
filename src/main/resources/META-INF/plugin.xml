@@ -37,12 +37,12 @@
         <applicationService serviceImplementation="com.modusbox.portx.jsonnet.config.JsonnetSettingsComponent"/>
         <projectService serviceImplementation="com.modusbox.portx.jsonnet.config.JsonnetProjectSettingsComponent"/>
 
-        <lang.parserDefinition language="Jsonnet" implementationClass="com.modusbox.portx.jsonnet.language.JsonnetParserDefinition"/>
-        <lang.syntaxHighlighterFactory language="Jsonnet" implementationClass="com.modusbox.portx.jsonnet.language.JsonnetSyntaxHighlighterFactory"/>
+        <lang.parserDefinition language="Datasonnet" implementationClass="com.modusbox.portx.jsonnet.language.JsonnetParserDefinition"/>
+        <lang.syntaxHighlighterFactory language="Datasonnet" implementationClass="com.modusbox.portx.jsonnet.language.JsonnetSyntaxHighlighterFactory"/>
         <fileTypeFactory implementation="com.modusbox.portx.jsonnet.language.JsonnetFileTypeFactory"/>
-        <lang.commenter language="Jsonnet" implementationClass="com.modusbox.portx.jsonnet.language.JsonnetCommenter"/>
-        <completion.contributor language="Jsonnet" implementationClass="com.modusbox.portx.jsonnet.language.JsonnetCompletionContributor"/>
-        <lang.foldingBuilder language="Jsonnet" implementationClass="com.modusbox.portx.jsonnet.language.JsonnetFoldingBuilder"/>
+        <lang.commenter language="Datasonnet" implementationClass="com.modusbox.portx.jsonnet.language.JsonnetCommenter"/>
+        <completion.contributor language="Datasonnet" implementationClass="com.modusbox.portx.jsonnet.language.JsonnetCompletionContributor"/>
+        <lang.foldingBuilder language="Datasonnet" implementationClass="com.modusbox.portx.jsonnet.language.JsonnetFoldingBuilder"/>
         <psi.referenceContributor implementation="com.modusbox.portx.jsonnet.language.JsonnetReferenceContributor"/>
 
         <!--<configurationType implementation="org.mule.tooling.lang.dw.launcher.configuration.WeaveConfigurationType"/>-->
