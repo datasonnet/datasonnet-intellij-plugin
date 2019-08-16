@@ -164,7 +164,10 @@ public class JsonnetEditor implements FileEditor {
             }
         };
 
-        this.textEditor.getEditor().getDocument().addDocumentListener(refreshPreview);
+        try {
+            this.textEditor.getEditor().getDocument().addDocumentListener(refreshPreview);
+        } catch (Throwable e) {
+        }
 
         psiFile = PsiManager.getInstance(project).findFile(virtualFile);
 
@@ -603,7 +606,10 @@ public class JsonnetEditor implements FileEditor {
             inputTabs.getTabs().addTab(tabInfo);
             inputTabs.setSelectedIndex(0);
 
-            editor.getDocument().addDocumentListener(refreshPreview);
+            try {
+                editor.getDocument().addDocumentListener(refreshPreview);
+            } catch (Throwable e) {
+            }
         }
     }
 
