@@ -18,6 +18,8 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes;
+import org.jetbrains.jps.model.java.JavaResourceRootType;
 
 import java.io.File;
 import java.io.IOException;
@@ -109,6 +111,19 @@ public class ScenarioManager  extends AbstractProjectComponent implements Dispos
 
         ModuleRootManager rootManager = ModuleRootManager.getInstance(module);
 
+        //TODO getSourceRoots - tests only JavaModuleSourceRootTypes.TESTS
+        List<VirtualFile> testRoots = rootManager.getSourceRoots(JavaResourceRootType.TEST_RESOURCE);
+        if (testRoots == null || testRoots.isEmpty()) {
+            return null;
+        }
+
+        for (VirtualFile testRoot : testRoots) {
+            if (findMappingTestsRoot(testRoot) != null) {
+                jsonnetInputsFolders.put(moduleName, testRoot);
+                return testRoot;
+            }
+        }
+
         VirtualFile[] sourceRoots = rootManager.getSourceRoots(true);
         for (VirtualFile sourceRoot : sourceRoots) {
             if (sourceRoot.isDirectory() && sourceRoot.getName().endsWith(INTEGRATION_TEST_FOLDER_NAME)) {
@@ -198,6 +213,23 @@ public class ScenarioManager  extends AbstractProjectComponent implements Dispos
         }
         return new ArrayList<>();
     }
+
+    @Nullable
+    private VirtualFile findMappingTestsRoot(VirtualFile root) {
+        if (root.isDirectory() && root.getName().equals(INTEGRATION_TEST_FOLDER_NAME)) {
+            return root;
+        } else {
+            VirtualFile[] children = root.getChildren();
+            for (VirtualFile child : children) {
+                VirtualFile mappingTestFolder = findMappingTestsRoot(child);
+                if (mappingTestFolder != null) {
+                    return mappingTestFolder;
+                }
+            }
+        }
+        return null;
+    }
+
 
     @Override
     public void dispose() {

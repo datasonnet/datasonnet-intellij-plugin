@@ -6,6 +6,10 @@ import com.intellij.icons.AllIcons;
 import com.intellij.json.JsonLanguage;
 import com.intellij.lang.Language;
 import com.intellij.navigation.ItemPresentation;
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationListener;
+import com.intellij.notification.NotificationType;
+import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.impl.ActionManagerImpl;
 import com.intellij.openapi.actionSystem.impl.MenuItemPresentationFactory;
@@ -28,6 +32,8 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.roots.ui.configuration.ProjectSettingsService;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.text.StringUtil;
@@ -48,8 +54,10 @@ import com.modusbox.portx.jsonnet.language.psi.JsonnetFile;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.jps.model.java.JavaResourceRootType;
 
 import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
 import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
@@ -108,6 +116,27 @@ public class JsonnetEditor implements FileEditor {
         actionGroup.add(new AnAction("Add new scenario", "Adds a new scenario for the current mapping", AllIcons.General.Add) {
             @Override
             public void actionPerformed(AnActionEvent e) {
+                //Check if there is a test resources folder
+                List<VirtualFile> testRoots = ModuleRootManager.getInstance(module).getSourceRoots(JavaResourceRootType.TEST_RESOURCE);
+                if (testRoots == null || testRoots.isEmpty()) {
+                    Notifications.Bus.notify(new Notification("DataSonnet",
+                            "No Test Resources folder found!",
+                            "Please mark at least one directory as <strong>Test Resources</strong> folder.\n <a href=\"projectSettings\">Click here</a> to open project settings.",
+                            NotificationType.WARNING,
+                            new NotificationListener() {
+                                @Override
+                                public void hyperlinkUpdate(@NotNull Notification notification, @NotNull HyperlinkEvent event) {
+                                    if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                                        if ("projectSettings".equals(event.getDescription())) {
+                                            ProjectSettingsService.getInstance(project).openModuleSettings(module);
+                                        }
+                                    }
+                                }
+                            }));
+
+                    return;
+                }
+
                 final ScenarioManager manager = ScenarioManager.getInstance(project);
                 AddScenarioDialog dialog = new AddScenarioDialog(project, manager, psiFile, (scenario) -> {
                     manager.setCurrentScenario(psiFile.getVirtualFile().getCanonicalPath(), scenario);
