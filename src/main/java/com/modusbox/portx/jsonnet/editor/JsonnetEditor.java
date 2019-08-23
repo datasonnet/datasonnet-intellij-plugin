@@ -28,6 +28,7 @@ import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.fileEditor.*;
 import com.intellij.openapi.fileEditor.impl.text.PsiAwareTextEditorImpl;
 import com.intellij.openapi.fileEditor.impl.text.TextEditorProvider;
+import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.options.ShowSettingsUtil;
@@ -363,13 +364,22 @@ public class JsonnetEditor implements FileEditor {
         Map<String, VirtualFile> inputFiles = currentScenario.getInputFiles();
         HashMap<String, String> variables = new HashMap<String, String>();
 
+        String inputMimeType = "application/json";
+
         for (Map.Entry<String, VirtualFile> f : inputFiles.entrySet()) {
 
             String contents = null;
             try {
                 contents = new String(f.getValue().contentsToByteArray());
-                if (f.getKey().equals("payload"))
+                if (f.getKey().equals("payload")) {
                     payload = contents;
+                    String extension = f.getValue().getExtension();
+                    if ("csv".equalsIgnoreCase(extension)) {
+                        inputMimeType = "application/csv";
+                    } else if ("xml".equalsIgnoreCase(extension)) {
+                        inputMimeType = "application/xml";
+                    }
+                }
                 else {
                     variables.put(f.getKey(), contents);
                     //tlf = tlf + ", " + f.getKey();
@@ -383,7 +393,7 @@ public class JsonnetEditor implements FileEditor {
 
         try {
             Mapper mapper = new Mapper(jsonnetScript, variables, true);
-            return mapper.transform(payload);
+            return mapper.transform(payload, inputMimeType);
         } catch (Exception e) {
             return e.getMessage();
         }

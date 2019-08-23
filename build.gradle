@@ -21,7 +21,7 @@ sourceSets {
 
 repositories {
     mavenCentral()
-    mavenLocal()
+//    mavenLocal()
     maven {
         name "portx-repository-releases"
         url "https://portx.jfrog.io/portx/portx-snapshots"
