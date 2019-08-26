@@ -16,7 +16,7 @@ public class AddInputAction extends AnAction {
 
     public AddInputAction(JsonnetEditor editor)
     {
-        super("Add new input", "Adds a new input to the scenario", AllIcons.General.Add);
+        super("Add new input", "Adds a new input to the scenario", IconLoader.findIcon("/icons/addInput.svg"));
         this.editor = editor;
     }
 

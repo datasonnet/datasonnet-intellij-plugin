@@ -1,0 +1,16 @@
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<mask id="path-1-inside-1" fill="white">
+<path d="M6 9H9.525H15V11H6V9Z"/>
+</mask>
+<path d="M6 9V7H4V9H6ZM15 9H17V7H15V9ZM15 11V13H17V11H15ZM6 11H4V13H6V11ZM13 9V11H17V9H13ZM15 9H6V13H15V9ZM8 11V9H4V11H8ZM6 11H9.525V7H6V11ZM9.525 11H15V7H9.525V11Z" fill="#AFB1B3" mask="url(#path-1-inside-1)"/>
+<mask id="path-3-inside-2" fill="white">
+<path d="M6 13H9.525H15V15H6V13Z"/>
+</mask>
+<path d="M6 13V11H4V13H6ZM15 13H17V11H15V13ZM15 15V17H17V15H15ZM6 15H4V17H6V15ZM13 13V15H17V13H13ZM15 13H6V17H15V13ZM8 15V13H4V15H8ZM6 15H9.525V11H6V15ZM9.525 15H15V11H9.525V15Z" fill="#AFB1B3" mask="url(#path-3-inside-2)"/>
+<mask id="path-5-inside-3" fill="white">
+<path d="M9 5H11.35H15V7H9V5Z"/>
+</mask>
+<path d="M9 5V3H7V5H9ZM15 5H17V3H15V5ZM15 7V9H17V7H15ZM9 7H7V9H9V7ZM13 5V7H17V5H13ZM15 5H9V9H15V5ZM11 7V5H7V7H11ZM9 7H11.35V3H9V7ZM11.35 7H15V3H11.35V7Z" fill="#AFB1B3" mask="url(#path-5-inside-3)"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M8 7H0V5H8V7Z" fill="#AFB1B3"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M3 10L3 2L5 2V10H3Z" fill="#AFB1B3"/>
+</svg>

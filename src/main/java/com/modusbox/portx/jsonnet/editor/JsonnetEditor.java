@@ -36,6 +36,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.ui.configuration.ProjectSettingsService;
 import com.intellij.openapi.util.Disposer;
+import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VfsUtil;
@@ -114,7 +115,7 @@ public class JsonnetEditor implements FileEditor {
         gui.getSourcePanel().add(inputTabs.getComponent(), BorderLayout.CENTER);
 
         DefaultActionGroup actionGroup = new DefaultActionGroup();
-        actionGroup.add(new AnAction("Add new scenario", "Adds a new scenario for the current mapping", AllIcons.General.Add) {
+        actionGroup.add(new AnAction("Add new scenario", "Adds a new scenario for the current mapping", IconLoader.findIcon("/icons/addScenario.svg")) {
             @Override
             public void actionPerformed(AnActionEvent e) {
                 //Check if there is a test resources folder
@@ -679,7 +680,7 @@ public class JsonnetEditor implements FileEditor {
 
     private class SelectScenarioAction extends AnAction {
         public SelectScenarioAction() {
-            super(null, "Select scenario", AllIcons.General.Gear);
+            super(null, "Select scenario", IconLoader.findIcon("/icons/selectScenario.svg"));
         }
 
         @Override
