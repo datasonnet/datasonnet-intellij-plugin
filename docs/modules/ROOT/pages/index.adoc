@@ -1,0 +1,36 @@
+= IntelliJ Plugin for DataSonnet
+Russell Duhon <fugu13@gmail.com>
+:toc:
+
+== Introduction
+
+This plugin helps edit and run DataSonnet files inside IntelliJ.
+It's a great way to start experimenting with DataSonnet in an easy interface, including the management of test data for DataSonnet transformations.
+
+== Installation
+
+First, download the plugin from https://datasonnet.s3-us-west-2.amazonaws.com/intellij/datasonnet-intellij-plugin-1.0-SNAPSHOT.zip .
+Then, open your IntelliJ preferences.
+In them, click on the Plugins section.
+Choose “Install plugin from disk”, select the downloaded zip file, then follow the instructions through restarting IntelliJ.
+These are also the upgrade instructions.
+
+== Use
+
+Create a new empty project in IntelliJ or use an existing one.
+In your main resources directory, create a directory named “mappings” to hold your DataSonnet files.
+Create a new file called “mapping.ds” (or any other name with that suffix).
+When you open that file, you’ll see three panes (though one will not be very visible, on the left).
+Click the left-most + on the left-most pane to add a Scenario, which is a grouping of inputs useful for testing the DataSonnet transformation.
+That creates a directory in your test resources.
+
+You’ll see a second + to the right of the first.
+Click that to add an input file. Name it something like “payload” or “input”.
+(Note: if you want to try the Example above without modification, you must name it “payload”).
+The name of each of your input files will be the name of the variable in your transformation.
+You should use the name “payload” for the input that will receive the main payload during a transformation, as that’s what other tooling assumes.
+You can add as many inputs as you would like.
+
+Write your DataSonnet transformation in the second pane.
+You can use the variables defined by your inputs there.
+(If your transformation isn't running automatically, click the “refresh” icon on the left of the third pane, which will rerun the transformation with the current Scenario.)
