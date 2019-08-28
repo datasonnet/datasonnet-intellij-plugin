@@ -1,6 +1,5 @@
 = IntelliJ Plugin for DataSonnet
 Russell Duhon <fugu13@gmail.com>
-:toc:
 
 This plugin helps edit and run DataSonnet files inside IntelliJ.
 It's a great way to start experimenting with DataSonnet in an easy interface, including the management of test data for DataSonnet transformations.

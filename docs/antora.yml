@@ -2,3 +2,5 @@ name: intellij
 title: IntelliJ Plugin
 version: '1.0-SNAPSHOT'
 start_page: ROOT:index.adoc
+nav:
+  - modules/ROOT/nav.adoc
