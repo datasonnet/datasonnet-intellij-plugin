@@ -1,0 +1,6 @@
+.Plugin Documentation
+* xref:index.adoc[Installation]
+* xref:use.adoc[Use]
+
+.Additional Documentation
+* xref:datasonnet:ROOT:index.adoc[DataSonnet Documentation]
