@@ -1,6 +1,7 @@
 package com.modusbox.portx.jsonnet.editor;
 
-import com.datasonnet.wrap.Mapper;
+import com.datasonnet.Mapper;
+import com.datasonnet.StringDocument;
 import com.intellij.codeHighlighting.BackgroundEditorHighlighter;
 import com.intellij.icons.AllIcons;
 import com.intellij.json.JsonLanguage;
@@ -363,9 +364,9 @@ public class JsonnetEditor implements FileEditor {
         String payload = "{}";
 
         Map<String, VirtualFile> inputFiles = currentScenario.getInputFiles();
-        HashMap<String, String> variables = new HashMap<String, String>();
+        HashMap<String, com.datasonnet.Document> variables = new HashMap<>();
 
-        String inputMimeType = "application/json";
+        String payloadMimeType = "application/json";
 
         for (Map.Entry<String, VirtualFile> f : inputFiles.entrySet()) {
 
@@ -374,15 +375,10 @@ public class JsonnetEditor implements FileEditor {
                 contents = new String(f.getValue().contentsToByteArray());
                 if (f.getKey().equals("payload")) {
                     payload = contents;
-                    String extension = f.getValue().getExtension();
-                    if ("csv".equalsIgnoreCase(extension)) {
-                        inputMimeType = "application/csv";
-                    } else if ("xml".equalsIgnoreCase(extension)) {
-                        inputMimeType = "application/xml";
-                    }
+                    payloadMimeType = getMimeTypeByExtension(f.getValue().getExtension());
                 }
                 else {
-                    variables.put(f.getKey(), contents);
+                    variables.put(f.getKey(), new StringDocument(contents, getMimeTypeByExtension(f.getValue().getExtension())));
                     //tlf = tlf + ", " + f.getKey();
                 }
             } catch (IOException e) {
@@ -393,8 +389,8 @@ public class JsonnetEditor implements FileEditor {
         //tlf = tlf + ") " + jsonnetScript;
 
         try {
-            Mapper mapper = new Mapper(jsonnetScript, variables, true);
-            return mapper.transform(payload, inputMimeType);
+            Mapper mapper = new Mapper(jsonnetScript, variables.keySet(), true);
+            return mapper.transform(new StringDocument(payload, payloadMimeType), variables).contents();
         } catch (Exception e) {
             return e.getMessage();
         }
@@ -676,6 +672,18 @@ public class JsonnetEditor implements FileEditor {
 
     public void closeAllInputs() {
         inputTabs.getTabs().removeAllTabs();
+    }
+
+    private String getMimeTypeByExtension(String extension) {
+        String inputMimeType = "application/json";
+
+        if ("csv".equalsIgnoreCase(extension)) {
+            inputMimeType = "application/csv";
+        } else if ("xml".equalsIgnoreCase(extension)) {
+            inputMimeType = "application/xml";
+        }
+
+        return inputMimeType;
     }
 
     private class SelectScenarioAction extends AnAction {
