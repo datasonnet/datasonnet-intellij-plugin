@@ -1,0 +1,13 @@
+= IntelliJ Plugin for DataSonnet
+Russell Duhon <fugu13@gmail.com>
+
+This plugin helps edit and run DataSonnet files inside IntelliJ.
+It's a great way to start experimenting with DataSonnet in an easy interface, including the management of test data for DataSonnet transformations.
+
+== Installation
+
+First, download the plugin from https://datasonnet.s3-us-west-2.amazonaws.com/intellij/datasonnet-intellij-plugin-1.0-SNAPSHOT.zip .
+Then, open your IntelliJ preferences.
+In them, click on the Plugins section.
+Choose “Install plugin from disk”, select the downloaded zip file, then follow the instructions through restarting IntelliJ.
+These are also the upgrade instructions.
