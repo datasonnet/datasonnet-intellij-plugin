@@ -6,6 +6,7 @@ import com.intellij.codeHighlighting.BackgroundEditorHighlighter;
 import com.intellij.icons.AllIcons;
 import com.intellij.json.JsonLanguage;
 import com.intellij.lang.Language;
+import com.intellij.lang.xml.XMLLanguage;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationListener;
@@ -22,6 +23,8 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
+import com.intellij.openapi.editor.ex.EditorEx;
+import com.intellij.openapi.editor.highlighter.EditorHighlighterFactory;
 import com.intellij.openapi.editor.markup.EffectType;
 import com.intellij.openapi.editor.markup.HighlighterTargetArea;
 import com.intellij.openapi.editor.markup.RangeHighlighter;
@@ -30,6 +33,7 @@ import com.intellij.openapi.fileEditor.*;
 import com.intellij.openapi.fileEditor.impl.text.PsiAwareTextEditorImpl;
 import com.intellij.openapi.fileEditor.impl.text.TextEditorProvider;
 import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.fileTypes.PlainTextLanguage;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.options.ShowSettingsUtil;
@@ -89,6 +93,8 @@ public class JsonnetEditor implements FileEditor {
 
     private JBTabsPaneImpl outputTabs;
     private JBTabsPaneImpl inputTabs;
+
+    private TabInfo previewTabInfo;
 
     private JsonnetEditorUI gui;
 
@@ -351,12 +357,12 @@ public class JsonnetEditor implements FileEditor {
 
     }
 
-    private String runPreviewBuiltIn() {
+    private com.datasonnet.Document runPreviewBuiltIn() {
         ScenarioManager manager = ScenarioManager.getInstance(project);
         Scenario currentScenario = manager.getCurrentScenario(getPsiFile().getVirtualFile().getCanonicalPath());
 
         if (currentScenario == null)
-            return "ERROR: No mapping scenarios available!";
+            return new StringDocument("ERROR: No mapping scenarios available!", "text/plain");
 
         String jsonnetScript = this.textEditor.getEditor().getDocument().getText();
 
@@ -390,9 +396,9 @@ public class JsonnetEditor implements FileEditor {
 
         try {
             Mapper mapper = new Mapper(jsonnetScript, variables.keySet(), true);
-            return mapper.transform(new StringDocument(payload, payloadMimeType), variables).contents();
+            return mapper.transform(new StringDocument(payload, payloadMimeType), variables);
         } catch (Exception e) {
-            return e.getMessage();
+            return new StringDocument(e.getMessage(), "text/plain");
         }
     }
 
@@ -510,7 +516,17 @@ public class JsonnetEditor implements FileEditor {
         JsonnetSettingsComponent mySettingsComponent = ServiceManager.getService(JsonnetSettingsComponent.class);
         boolean useBuiltIn = mySettingsComponent.getState().isBuiltInParser();
 
-        String preview = useBuiltIn ? runPreviewBuiltIn() : runPreviewExt();
+        final String contentType;
+        final String preview;
+
+        if (useBuiltIn) {
+            com.datasonnet.Document doc = runPreviewBuiltIn();
+            preview = doc.contents();
+            contentType = doc.mimeType();
+        } else {
+            preview = runPreviewExt();
+            contentType = "application/json";
+        }
 
         if (preview != null) {
             if (preview.startsWith("Problem")) {
@@ -545,10 +561,11 @@ public class JsonnetEditor implements FileEditor {
                 new WriteCommandAction.Simple(project, psiFile) {
                     @Override
                     protected void run() throws Throwable {
-                        editors.get("Preview").getDocument().setText(preview);
-                        PsiDocumentManager.getInstance(project).commitDocument(editors.get("Preview").getDocument());
-                        PsiFile previewPsiFile = PsiDocumentManager.getInstance(project).getPsiFile(editors.get("Preview").getDocument());
-                        CodeStyleManager.getInstance(project).reformat(previewPsiFile);
+                        updateOutputTab(preview, contentType);
+//                        editors.get("Preview").getDocument().setText(preview);
+//                        PsiDocumentManager.getInstance(project).commitDocument(editors.get("Preview").getDocument());
+//                        PsiFile previewPsiFile = PsiDocumentManager.getInstance(project).getPsiFile(editors.get("Preview").getDocument());
+//                        CodeStyleManager.getInstance(project).reformat(previewPsiFile);
                     }
                 }.execute();
             } catch (Exception e) {
@@ -556,8 +573,6 @@ public class JsonnetEditor implements FileEditor {
             }
 
         }
-
-
     }
 
     public Project getProject() {
@@ -577,6 +592,7 @@ public class JsonnetEditor implements FileEditor {
     }
 
     private void createOutputTab() {
+
         Icon icon = AllIcons.FileTypes.Json;
 
         Language language = JsonLanguage.INSTANCE;
@@ -589,17 +605,50 @@ public class JsonnetEditor implements FileEditor {
         Editor editor = EditorFactory.getInstance().createEditor(f.getViewProvider().getDocument(), getProject(), language.getAssociatedFileType(), true);
         editors.put(title, editor);
 
-        TabInfo tabInfo = new TabInfo(editor.getComponent());
-        tabInfo.setText(title);
-        tabInfo.setIcon(icon);
+        previewTabInfo = new TabInfo(editor.getComponent());
+        previewTabInfo.setText(title);
+        previewTabInfo.setIcon(icon);
 
         DefaultActionGroup actionGroup = new DefaultActionGroup();
         actionGroup.add(new AutoSyncAction(this));
         actionGroup.add(new RefreshAction(this));
-        tabInfo.setActions(actionGroup, "DataSonnetPreview");
+        previewTabInfo.setActions(actionGroup, "DataSonnetPreview");
 
         outputTabs.getTabs().getPresentation().setSideComponentVertical(true);
-        outputTabs.getTabs().addTab(tabInfo);
+        outputTabs.getTabs().addTab(previewTabInfo);
+    }
+
+    private void updateOutputTab(String contents, String mimeType) {
+        Icon icon;
+        Language language;
+
+        if ("application/json".equals(mimeType)) {
+            icon = AllIcons.FileTypes.Json;
+            language = JsonLanguage.INSTANCE;
+        } else if ("application/xml".equals(mimeType)) {
+            icon = AllIcons.FileTypes.Xml;
+            language = XMLLanguage.INSTANCE;
+        } else {
+            icon = AllIcons.FileTypes.Text;
+            language = PlainTextLanguage.INSTANCE;
+        }
+
+        String title = "Preview";
+        PsiFile f = PsiFileFactory.getInstance(getProject()).createFileFromText(language, "");
+        inputOutputFiles.put(title, f.getVirtualFile());
+
+        Editor editor = editors.get("Preview");
+        editor.getDocument().setText(contents);
+
+        FileType newType = language.getAssociatedFileType();
+        ((EditorEx) editor).setHighlighter(EditorHighlighterFactory.getInstance().createEditorHighlighter(project, newType));
+
+//        previewTabInfo.setComponent(editor.getComponent());
+        previewTabInfo.setIcon(icon);
+
+        PsiDocumentManager.getInstance(project).commitDocument(editor.getDocument());
+        PsiFile previewPsiFile = PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument());
+        CodeStyleManager.getInstance(project).reformat(previewPsiFile);
     }
 
     protected PsiFile getPsiFile() {
