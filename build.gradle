@@ -20,8 +20,8 @@ sourceSets {
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
-//    mavenLocal()
     maven {
         name "portx-repository-releases"
         url "https://portx.jfrog.io/portx/portx-snapshots"
@@ -40,7 +40,11 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
+    //compile group: 'com.datasonnet', name: 'datasonnet-mapper', version: '1.0.2-XML-Support-SNAPSHOT'
     compile group: 'com.datasonnet', name: 'datasonnet-mapper', version: '1.0.1-SNAPSHOT'
+}
+configurations {
+    compile.exclude group: 'org.slf4j'
 }
 
 gitVersioning {

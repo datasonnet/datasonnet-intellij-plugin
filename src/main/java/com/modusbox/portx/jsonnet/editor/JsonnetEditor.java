@@ -2,6 +2,7 @@ package com.modusbox.portx.jsonnet.editor;
 
 import com.datasonnet.Mapper;
 import com.datasonnet.StringDocument;
+import com.datasonnet.portx.spi.DataFormatPlugin;
 import com.intellij.codeHighlighting.BackgroundEditorHighlighter;
 import com.intellij.icons.AllIcons;
 import com.intellij.json.JsonLanguage;
@@ -106,6 +107,8 @@ public class JsonnetEditor implements FileEditor {
     DocumentListener refreshPreview;
 
     private boolean autoSync = false;
+
+    private String outputMimeType = "application/json";
 
     public JsonnetEditor(@NotNull Project project, @NotNull VirtualFile virtualFile, final TextEditorProvider provider) {
         this.project = project;
@@ -396,7 +399,7 @@ public class JsonnetEditor implements FileEditor {
 
         try {
             Mapper mapper = new Mapper(jsonnetScript, variables.keySet(), true);
-            return mapper.transform(new StringDocument(payload, payloadMimeType), variables);
+            return mapper.transform(new StringDocument(payload, payloadMimeType), variables, outputMimeType);
         } catch (Exception e) {
             return new StringDocument(e.getMessage(), "text/plain");
         }
@@ -424,6 +427,7 @@ public class JsonnetEditor implements FileEditor {
             panel.createActionLabel("Configure Jsonnet path", new Runnable() {
                 @Override
                 public void run() {
+                    editors.get("Preview").setHeaderComponent(null);
                     ShowSettingsUtil.getInstance().showSettingsDialog(project, "datasonnet");
                 }
             });
@@ -562,10 +566,6 @@ public class JsonnetEditor implements FileEditor {
                     @Override
                     protected void run() throws Throwable {
                         updateOutputTab(preview, contentType);
-//                        editors.get("Preview").getDocument().setText(preview);
-//                        PsiDocumentManager.getInstance(project).commitDocument(editors.get("Preview").getDocument());
-//                        PsiFile previewPsiFile = PsiDocumentManager.getInstance(project).getPsiFile(editors.get("Preview").getDocument());
-//                        CodeStyleManager.getInstance(project).reformat(previewPsiFile);
                     }
                 }.execute();
             } catch (Exception e) {
@@ -592,30 +592,7 @@ public class JsonnetEditor implements FileEditor {
     }
 
     private void createOutputTab() {
-
-        Icon icon = AllIcons.FileTypes.Json;
-
-        Language language = JsonLanguage.INSTANCE;
-
-        String title = "Preview";
-
-        PsiFile f = PsiFileFactory.getInstance(getProject()).createFileFromText(language, "");
-        inputOutputFiles.put(title, f.getVirtualFile());
-
-        Editor editor = EditorFactory.getInstance().createEditor(f.getViewProvider().getDocument(), getProject(), language.getAssociatedFileType(), true);
-        editors.put(title, editor);
-
-        previewTabInfo = new TabInfo(editor.getComponent());
-        previewTabInfo.setText(title);
-        previewTabInfo.setIcon(icon);
-
-        DefaultActionGroup actionGroup = new DefaultActionGroup();
-        actionGroup.add(new AutoSyncAction(this));
-        actionGroup.add(new RefreshAction(this));
-        previewTabInfo.setActions(actionGroup, "DataSonnetPreview");
-
-        outputTabs.getTabs().getPresentation().setSideComponentVertical(true);
-        outputTabs.getTabs().addTab(previewTabInfo);
+        updateOutputTab("", "application/json");
     }
 
     private void updateOutputTab(String contents, String mimeType) {
@@ -634,21 +611,34 @@ public class JsonnetEditor implements FileEditor {
         }
 
         String title = "Preview";
-        PsiFile f = PsiFileFactory.getInstance(getProject()).createFileFromText(language, "");
+        PsiFile f = PsiFileFactory.getInstance(getProject()).createFileFromText(language, contents);
         inputOutputFiles.put(title, f.getVirtualFile());
 
-        Editor editor = editors.get("Preview");
+        Editor editor = EditorFactory.getInstance().createEditor(f.getViewProvider().getDocument(), getProject(), language.getAssociatedFileType(), true);
+        editors.put(title, editor);
         editor.getDocument().setText(contents);
 
         FileType newType = language.getAssociatedFileType();
         ((EditorEx) editor).setHighlighter(EditorHighlighterFactory.getInstance().createEditorHighlighter(project, newType));
-
-//        previewTabInfo.setComponent(editor.getComponent());
-        previewTabInfo.setIcon(icon);
+        ((EditorEx) editor).setFile(f.getVirtualFile());
 
         PsiDocumentManager.getInstance(project).commitDocument(editor.getDocument());
         PsiFile previewPsiFile = PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument());
         CodeStyleManager.getInstance(project).reformat(previewPsiFile);
+
+        outputTabs.getTabs().getPresentation().setSideComponentVertical(true);
+
+        outputTabs.removeTabAt(outputTabs.getTabs().getIndexOf(previewTabInfo));
+        previewTabInfo = new TabInfo(editor.getComponent());
+        previewTabInfo.setText(title);
+        previewTabInfo.setIcon(icon);
+
+        DefaultActionGroup actionGroup = new DefaultActionGroup();
+        actionGroup.add(new AutoSyncAction(this));
+        actionGroup.add(new RefreshAction(this));
+        actionGroup.add(new SelectOutputMimeTypeAction());
+        previewTabInfo.setActions(actionGroup, "DataSonnetPreview");
+        outputTabs.getTabs().addTab(previewTabInfo);
     }
 
     protected PsiFile getPsiFile() {
@@ -777,6 +767,74 @@ public class JsonnetEditor implements FileEditor {
                 });
             }
 
+        }
+    }
+
+    private class SelectOutputMimeTypeAction extends AnAction {
+        public SelectOutputMimeTypeAction() {
+            super(null, "Select Output Mime Type", IconLoader.findIcon("/icons/selectScenario.svg"));
+        }
+
+        @Override
+        public void update(@NotNull final AnActionEvent e) {
+            JsonnetSettingsComponent mySettingsComponent = ServiceManager.getService(JsonnetSettingsComponent.class);
+            boolean useBuiltIn = mySettingsComponent.getState().isBuiltInParser();
+            e.getPresentation().setEnabled(useBuiltIn);
+        }
+
+        @Override
+        public void actionPerformed(AnActionEvent e) {
+            DefaultActionGroup group = new DefaultActionGroup();
+
+            group.add(new ToggleMimeType("JSON", "application/json"));
+
+            ServiceLoader<DataFormatPlugin> loader = ServiceLoader.load(DataFormatPlugin.class, Mapper.class.getClassLoader());
+            Iterator<DataFormatPlugin> plugins = loader.iterator();
+
+            while (plugins.hasNext()) {
+                DataFormatPlugin plugin = plugins.next();
+
+                final String dataFormatId = plugin.getPluginId();
+                final String mimeType = plugin.getSupportedMimeTypes()[0];
+
+                group.add(new ToggleMimeType(dataFormatId, mimeType));
+            }
+
+            final InputEvent inputEvent = e.getInputEvent();
+            final ActionPopupMenu popupMenu =
+                    ((ActionManagerImpl) ActionManager.getInstance())
+                            .createActionPopupMenu(ToolWindowContentUi.POPUP_PLACE, group, new MenuItemPresentationFactory(false));
+
+            int x = 0;
+            int y = 0;
+            if (inputEvent instanceof MouseEvent) {
+                x = ((MouseEvent) inputEvent).getX();
+                y = ((MouseEvent) inputEvent).getY();
+            }
+            popupMenu.getComponent().show(inputEvent.getComponent(), x, y);
+        }
+
+        class ToggleMimeType extends ToggleAction {
+            ToggleMimeType(String format, String mimeType) {
+                super(format, mimeType, null);
+            }
+            @Override
+            public void update(@NotNull final AnActionEvent e) {
+                JsonnetSettingsComponent mySettingsComponent = ServiceManager.getService(JsonnetSettingsComponent.class);
+                boolean useBuiltIn = mySettingsComponent.getState().isBuiltInParser();
+                e.getPresentation().setEnabled(useBuiltIn);
+            }
+            @Override
+            public boolean isSelected(@NotNull AnActionEvent e) {
+                String mimeType = e.getPresentation().getDescription();
+                return mimeType.equalsIgnoreCase(JsonnetEditor.this.outputMimeType);
+            }
+
+            @Override
+            public void setSelected(@NotNull AnActionEvent e, boolean state) {
+                JsonnetEditor.this.outputMimeType = e.getPresentation().getDescription();
+                JsonnetEditor.this.runPreview(true);
+            }
         }
     }
 }
