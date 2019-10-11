@@ -1,6 +1,6 @@
 <idea-plugin version="2">
-    <id>com.modusbox.portx.jsonnet</id>
-    <name>Datasonnet Mapper</name>
+    <id>com.modusbox.portx.datasonnet</id>
+    <name>DataSonnet Mapper</name>
     <version>0.1</version>
     <vendor email="eugene.berman@modusbox.com" url="">Eugene Berman</vendor>
     <description><![CDATA[
@@ -29,21 +29,24 @@
 
     <extensions defaultExtensionNs="com.intellij">
 
-        <fileEditorProvider implementation="com.modusbox.portx.jsonnet.editor.JsonnetEditorProvider"/>
-        <fileTypeFactory implementation="com.modusbox.portx.jsonnet.language.JsonnetFileTypeFactory"/>
+        <fileEditorProvider implementation="com.modusbox.portx.datasonnet.editor.DataSonnetEditorProvider"/>
+        <fileTypeFactory implementation="com.modusbox.portx.datasonnet.language.DataSonnetFileTypeFactory"/>
 
-        <projectConfigurable groupId="tools" displayName="Datasonnet" id="com.modusbox.portx.jsonnet.configurable"
-                             instance="com.modusbox.portx.jsonnet.config.JsonnetConfigurable" nonDefaultProject="true"/>
-        <applicationService serviceImplementation="com.modusbox.portx.jsonnet.config.JsonnetSettingsComponent"/>
-        <projectService serviceImplementation="com.modusbox.portx.jsonnet.config.JsonnetProjectSettingsComponent"/>
+        <fileType name="DataSonnet" implementationClass="com.modusbox.portx.datasonnet.language.DataSonnetFileType"
+                  fieldName="INSTANCE" language="Datasonnet" extensions="ds"/>
 
-        <lang.parserDefinition language="Datasonnet" implementationClass="com.modusbox.portx.jsonnet.language.JsonnetParserDefinition"/>
-        <lang.syntaxHighlighterFactory language="Datasonnet" implementationClass="com.modusbox.portx.jsonnet.language.JsonnetSyntaxHighlighterFactory"/>
-        <fileTypeFactory implementation="com.modusbox.portx.jsonnet.language.JsonnetFileTypeFactory"/>
-        <lang.commenter language="Datasonnet" implementationClass="com.modusbox.portx.jsonnet.language.JsonnetCommenter"/>
-        <completion.contributor language="Datasonnet" implementationClass="com.modusbox.portx.jsonnet.language.JsonnetCompletionContributor"/>
-        <lang.foldingBuilder language="Datasonnet" implementationClass="com.modusbox.portx.jsonnet.language.JsonnetFoldingBuilder"/>
-        <psi.referenceContributor implementation="com.modusbox.portx.jsonnet.language.JsonnetReferenceContributor"/>
+        <projectConfigurable groupId="tools" displayName="DataSonnet" id="com.modusbox.portx.datasonnet.configurable"
+                             instance="com.modusbox.portx.datasonnet.config.DataSonnetConfigurable" nonDefaultProject="true"/>
+        <applicationService serviceImplementation="com.modusbox.portx.datasonnet.config.DataSonnetSettingsComponent"/>
+        <projectService serviceImplementation="com.modusbox.portx.datasonnet.config.DataSonnetProjectSettingsComponent"/>
+
+        <lang.parserDefinition language="Datasonnet" implementationClass="com.modusbox.portx.datasonnet.language.DataSonnetParserDefinition"/>
+        <lang.syntaxHighlighterFactory language="Datasonnet" implementationClass="com.modusbox.portx.datasonnet.language.DataSonnetSyntaxHighlighterFactory"/>
+        <fileTypeFactory implementation="com.modusbox.portx.datasonnet.language.DataSonnetFileTypeFactory"/>
+        <lang.commenter language="Datasonnet" implementationClass="com.modusbox.portx.datasonnet.language.DataSonnetCommenter"/>
+        <completion.contributor language="Datasonnet" implementationClass="com.modusbox.portx.datasonnet.language.DataSonnetCompletionContributor"/>
+        <lang.foldingBuilder language="Datasonnet" implementationClass="com.modusbox.portx.datasonnet.language.DataSonnetFoldingBuilder"/>
+        <psi.referenceContributor implementation="com.modusbox.portx.datasonnet.language.DataSonnetReferenceContributor"/>
 
         <!--<configurationType implementation="org.mule.tooling.lang.dw.launcher.configuration.WeaveConfigurationType"/>-->
         <!--<runConfigurationProducer implementation="org.mule.tooling.lang.dw.launcher.configuration.WeaveConfigurationProducer"/>-->
@@ -74,21 +77,21 @@
         <!--<programRunner id="WeaveDebug" implementation="org.mule.tooling.lang.dw.debug.WeaveDebuggerRunner" order="last"/>-->
 
 
-        <!--<lang.substitutor implementationClass="org.mule.tooling.lang.dw.editor.JsonnetEditor$WeaveIOSubstitutor" language="JSON"/>-->
-        <!--<lang.substitutor implementationClass="org.mule.tooling.lang.dw.editor.JsonnetEditor$WeaveIOSubstitutor" language="XML"/>-->
-        <!--<lang.substitutor implementationClass="org.mule.tooling.lang.dw.editor.JsonnetEditor$WeaveIOSubstitutor" language="TEXT"/>-->
+        <!--<lang.substitutor implementationClass="org.mule.tooling.lang.dw.editor.DataSonnetEditor$WeaveIOSubstitutor" language="JSON"/>-->
+        <!--<lang.substitutor implementationClass="org.mule.tooling.lang.dw.editor.DataSonnetEditor$WeaveIOSubstitutor" language="XML"/>-->
+        <!--<lang.substitutor implementationClass="org.mule.tooling.lang.dw.editor.DataSonnetEditor$WeaveIOSubstitutor" language="TEXT"/>-->
 
     </extensions>
 
     <project-components>
         <component>
-            <implementation-class>com.modusbox.portx.jsonnet.editor.ScenarioManager</implementation-class>
+            <implementation-class>com.modusbox.portx.datasonnet.editor.ScenarioManager</implementation-class>
         </component>
     </project-components>
 
     <application-components>
         <!--<component>-->
-            <!--<implementation-class>com.modusbox.portx.jsonnet.config.JsonnetSettingsComponent</implementation-class>-->
+            <!--<implementation-class>com.modusbox.portx.datasonnet.config.DataSonnetSettingsComponent</implementation-class>-->
         <!--</component>-->
     </application-components>
 
