@@ -90,16 +90,6 @@ public class DataSonnetCompletionContributor extends CompletionContributor {
                     }
                 }
         );
-        extend(CompletionType.BASIC,
-                PlatformPatterns.psiElement(DataSonnetTypes.DOT).withLanguage(DataSonnetLanguage.INSTANCE),
-                new CompletionProvider<CompletionParameters>() {
-                    public void addCompletions(@NotNull CompletionParameters parameters,
-                                               ProcessingContext context,
-                                               @NotNull CompletionResultSet resultSet) {
-                        resultSet.addElement(LookupElementBuilder.create("ZHOOOOPAAAA"));
-                    }
-                }
-        );
 
     }
 
