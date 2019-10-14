@@ -17,8 +17,8 @@ phases:
           refs/tags/*) export VERSIONING_GIT_TAG=${CODEBUILD_WEBHOOK_HEAD_REF#refs/tags/} ;;
         esac
       - ./gradlew :version -q
-      - ./gradlew test
-      - ./gradlew buildPlugin
+      - ./gradlew -q test
+      - ./gradlew -q buildPlugin
       - |
         case "$CODEBUILD_WEBHOOK_TRIGGER" in
           pr/*) echo "pull request, not uploaded" ;;
