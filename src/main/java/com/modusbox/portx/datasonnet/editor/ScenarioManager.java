@@ -150,30 +150,11 @@ public class ScenarioManager  extends AbstractProjectComponent implements Dispos
 
                 final VirtualFile dataSonnetInputsFile = testdataSonnetInputs;
 
-                final Application app = ApplicationManager.getApplication();
-                Runnable action = new Runnable() {
-                    @Override
-                    public void run() {
-                        app.runWriteAction(new Runnable() {
-                            @Override
-                            public void run() {
-                                ModifiableRootModel model = ModuleRootManager.getInstance(module).getModifiableModel();
-                                ContentEntry[] entries = model.getContentEntries();
-                                for (ContentEntry entry : entries) {
-                                    if (entry.getFile() == moduleRoot)
-                                        entry.addSourceFolder(dataSonnetInputsFile, true);
-                                }
-                                model.commit();
-                            }
-                        });
-                    }
-                };
-
-                if (app.isDispatchThread()) {
-                    action.run();
-                }
-                else {
-                    app.invokeAndWait(action, ModalityState.current());
+                ModifiableRootModel model = ModuleRootManager.getInstance(module).getModifiableModel();
+                ContentEntry[] entries = model.getContentEntries();
+                for (ContentEntry entry : entries) {
+                    if (entry.getFile() == moduleRoot)
+                        entry.addSourceFolder(dataSonnetInputsFile, true);
                 }
 
                 dataSonnetInputsFolders.put(moduleName, testdataSonnetInputs);
@@ -182,7 +163,6 @@ public class ScenarioManager  extends AbstractProjectComponent implements Dispos
                 e.printStackTrace();
             }
         }
-
 
         return null;
     }

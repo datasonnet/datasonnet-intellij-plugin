@@ -6,5 +6,5 @@ import com.intellij.openapi.util.IconLoader;
 import javax.swing.*;
 
 public class DataSonnetIcon {
-    public static final Icon FILE = IconLoader.getIcon("/icons/dataSonnet.png");
+    public static final Icon FILE = IconLoader.getIcon("/icons/dataSonnet.svg");
 }

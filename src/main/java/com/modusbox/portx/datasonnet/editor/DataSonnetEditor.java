@@ -256,16 +256,34 @@ public class DataSonnetEditor implements FileEditor {
 
             //TODO - list scenarios for file, if there are any, load first one and display
             ScenarioManager manager = ScenarioManager.getInstance(project);
-            java.util.List<Scenario> scenarios = manager.getScenariosFor(psiFile);
-            if (!scenarios.isEmpty()) {
-                Scenario first = scenarios.get(0);
-                manager.setCurrentScenario(psiFile.getVirtualFile().getCanonicalPath(), first);
-                loadScenario(first);
-                gui.getInputsSplitter().setEnabled(true);
-                gui.getInputsSplitter().setProportion(0.3f);
-            } else {
-                gui.getInputsSplitter().setEnabled(false);
-                gui.getInputsSplitter().setProportion(0);
+
+            final Application app = ApplicationManager.getApplication();
+            Runnable action = new Runnable() {
+                @Override
+                public void run() {
+                    app.runWriteAction(new Runnable() {
+                        @Override
+                        public void run() {
+                            java.util.List<Scenario> scenarios = manager.getScenariosFor(psiFile);
+                            if (!scenarios.isEmpty()) {
+                                Scenario first = scenarios.get(0);
+                                manager.setCurrentScenario(psiFile.getVirtualFile().getCanonicalPath(), first);
+                                loadScenario(first);
+                                gui.getInputsSplitter().setEnabled(true);
+                                gui.getInputsSplitter().setProportion(0.3f);
+                            } else {
+                                gui.getInputsSplitter().setEnabled(false);
+                                gui.getInputsSplitter().setProportion(0);
+                            }
+                        }
+                    });
+                }
+            };
+            if (app.isDispatchThread()) {
+                action.run();
+            }
+            else {
+                app.invokeAndWait(action, ModalityState.current());
             }
 
             createOutputTab();
