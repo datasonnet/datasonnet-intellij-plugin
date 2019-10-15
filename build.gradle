@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.jetbrains.intellij' version '0.4.9'
+    id 'org.jetbrains.intellij' version '0.4.10'
     id "org.datlowe.maven-publish-auth" version "2.0.2"
     id 'me.qoomon.git-versioning' version '1.2.3'
 }
