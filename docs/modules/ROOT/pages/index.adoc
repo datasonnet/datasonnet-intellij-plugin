@@ -6,7 +6,7 @@ It's a great way to start experimenting with DataSonnet in an easy interface, in
 
 == Installation
 
-First, download the plugin from https://datasonnet.s3-us-west-2.amazonaws.com/intellij/datasonnet-intellij-plugin-1.0-SNAPSHOT.zip .
+First, download the plugin from https://datasonnet.s3-us-west-2.amazonaws.com/intellij/datasonnet-intellij-plugin-1.0.1-SNAPSHOT.zip .
 Then, open your IntelliJ preferences.
 In them, click on the Plugins section.
 Choose “Install plugin from disk”, select the downloaded zip file, then follow the instructions through restarting IntelliJ.
