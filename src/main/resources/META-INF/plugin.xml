@@ -97,6 +97,11 @@
 
 
     <actions>
+        <action id="DataSonnet.CreateNewFileAction"
+                class="com.modusbox.portx.datasonnet.actions.CreateNewFileAction" text="DataSonnet File"
+                description="Create New DataSonnet File">
+            <add-to-group group-id="NewGroup" anchor="first"/>
+        </action>
 
     </actions>
 
