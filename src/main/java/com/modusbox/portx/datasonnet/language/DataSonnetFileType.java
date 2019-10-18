@@ -17,13 +17,13 @@ public class DataSonnetFileType extends LanguageFileType {
     @NotNull
     @Override
     public String getName() {
-        return "Datasonnet file";
+        return "DataSonnet";
     }
 
     @NotNull
     @Override
     public String getDescription() {
-        return "Datasonnet language file";
+        return "DataSonnet language file";
     }
 
     @NotNull

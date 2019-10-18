@@ -391,7 +391,6 @@ public class DataSonnetEditor implements FileEditor {
 
         String dataSonnetScript = this.textEditor.getEditor().getDocument().getText();
 
-        //String tlf = "function(payload";
         String payload = "{}";
 
         Map<String, VirtualFile> inputFiles = currentScenario.getInputFiles();
@@ -410,18 +409,22 @@ public class DataSonnetEditor implements FileEditor {
                 }
                 else {
                     variables.put(f.getKey(), new StringDocument(contents, getMimeTypeByExtension(f.getValue().getExtension())));
-                    //tlf = tlf + ", " + f.getKey();
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
 
-        //tlf = tlf + ") " + dataSonnetScript;
-
         try {
+            ClassLoader currentCL = Thread.currentThread().getContextClassLoader();
+            Thread.currentThread().setContextClassLoader(Mapper.class.getClassLoader());
+
             Mapper mapper = new Mapper(dataSonnetScript, variables.keySet(), true);
-            return mapper.transform(new StringDocument(payload, payloadMimeType), variables, outputMimeType);
+            com.datasonnet.Document transformDoc = mapper.transform(new StringDocument(payload, payloadMimeType), variables, outputMimeType);
+
+            Thread.currentThread().setContextClassLoader(currentCL);
+
+            return transformDoc;
         } catch (Exception e) {
             return new StringDocument(e.getMessage(), "text/plain");
         }
