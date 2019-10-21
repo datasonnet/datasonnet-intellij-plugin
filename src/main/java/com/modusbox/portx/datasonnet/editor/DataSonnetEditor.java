@@ -41,10 +41,10 @@ import com.intellij.openapi.fileTypes.PlainTextLanguage;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.options.ShowSettingsUtil;
+import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ContentEntry;
-import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.roots.ui.configuration.ProjectSettingsService;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.IconLoader;
@@ -52,9 +52,14 @@ import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileVisitor;
 import com.intellij.openapi.wm.impl.content.ToolWindowContentUi;
 import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.CodeStyleManager;
+import com.intellij.psi.util.CachedValueProvider;
+import com.intellij.psi.util.CachedValuesManager;
+import com.intellij.psi.util.ParameterizedCachedValue;
+import com.intellij.psi.util.ParameterizedCachedValueProvider;
 import com.intellij.ui.EditorNotificationPanel;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.JBTabsPaneImpl;
@@ -63,7 +68,6 @@ import com.intellij.util.Alarm;
 import com.modusbox.portx.datasonnet.config.DataSonnetProjectSettingsComponent;
 import com.modusbox.portx.datasonnet.config.DataSonnetSettingsComponent;
 import com.modusbox.portx.datasonnet.language.DataSonnetFileType;
-import com.modusbox.portx.datasonnet.language.psi.DataSonnetFile;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -78,6 +82,8 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.*;
 
@@ -114,6 +120,8 @@ public class DataSonnetEditor implements FileEditor {
     private boolean autoSync = false;
 
     private String outputMimeType = "application/json";
+
+    private static final Key<ParameterizedCachedValue<Map<String, String>, VirtualFile>> DS_LIBRARIES_KEY = Key.create("DS_LIBRARIES");
 
     public DataSonnetEditor(@NotNull Project project, @NotNull VirtualFile virtualFile, final TextEditorProvider provider) {
         this.project = project;
@@ -415,11 +423,13 @@ public class DataSonnetEditor implements FileEditor {
             }
         }
 
+        Map<String, String> libraries = getDSLibraries(this.textEditor.getFile());
+
         try {
             ClassLoader currentCL = Thread.currentThread().getContextClassLoader();
             Thread.currentThread().setContextClassLoader(Mapper.class.getClassLoader());
 
-            Mapper mapper = new Mapper(dataSonnetScript, variables.keySet(), true);
+            Mapper mapper = new Mapper(dataSonnetScript, variables.keySet(), libraries,true);
             com.datasonnet.Document transformDoc = mapper.transform(new StringDocument(payload, payloadMimeType), variables, outputMimeType);
 
             Thread.currentThread().setContextClassLoader(currentCL);
@@ -770,6 +780,49 @@ public class DataSonnetEditor implements FileEditor {
         }
 
         return inputMimeType;
+    }
+
+    private class DSLibrariesCachedProvider implements ParameterizedCachedValueProvider<Map<String, String>, VirtualFile> {
+        @Nullable
+        @Override
+        public CachedValueProvider.Result<Map<String, String>> compute(VirtualFile mappingFile) {
+            try {
+                Map<String, String> result = new HashMap<>();
+
+                Path parentPath = Paths.get(mappingFile.getParent().getPath());
+
+                VfsUtil.visitChildrenRecursively(mappingFile.getParent(), new VirtualFileVisitor<Object>(VirtualFileVisitor.NO_FOLLOW_SYMLINKS) {
+                    @Override
+                    public boolean visitFile(@NotNull VirtualFile file) {
+                        if ("libsonnet".equalsIgnoreCase(file.getExtension())) {
+                            try {
+                                Path filePath = Paths.get(file.getPath());
+                                result.put(parentPath.relativize(filePath).toString(), VfsUtil.loadText(file));
+                            } catch (IOException e) {
+                                //e.printStackTrace();
+                            }
+                        }
+                        return true;
+                    }
+                });
+                return new CachedValueProvider.Result(result, mappingFile);
+            } catch (ProcessCanceledException pce) {
+                throw pce;
+            } catch (Exception e) {
+                //e.printStackTrace();
+                return null;
+            }
+        }
+    }
+
+    @NotNull
+    private Map<String, String> getDSLibraries(@NotNull final VirtualFile ds) throws ProcessCanceledException {
+        final Project project = module.getProject();
+        final CachedValuesManager manager = CachedValuesManager.getManager(project);
+
+        final Map<String, String> libraries = manager.getParameterizedCachedValue(module, DS_LIBRARIES_KEY, new DSLibrariesCachedProvider(), false, ds);
+
+        return libraries == null ? Collections.<String, String>emptyMap() : libraries;
     }
 
     private class SelectScenarioAction extends AnAction {

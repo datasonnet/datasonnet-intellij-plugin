@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 public class ScenarioManager  extends AbstractProjectComponent implements Disposable {
 
     public static final String INTEGRATION_TEST_FOLDER_NAME = "mapping-tests";
-    public static final String INTEGRATION_TEST_FOLDER_PATH = "src/test/mapping-tests";
+    public static final String INTEGRATION_TEST_FOLDER_PATH = "src/test/resources/mapping-tests";
     public static final String NO_SCENARIO = "No scenario";
     public static final String DEFAULT_SCENARIO_NAME = "default_scenario";
 
@@ -144,6 +144,9 @@ public class ScenarioManager  extends AbstractProjectComponent implements Dispos
                     VirtualFile testDir = srcDir.findFileByRelativePath("test");
                     if (testDir == null)
                         testDir = srcDir.createChildDirectory(this, "test");
+                    testDir = testDir.findFileByRelativePath("resources");
+                    if (testDir == null)
+                        testDir = testDir.createChildDirectory(this, "resources");
                     //Create it here
                     testdataSonnetInputs = testDir.createChildDirectory(this, INTEGRATION_TEST_FOLDER_NAME);
                 }
