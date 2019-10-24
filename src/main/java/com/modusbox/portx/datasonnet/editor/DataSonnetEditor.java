@@ -41,10 +41,8 @@ import com.intellij.openapi.fileTypes.PlainTextLanguage;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.options.ShowSettingsUtil;
-import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
-import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.roots.ui.configuration.ProjectSettingsService;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.IconLoader;
@@ -52,14 +50,15 @@ import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.VirtualFileVisitor;
 import com.intellij.openapi.wm.impl.content.ToolWindowContentUi;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiDocumentManager;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiFileFactory;
+import com.intellij.psi.PsiManager;
 import com.intellij.psi.codeStyle.CodeStyleManager;
-import com.intellij.psi.util.CachedValueProvider;
-import com.intellij.psi.util.CachedValuesManager;
+import com.intellij.psi.search.FilenameIndex;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.ParameterizedCachedValue;
-import com.intellij.psi.util.ParameterizedCachedValueProvider;
 import com.intellij.ui.EditorNotificationPanel;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.JBTabsPaneImpl;
@@ -82,10 +81,8 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 
 /**
  * Created by eberman on 11/3/16.
@@ -631,6 +628,7 @@ public class DataSonnetEditor implements FileEditor {
     }
 
     private void updateOutputTab(String contents, String mimeType) {
+
         Icon icon;
         Language language;
 
@@ -782,47 +780,38 @@ public class DataSonnetEditor implements FileEditor {
         return inputMimeType;
     }
 
-    private class DSLibrariesCachedProvider implements ParameterizedCachedValueProvider<Map<String, String>, VirtualFile> {
-        @Nullable
-        @Override
-        public CachedValueProvider.Result<Map<String, String>> compute(VirtualFile mappingFile) {
+    @NotNull
+    private Map<String, String> getDSLibraries(@NotNull final VirtualFile ds) {
+        Map<String, String> libraries = new HashMap();
+
+        Collection<VirtualFile> libs = FilenameIndex.getAllFilesByExt(project, "libsonnet", GlobalSearchScope.allScope(project));
+        for (VirtualFile nextLib : libs) {
             try {
-                Map<String, String> result = new HashMap<>();
+                String content = VfsUtil.loadText(nextLib);
+                String path = nextLib.getPath();
+                if (path.toLowerCase().contains(".jar!")) {
+                    path = path.substring(path.lastIndexOf("!") + 1);
+                } else {
+                    List<VirtualFile> roots = new ArrayList(Arrays.asList(ModuleRootManager.getInstance(module).getSourceRoots()));
+                    roots.addAll(Arrays.asList(ModuleRootManager.getInstance(module).getContentRoots()));
 
-                Path parentPath = Paths.get(mappingFile.getParent().getPath());
-
-                VfsUtil.visitChildrenRecursively(mappingFile.getParent(), new VirtualFileVisitor<Object>(VirtualFileVisitor.NO_FOLLOW_SYMLINKS) {
-                    @Override
-                    public boolean visitFile(@NotNull VirtualFile file) {
-                        if ("libsonnet".equalsIgnoreCase(file.getExtension())) {
-                            try {
-                                Path filePath = Paths.get(file.getPath());
-                                result.put(parentPath.relativize(filePath).toString(), VfsUtil.loadText(file));
-                            } catch (IOException e) {
-                                //e.printStackTrace();
-                            }
+                    for (VirtualFile root : roots) {
+                        if (path.startsWith(root.getPath())) {
+                            path = path.replace(root.getPath(), "");
+                            break;
                         }
-                        return true;
                     }
-                });
-                return new CachedValueProvider.Result(result, mappingFile);
-            } catch (ProcessCanceledException pce) {
-                throw pce;
-            } catch (Exception e) {
-                //e.printStackTrace();
-                return null;
+                }
+                if (path.startsWith("/")) {
+                    path = path.substring(1);
+                }
+                libraries.put(path, content);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
-    }
 
-    @NotNull
-    private Map<String, String> getDSLibraries(@NotNull final VirtualFile ds) throws ProcessCanceledException {
-        final Project project = module.getProject();
-        final CachedValuesManager manager = CachedValuesManager.getManager(project);
-
-        final Map<String, String> libraries = manager.getParameterizedCachedValue(module, DS_LIBRARIES_KEY, new DSLibrariesCachedProvider(), false, ds);
-
-        return libraries == null ? Collections.<String, String>emptyMap() : libraries;
+        return libraries;
     }
 
     private class SelectScenarioAction extends AnAction {
