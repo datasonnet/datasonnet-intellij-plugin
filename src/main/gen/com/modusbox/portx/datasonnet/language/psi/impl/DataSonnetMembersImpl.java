@@ -11,14 +11,14 @@ import static com.modusbox.portx.datasonnet.language.psi.DataSonnetTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.modusbox.portx.datasonnet.language.psi.*;
 
-public class DataSonnetParamImpl extends ASTWrapperPsiElement implements DataSonnetParam {
+public class DataSonnetMembersImpl extends ASTWrapperPsiElement implements DataSonnetMembers {
 
-  public DataSonnetParamImpl(@NotNull ASTNode node) {
+  public DataSonnetMembersImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull DataSonnetVisitor visitor) {
-    visitor.visitParam(this);
+    visitor.visitMembers(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -28,14 +28,8 @@ public class DataSonnetParamImpl extends ASTWrapperPsiElement implements DataSon
 
   @Override
   @NotNull
-  public DataSonnetIdentifier0 getIdentifier0() {
-    return findNotNullChildByClass(DataSonnetIdentifier0.class);
-  }
-
-  @Override
-  @Nullable
-  public DataSonnetExpr getExpr() {
-    return findChildByClass(DataSonnetExpr.class);
+  public List<DataSonnetMember> getMemberList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, DataSonnetMember.class);
   }
 
 }

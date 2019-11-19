@@ -25,7 +25,40 @@ public class DataSonnetIdentifierReference extends PsiReferenceBase<PsiElement> 
         String identifier = this.getElement().getText();
         PsiElement element = this.getElement();
         while (element != null) {
-            if (element instanceof DataSonnetOuterlocal) {
+            if (element instanceof DataSonnetSelect) {
+                List<DataSonnetIdentifier0> selectList = new ArrayList<>();
+                for (DataSonnetSelect select : ((DataSonnetExpr)element.getParent()).getSelectList()) {
+                    if (select == element) {
+                        break;
+                    }
+                    selectList.add(select.getIdentifier0());
+                }
+                DataSonnetObj obj = DataSonnetCompletionContributor.resolveExprToObj(
+                        (DataSonnetExpr)element.getParent(),
+                        new ArrayList<>(),
+                        selectList
+                );
+                if (obj != null){
+
+                    if (obj.getObjinside() != null && obj.getObjinside().getMembers() != null){
+                        String lastSelectText = ((DataSonnetSelect) element).getIdentifier0().getText();
+                        DataSonnetMembers members = obj.getObjinside().getMembers();
+                        for(DataSonnetMember m: members.getMemberList()){
+                            if (m.getField() != null){
+                                DataSonnetIdentifier0 ident = m.getField().getFieldname().getIdentifier0();
+                                if (ident != null && ident.getText().equals(lastSelectText)){
+                                    results.add(new PsiElementResolveResult(m.getField().getFieldname().getIdentifier0()));
+                                    return results.toArray(new ResolveResult[results.size()]);
+                                }
+                            }
+                        }
+                    }
+
+                    results.add(new PsiElementResolveResult(obj));
+                    return results.toArray(new ResolveResult[results.size()]);
+                }
+
+            } else if (element instanceof DataSonnetOuterlocal) {
                 List<DataSonnetBind> binds = findBindInOuterLocal((DataSonnetOuterlocal) element);
                 for (DataSonnetBind b: binds) {
                     if (identifier.equals(findIdentifierFromBind(b))) {
@@ -42,22 +75,37 @@ public class DataSonnetIdentifierReference extends PsiReferenceBase<PsiElement> 
                     }
                 }
             }else if (element instanceof DataSonnetObjinside) {
-                List<DataSonnetObjlocal> locals = ((DataSonnetObjinside)element).getObjlocalList();
-                for (DataSonnetMember m: ((DataSonnetObjinside)element).getMemberList()){
-                    if (m.getObjlocal() != null){
-                        locals.add(m.getObjlocal());
+
+                List<DataSonnetObjlocal> locals = new ArrayList<>(((DataSonnetObjinside) element).getObjlocalList());
+                DataSonnetMembers members = ((DataSonnetObjinside) element).getMembers();
+                if (members != null) {
+                    for (DataSonnetMember m : members.getMemberList()) {
+                        if (m.getObjlocal() != null) {
+                            locals.add(m.getObjlocal());
+                        }
                     }
                 }
-                for (DataSonnetObjlocal local: locals) {
+                for (DataSonnetObjlocal local : locals) {
                     DataSonnetBind b = local.getBind();
                     if (identifier.equals(findIdentifierFromBind(b))) {
                         results.add(new PsiElementResolveResult(b));
                         return results.toArray(new ResolveResult[results.size()]);
                     }
                 }
+
+                DataSonnetCompspec comp = ((DataSonnetObjinside) element).getCompspec();
+                DataSonnetForspec forspec = ((DataSonnetObjinside) element).getForspec();
+                if (findComprehensionBinding(results, identifier, comp, forspec))
+                    return results.toArray(new ResolveResult[results.size()]);
+
+            }else if (element instanceof DataSonnetArrcomp){
+                DataSonnetCompspec comp = ((DataSonnetArrcomp) element).getCompspec();
+                DataSonnetForspec forspec = ((DataSonnetArrcomp) element).getForspec();
+                if (findComprehensionBinding(results, identifier, comp, forspec))
+                    return results.toArray(new ResolveResult[results.size()]);
             }else if (element.getParent() instanceof DataSonnetBind &&
                     ((DataSonnetBind)element.getParent()).getExpr() == element){
-                List<DataSonnetIdentifier0> idents = findIdentifierFromParams(((DataSonnetBind)element.getParent()).getParams());
+                List<DataSonnetIdentifier0> idents = new ArrayList<>(findIdentifierFromParams(((DataSonnetBind)element.getParent()).getParams()));
                 for(DataSonnetIdentifier0 ident: idents){
                     if (identifier.equals(ident.getText())) {
                         results.add(new PsiElementResolveResult(ident));
@@ -66,7 +114,7 @@ public class DataSonnetIdentifierReference extends PsiReferenceBase<PsiElement> 
                 }
             }else if (element.getParent() instanceof DataSonnetField &&
                     ((DataSonnetField)element.getParent()).getExpr() == element){
-                List<DataSonnetIdentifier0> idents = findIdentifierFromParams(((DataSonnetField)element.getParent()).getParams());
+                List<DataSonnetIdentifier0> idents = new ArrayList<>(findIdentifierFromParams(((DataSonnetField)element.getParent()).getParams()));
                 for(DataSonnetIdentifier0 ident: idents){
                     if (identifier.equals(ident.getText())) {
                         results.add(new PsiElementResolveResult(ident));
@@ -77,6 +125,25 @@ public class DataSonnetIdentifierReference extends PsiReferenceBase<PsiElement> 
             element = element.getParent();
         }
         return results.toArray(new ResolveResult[results.size()]);
+    }
+
+    private boolean findComprehensionBinding(List<ResolveResult> results, String identifier, DataSonnetCompspec comp, DataSonnetForspec forspec) {
+        if (comp != null) {
+
+            for (DataSonnetForspec spec : comp.getForspecList()) {
+                if (identifier.equals(spec.getIdentifier0().getText())) {
+                    results.add(new PsiElementResolveResult(spec.getIdentifier0()));
+                    return true;
+                }
+            }
+        }
+        if (forspec != null) {
+            if (identifier.equals(forspec.getIdentifier0().getText())) {
+                results.add(new PsiElementResolveResult(forspec.getIdentifier0()));
+                return true;
+            }
+        }
+        return false;
     }
 
     @Nullable
@@ -137,4 +204,5 @@ public class DataSonnetIdentifierReference extends PsiReferenceBase<PsiElement> 
         }
         return false;
     }
+
 }

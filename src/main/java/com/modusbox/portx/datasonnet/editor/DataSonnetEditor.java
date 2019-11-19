@@ -639,6 +639,10 @@ public class DataSonnetEditor implements FileEditor {
         PsiFile f = PsiFileFactory.getInstance(getProject()).createFileFromText(language, contents);
         inputOutputFiles.put(title, f.getVirtualFile());
 
+        Editor oldEditor = editors.get(title);
+        if (oldEditor != null) {
+            EditorFactory.getInstance().releaseEditor(oldEditor);
+        }
         final Editor editor = EditorFactory.getInstance().createEditor(f.getViewProvider().getDocument(), getProject(), language.getAssociatedFileType(), true);
         editors.put(title, editor);
 
