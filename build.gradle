@@ -23,14 +23,14 @@ repositories {
     mavenLocal()
     mavenCentral()
     maven {
-        name "portx-repository-releases"
+        name "portx-repository-snapshots"
         url "https://portx.jfrog.io/portx/portx-snapshots"
         mavenContent {
             snapshotsOnly()
         }
     }
     maven {
-        name "portx-repository-snapshots"
+        name "portx-repository-releases"
         url "https://portx.jfrog.io/portx/portx-releases"
         mavenContent {
             releasesOnly()
