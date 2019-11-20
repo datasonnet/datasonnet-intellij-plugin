@@ -1,20 +1,15 @@
 package com.modusbox.portx.datasonnet.language;
 
 import com.intellij.codeInsight.completion.*;
-import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiElementResolveResult;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.ResolveResult;
-import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.util.ProcessingContext;
 import com.modusbox.portx.datasonnet.language.psi.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -148,7 +143,7 @@ public class DataSonnetCompletionContributor extends CompletionContributor {
             for (DataSonnetSelect select : expr.getSelectList()) {
                 if (!select.getIdentifier0().getText().endsWith(Constants.INTELLIJ_RULES.trim())) {
                     selectList.add(select.getIdentifier0());
-                }else{
+                } else {
                     break;
                 }
             }

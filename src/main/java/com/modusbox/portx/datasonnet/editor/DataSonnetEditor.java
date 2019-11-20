@@ -3,6 +3,7 @@ package com.modusbox.portx.datasonnet.editor;
 import com.datasonnet.Mapper;
 import com.datasonnet.StringDocument;
 import com.datasonnet.portx.spi.DataFormatPlugin;
+import com.datasonnet.portx.spi.DataFormatService;
 import com.intellij.codeHighlighting.BackgroundEditorHighlighter;
 import com.intellij.icons.AllIcons;
 import com.intellij.json.JsonLanguage;
@@ -536,7 +537,6 @@ public class DataSonnetEditor implements FileEditor {
                     PsiDocumentManager.getInstance(project).commitDocument(nextEditor.getDocument());
                     FileDocumentManager.getInstance().saveDocument(nextEditor.getDocument());
                 }
-
             }
         }.execute();
 
@@ -617,6 +617,7 @@ public class DataSonnetEditor implements FileEditor {
     }
 
     private void createOutputTab() {
+        DataFormatService.getInstance().findAndRegisterPlugins();
         updateOutputTab("", "application/json");
     }
 
