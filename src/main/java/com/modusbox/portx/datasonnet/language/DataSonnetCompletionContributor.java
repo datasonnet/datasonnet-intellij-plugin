@@ -109,10 +109,22 @@ public class DataSonnetCompletionContributor extends CompletionContributor {
 
         List<DataSonnetMember> memberList = obj.getObjinside().getMembers().getMemberList();
         for (DataSonnetMember member : memberList) {
-            if (member.getField() != null && member.getField().getFieldname().getIdentifier0() != null) {
-                String fieldName = member.getField().getFieldname().getIdentifier0().getText();
+//            if (member.getField() != null && member.getField().getFieldname().getIdentifier0() != null) {
+//                String fieldName = member.getField().getFieldname().getIdentifier0().getText();
+//                resultSet.addElement(LookupElementBuilder.create(fieldName));
+//            }
+
+            if (member.getField() != null && member.getField().getFieldname() != null) {
+                String fieldName = member.getField().getFieldname().getText();
+                if (fieldName.startsWith("\"") || fieldName.startsWith("\'")) {
+                    fieldName = fieldName.substring(1);
+                }
+                if (fieldName.endsWith("\"") || fieldName.endsWith("\'")) {
+                    fieldName = fieldName.substring(0, fieldName.length() - 1);
+                }
                 resultSet.addElement(LookupElementBuilder.create(fieldName));
             }
+
         }
     }
 
@@ -175,10 +187,23 @@ public class DataSonnetCompletionContributor extends CompletionContributor {
 
         List<DataSonnetMember> memberList = obj.getObjinside().getMembers().getMemberList();
         for (DataSonnetMember member : memberList) {
-            if (member.getField() != null && member.getField().getFieldname().getIdentifier0() != null) {
-                String fieldName = member.getField().getFieldname().getIdentifier0().getText();
-                if (fieldName.equals(name)) {
-                    return member.getField().getExpr();
+            if (member.getField() != null) {
+                if (member.getField().getFieldname().getIdentifier0() != null) {
+                    String fieldName = member.getField().getFieldname().getIdentifier0().getText();
+                    if (fieldName.equals(name)) {
+                        return member.getField().getExpr();
+                    }
+                } else if (member.getField().getFieldname() != null) {
+                    String fieldName = member.getField().getFieldname().getText();
+                    if (fieldName.startsWith("\"") || fieldName.startsWith("\'")) {
+                        fieldName = fieldName.substring(1);
+                    }
+                    if (fieldName.endsWith("\"") || fieldName.endsWith("\'")) {
+                        fieldName = fieldName.substring(0, fieldName.length() - 1);
+                    }
+                    if (fieldName.equals(name)) {
+                        return member.getField().getExpr();
+                    }
                 }
             }
         }
