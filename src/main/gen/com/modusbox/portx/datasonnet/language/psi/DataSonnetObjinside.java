@@ -16,8 +16,8 @@ public interface DataSonnetObjinside extends PsiElement {
   @Nullable
   DataSonnetForspec getForspec();
 
-  @NotNull
-  List<DataSonnetMember> getMemberList();
+  @Nullable
+  DataSonnetMembers getMembers();
 
   @NotNull
   List<DataSonnetObjlocal> getObjlocalList();

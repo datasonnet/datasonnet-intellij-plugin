@@ -48,6 +48,7 @@
         <lang.foldingBuilder language="Datasonnet" implementationClass="com.modusbox.portx.datasonnet.language.DataSonnetFoldingBuilder"/>
         <psi.referenceContributor implementation="com.modusbox.portx.datasonnet.language.DataSonnetReferenceContributor"/>
 
+        <annotator language="Datasonnet" implementationClass="com.modusbox.portx.datasonnet.language.DataSonnetAnnotator"/>
         <!--<configurationType implementation="org.mule.tooling.lang.dw.launcher.configuration.WeaveConfigurationType"/>-->
         <!--<runConfigurationProducer implementation="org.mule.tooling.lang.dw.launcher.configuration.WeaveConfigurationProducer"/>-->
 

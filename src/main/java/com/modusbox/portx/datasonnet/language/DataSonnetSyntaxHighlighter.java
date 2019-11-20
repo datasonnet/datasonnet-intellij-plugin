@@ -13,34 +13,25 @@ import static com.intellij.openapi.editor.colors.TextAttributesKey.createTextAtt
 
 public class DataSonnetSyntaxHighlighter extends SyntaxHighlighterBase {
     public static final TextAttributesKey BAD_CHARACTER =
-            createTextAttributesKey("DataSonnet_BAD_CHARACTER", HighlighterColors.BAD_CHARACTER);
-    public static final TextAttributesKey SEPARATOR =
-            createTextAttributesKey("DataSonnet_SEPARATOR", DefaultLanguageHighlighterColors.OPERATION_SIGN);
+            createTextAttributesKey("DATASONNET_BAD_CHARACTER", HighlighterColors.BAD_CHARACTER);
+
     public static final TextAttributesKey KEY =
-            createTextAttributesKey("DataSonnet_KEY", DefaultLanguageHighlighterColors.KEYWORD);
+            createTextAttributesKey("DATASONNET_KEY", DefaultLanguageHighlighterColors.KEYWORD);
     public static final TextAttributesKey VALUE =
-            createTextAttributesKey("DataSonnet_VALUE", DefaultLanguageHighlighterColors.STRING);
+            createTextAttributesKey("DATASONNET_VALUE", DefaultLanguageHighlighterColors.STRING);
     public static final TextAttributesKey COMMENT =
-            createTextAttributesKey("DataSonnet_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT);
-
-
+            createTextAttributesKey("DATASONNET_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT);
     public static final TextAttributesKey NUMBER =
-            createTextAttributesKey("DataSonnet_NUMBER", DefaultLanguageHighlighterColors.NUMBER);
-    public static final TextAttributesKey NULL_ =
-            createTextAttributesKey("DataSonnet_NULL", DefaultLanguageHighlighterColors.CONSTANT);
-    public static final TextAttributesKey PARAMS =
-            createTextAttributesKey("DataSonnet_PARAMS", DefaultLanguageHighlighterColors.PARAMETER);
+            createTextAttributesKey("DATASONNET_NUMBER", DefaultLanguageHighlighterColors.NUMBER);
 
 
     private static final TextAttributesKey[] BAD_CHAR_KEYS = new TextAttributesKey[]{BAD_CHARACTER};
-    private static final TextAttributesKey[] SEPARATOR_KEYS = new TextAttributesKey[]{SEPARATOR};
-    private static final TextAttributesKey[] KEY_KEYS = new TextAttributesKey[]{KEY};
-    private static final TextAttributesKey[] VALUE_KEYS = new TextAttributesKey[]{VALUE};
+    private static final TextAttributesKey[] KEYWORD_KEYS = new TextAttributesKey[]{KEY};
+    private static final TextAttributesKey[] STRING_KEYS = new TextAttributesKey[]{VALUE};
+
     private static final TextAttributesKey[] COMMENT_KEYS = new TextAttributesKey[]{COMMENT};
     private static final TextAttributesKey[] EMPTY_KEYS = new TextAttributesKey[0];
     private static final TextAttributesKey[] NUMBER_KEYS = new TextAttributesKey[]{NUMBER};
-    private static final TextAttributesKey[] NULL_KEYS = new TextAttributesKey[]{NULL_};
-    private static final TextAttributesKey[] PARAM_KEYS = new TextAttributesKey[]{PARAMS};
 
     @NotNull
     @Override
@@ -51,9 +42,7 @@ public class DataSonnetSyntaxHighlighter extends SyntaxHighlighterBase {
     @NotNull
     @Override
     public TextAttributesKey[] getTokenHighlights(IElementType tokenType) {
-        if (tokenType.equals(DataSonnetTypes.COMMA)) {
-            return SEPARATOR_KEYS;
-        } else if (tokenType.equals(DataSonnetTypes.BLOCK_COMMENT)) {
+        if (tokenType.equals(DataSonnetTypes.BLOCK_COMMENT)) {
             return COMMENT_KEYS;
         } else if (tokenType.equals(DataSonnetTypes.LINE_COMMENT)) {
             return COMMENT_KEYS;
@@ -76,21 +65,16 @@ public class DataSonnetSyntaxHighlighter extends SyntaxHighlighterBase {
             tokenType.equals(DataSonnetTypes.ASSERT) ||
             tokenType.equals(DataSonnetTypes.DOLLAR)
         ) {
-            return KEY_KEYS;
+            return KEYWORD_KEYS;
         } else if (tokenType.equals(DataSonnetTypes.NUMBER)) {
             return NUMBER_KEYS;
-        } else if (tokenType.equals(DataSonnetTypes.SINGLE_QUOTED_STRING)) {
-            return VALUE_KEYS;
-        } else if (tokenType.equals(DataSonnetTypes.DOUBLE_QUOTED_STRING)) {
-            return VALUE_KEYS;
-        } else if (tokenType.equals(DataSonnetTypes.VERBATIM_DOUBLE_QUOTED_STRING)) {
-            return VALUE_KEYS;
-        } else if (tokenType.equals(DataSonnetTypes.VERBATIM_SINGLE_QUOTED_STRING)) {
-            return VALUE_KEYS;
-        } else if (tokenType.equals(DataSonnetTypes.TRIPLE_BAR_QUOTED_STRING)) {
-            return VALUE_KEYS;
-        } else if (tokenType.equals(DataSonnetTypes.PARAMS)) {
-            return PARAM_KEYS;
+        } else if (
+                tokenType.equals(DataSonnetTypes.SINGLE_QUOTED_STRING) ||
+                tokenType.equals(DataSonnetTypes.DOUBLE_QUOTED_STRING) ||
+                tokenType.equals(DataSonnetTypes.VERBATIM_DOUBLE_QUOTED_STRING) ||
+                tokenType.equals(DataSonnetTypes.VERBATIM_SINGLE_QUOTED_STRING) ||
+                tokenType.equals(DataSonnetTypes.TRIPLE_BAR_QUOTED_STRING)) {
+            return STRING_KEYS;
         } else if (tokenType.equals(TokenType.BAD_CHARACTER)) {
             return BAD_CHAR_KEYS;
         } else {

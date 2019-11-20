@@ -95,6 +95,10 @@ public class DataSonnetVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitMembers(@NotNull DataSonnetMembers o) {
+    visitPsiElement(o);
+  }
+
   public void visitObj(@NotNull DataSonnetObj o) {
     visitPsiElement(o);
   }

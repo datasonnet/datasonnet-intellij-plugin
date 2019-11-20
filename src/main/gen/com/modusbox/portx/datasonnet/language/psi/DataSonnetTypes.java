@@ -30,6 +30,7 @@ public interface DataSonnetTypes {
   IElementType IMPORTSTROP = new DataSonnetElementType("IMPORTSTROP");
   IElementType INSUPER = new DataSonnetElementType("INSUPER");
   IElementType MEMBER = new DataSonnetElementType("MEMBER");
+  IElementType MEMBERS = new DataSonnetElementType("MEMBERS");
   IElementType OBJ = new DataSonnetElementType("OBJ");
   IElementType OBJEXTEND = new DataSonnetElementType("OBJEXTEND");
   IElementType OBJINSIDE = new DataSonnetElementType("OBJINSIDE");
@@ -170,6 +171,9 @@ public interface DataSonnetTypes {
       }
       else if (type == MEMBER) {
         return new DataSonnetMemberImpl(node);
+      }
+      else if (type == MEMBERS) {
+        return new DataSonnetMembersImpl(node);
       }
       else if (type == OBJ) {
         return new DataSonnetObjImpl(node);
