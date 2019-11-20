@@ -42,8 +42,6 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ContentEntry;
-import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.ui.configuration.ProjectSettingsService;
 import com.intellij.openapi.util.Disposer;
@@ -53,8 +51,14 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.impl.content.ToolWindowContentUi;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiDocumentManager;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiFileFactory;
+import com.intellij.psi.PsiManager;
 import com.intellij.psi.codeStyle.CodeStyleManager;
+import com.intellij.psi.search.FilenameIndex;
+import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.util.ParameterizedCachedValue;
 import com.intellij.ui.EditorNotificationPanel;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.JBTabsPaneImpl;
@@ -63,7 +67,6 @@ import com.intellij.util.Alarm;
 import com.modusbox.portx.datasonnet.config.DataSonnetProjectSettingsComponent;
 import com.modusbox.portx.datasonnet.config.DataSonnetSettingsComponent;
 import com.modusbox.portx.datasonnet.language.DataSonnetFileType;
-import com.modusbox.portx.datasonnet.language.psi.DataSonnetFile;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -78,8 +81,8 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 
 /**
  * Created by eberman on 11/3/16.
@@ -114,6 +117,8 @@ public class DataSonnetEditor implements FileEditor {
     private boolean autoSync = false;
 
     private String outputMimeType = "application/json";
+
+    private static final Key<ParameterizedCachedValue<Map<String, String>, VirtualFile>> DS_LIBRARIES_KEY = Key.create("DS_LIBRARIES");
 
     public DataSonnetEditor(@NotNull Project project, @NotNull VirtualFile virtualFile, final TextEditorProvider provider) {
         this.project = project;
@@ -415,11 +420,13 @@ public class DataSonnetEditor implements FileEditor {
             }
         }
 
+        Map<String, String> libraries = getDSLibraries(this.textEditor.getFile());
+
         try {
             ClassLoader currentCL = Thread.currentThread().getContextClassLoader();
             Thread.currentThread().setContextClassLoader(Mapper.class.getClassLoader());
 
-            Mapper mapper = new Mapper(dataSonnetScript, variables.keySet(), true);
+            Mapper mapper = new Mapper(dataSonnetScript, variables.keySet(), libraries,true);
             com.datasonnet.Document transformDoc = mapper.transform(new StringDocument(payload, payloadMimeType), variables, outputMimeType);
 
             Thread.currentThread().setContextClassLoader(currentCL);
@@ -621,6 +628,7 @@ public class DataSonnetEditor implements FileEditor {
     }
 
     private void updateOutputTab(String contents, String mimeType) {
+
         Icon icon;
         Language language;
 
@@ -774,6 +782,40 @@ public class DataSonnetEditor implements FileEditor {
         }
 
         return inputMimeType;
+    }
+
+    @NotNull
+    private Map<String, String> getDSLibraries(@NotNull final VirtualFile ds) {
+        Map<String, String> libraries = new HashMap();
+
+        Collection<VirtualFile> libs = FilenameIndex.getAllFilesByExt(project, "libsonnet", GlobalSearchScope.allScope(project));
+        for (VirtualFile nextLib : libs) {
+            try {
+                String content = VfsUtil.loadText(nextLib);
+                String path = nextLib.getPath();
+                if (path.toLowerCase().contains(".jar!")) {
+                    path = path.substring(path.lastIndexOf("!") + 1);
+                } else {
+                    List<VirtualFile> roots = new ArrayList(Arrays.asList(ModuleRootManager.getInstance(module).getSourceRoots()));
+                    roots.addAll(Arrays.asList(ModuleRootManager.getInstance(module).getContentRoots()));
+
+                    for (VirtualFile root : roots) {
+                        if (path.startsWith(root.getPath())) {
+                            path = path.replace(root.getPath(), "");
+                            break;
+                        }
+                    }
+                }
+                if (path.startsWith("/")) {
+                    path = path.substring(1);
+                }
+                libraries.put(path, content);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return libraries;
     }
 
     private class SelectScenarioAction extends AnAction {
