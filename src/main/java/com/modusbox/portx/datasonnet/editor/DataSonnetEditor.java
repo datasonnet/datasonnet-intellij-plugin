@@ -2,8 +2,8 @@ package com.modusbox.portx.datasonnet.editor;
 
 import com.datasonnet.Mapper;
 import com.datasonnet.StringDocument;
-import com.datasonnet.portx.spi.DataFormatPlugin;
-import com.datasonnet.portx.spi.DataFormatService;
+import com.datasonnet.spi.DataFormatPlugin;
+import com.datasonnet.spi.DataFormatService;
 import com.intellij.codeHighlighting.BackgroundEditorHighlighter;
 import com.intellij.icons.AllIcons;
 import com.intellij.json.JsonLanguage;
@@ -625,7 +625,10 @@ public class DataSonnetEditor implements FileEditor {
     }
 
     private void createOutputTab() {
+        ClassLoader currentCL = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader(Mapper.class.getClassLoader());
         DataFormatService.getInstance().findAndRegisterPlugins();
+        Thread.currentThread().setContextClassLoader(currentCL);
 
         updateOutputTab("", "application/json");
     }
@@ -891,7 +894,7 @@ public class DataSonnetEditor implements FileEditor {
                 DataFormatPlugin plugin = plugins.next();
 
                 final String dataFormatId = plugin.getPluginId();
-                final String mimeType = plugin.getSupportedMimeTypes()[0];
+                final String mimeType = plugin.getSupportedIdentifiers()[0];
 
                 group.add(new ToggleMimeType(dataFormatId, mimeType));
             }
