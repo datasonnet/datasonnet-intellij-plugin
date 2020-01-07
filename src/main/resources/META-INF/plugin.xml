@@ -9,7 +9,7 @@
 
     <!--<depends>com.databricks</depends>-->
 
-    <idea-version since-build="190.*"/>
+    <idea-version since-build="180.*"/>
 
     <change-notes><![CDATA[
 
@@ -49,6 +49,11 @@
         <psi.referenceContributor implementation="com.modusbox.portx.datasonnet.language.DataSonnetReferenceContributor"/>
 
         <annotator language="Datasonnet" implementationClass="com.modusbox.portx.datasonnet.language.DataSonnetAnnotator"/>
+
+        <codeStyleSettingsProvider implementation="com.modusbox.portx.datasonnet.language.formatter.DataSonnetCodeStyleSettingsProvider"/>
+        <langCodeStyleSettingsProvider implementation="com.modusbox.portx.datasonnet.language.formatter.DataSonnetLanguageCodeStyleSettingsProvider"/>
+
+        <lang.formatter language="Datasonnet" implementationClass="com.modusbox.portx.datasonnet.language.formatter.DataSonnetFormattingModelBuilder"/>
         <!--<configurationType implementation="org.mule.tooling.lang.dw.launcher.configuration.WeaveConfigurationType"/>-->
         <!--<runConfigurationProducer implementation="org.mule.tooling.lang.dw.launcher.configuration.WeaveConfigurationProducer"/>-->
 
