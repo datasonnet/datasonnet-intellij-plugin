@@ -9,10 +9,13 @@ import com.modusbox.portx.datasonnet.language.parser.DataSonnetParser;
 import com.modusbox.portx.datasonnet.language.psi.*;
 import org.jetbrains.annotations.NotNull;
 
+import static com.modusbox.portx.datasonnet.language.psi.DataSonnetTypes.*;
+
 public class DataSonnetParserDefinition implements ParserDefinition {
     public static final TokenSet WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE);
-    public static final TokenSet COMMENTS = TokenSet.create(
-            DataSonnetTypes.LINE_COMMENT, DataSonnetTypes.BLOCK_COMMENT);
+    public static final TokenSet COMMENTS = TokenSet.create(LINE_COMMENT, BLOCK_COMMENT);
+    public static final TokenSet DATASONNET_CONTAINERS = TokenSet.create(OBJ, ARR, ARRCOMP);
+
 
     public static final IFileElementType FILE = new IFileElementType(DataSonnetLanguage.INSTANCE);
 
