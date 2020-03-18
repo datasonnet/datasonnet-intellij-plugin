@@ -1,7 +1,8 @@
 package com.modusbox.portx.datasonnet.editor;
 
 import com.datasonnet.Mapper;
-import com.datasonnet.StringDocument;
+//import com.datasonnet.StringDocument;
+import com.datasonnet.document.StringDocument;
 import com.datasonnet.spi.DataFormatPlugin;
 import com.datasonnet.spi.DataFormatService;
 import com.intellij.codeHighlighting.BackgroundEditorHighlighter;
@@ -30,6 +31,7 @@ import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.highlighter.EditorHighlighterFactory;
+import com.intellij.openapi.editor.impl.EditorImpl;
 import com.intellij.openapi.editor.markup.EffectType;
 import com.intellij.openapi.editor.markup.HighlighterTargetArea;
 import com.intellij.openapi.editor.markup.RangeHighlighter;
@@ -82,6 +84,9 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.List;
 
@@ -223,44 +228,7 @@ public class DataSonnetEditor implements FileEditor {
         psiFile = PsiManager.getInstance(project).findFile(virtualFile);
 
         if (psiFile != null && psiFile.getFileType() == DataSonnetFileType.INSTANCE) {
-        /*
-            final DataSonnetFile dataSonnetFile = (DataSonnetFile) psiFile;
 
-            PsiManager.getInstance(project).addPsiTreeChangeListener(new PsiTreeChangeAdapter() {
-                @Override
-                public void childReplaced(@NotNull PsiTreeChangeEvent event) {
-                    super.childReplaced(event);
-
-                    if (event.getFile() != psiFile && !(event.getFile() instanceof DataSonnetFile))
-                        return;
-
-                    textEditor.getPreferredFocusedComponent().grabFocus();
-
-                    if (myDocumentAlarm.isDisposed())
-                        return;
-
-                    myDocumentAlarm.cancelAllRequests();
-                    myDocumentAlarm.addRequest(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                new WriteCommandAction.Simple(project, psiFile) {
-                                    @Override
-                                    protected void run() throws Throwable {
-                                        runPreview(false);
-                                    }
-                                }.execute();
-                            } catch (Exception e) {
-                                logger.error(e);
-                            }
-
-                        }
-                    }, PREVIEW_DELAY);
-                }
-            });
-            */
-
-            //TODO - list scenarios for file, if there are any, load first one and display
             ScenarioManager manager = ScenarioManager.getInstance(project);
 
             final Application app = ApplicationManager.getApplication();
@@ -388,7 +356,7 @@ public class DataSonnetEditor implements FileEditor {
 
     }
 
-    private com.datasonnet.Document runPreviewBuiltIn() {
+    private com.datasonnet.document.Document runPreviewBuiltIn() {
         ScenarioManager manager = ScenarioManager.getInstance(project);
         Scenario currentScenario = manager.getCurrentScenario(getPsiFile().getVirtualFile().getCanonicalPath());
 
@@ -400,7 +368,7 @@ public class DataSonnetEditor implements FileEditor {
         String payload = "{}";
 
         Map<String, VirtualFile> inputFiles = currentScenario.getInputFiles();
-        HashMap<String, com.datasonnet.Document> variables = new HashMap<>();
+        HashMap<String, com.datasonnet.document.Document> variables = new HashMap<>();
 
         String payloadMimeType = "application/json";
 
@@ -427,8 +395,8 @@ public class DataSonnetEditor implements FileEditor {
             ClassLoader currentCL = Thread.currentThread().getContextClassLoader();
             Thread.currentThread().setContextClassLoader(Mapper.class.getClassLoader());
 
-            Mapper mapper = new Mapper(dataSonnetScript, variables.keySet(), libraries,true);
-            com.datasonnet.Document transformDoc = mapper.transform(new StringDocument(payload, payloadMimeType), variables, outputMimeType);
+            Mapper mapper = new Mapper(dataSonnetScript, variables.keySet(), libraries,true, true);
+            com.datasonnet.document.Document transformDoc = mapper.transform(new StringDocument(payload, payloadMimeType), variables, outputMimeType);
 
             Thread.currentThread().setContextClassLoader(currentCL);
 
@@ -451,7 +419,6 @@ public class DataSonnetEditor implements FileEditor {
         String pathToDataSonnet = mySettingsComponent.getState().getDataSonnetExecPath();
         String pathToMappingFile = psiFile.getVirtualFile().getCanonicalPath();
 
-        //TODO Assert not null, display message - com.intellij.openapi.options.ShowSettingsUtil
         if (pathToDataSonnet == null ||
                 StringUtils.isEmpty(pathToDataSonnet) ||
                 !(new File(pathToDataSonnet).exists() && !new File(pathToDataSonnet).isDirectory())) {
@@ -467,7 +434,6 @@ public class DataSonnetEditor implements FileEditor {
 
             editors.get("Preview").setHeaderComponent(panel);
 
-            //return "Unable to find DataSonnet executable in path. Please configure the DataSonnet path at Tools -> DataSonnet";
             return "";
         }
 
@@ -557,9 +523,10 @@ public class DataSonnetEditor implements FileEditor {
         final String preview;
 
         if (useBuiltIn) {
-            com.datasonnet.Document doc = runPreviewBuiltIn();
-            preview = doc.contents();
-            contentType = doc.mimeType();
+            com.datasonnet.document.Document doc = runPreviewBuiltIn();
+            //preview = doc.getContentsAsString();
+            preview = doc.canGetContentsAs(String.class) ? doc.getContentsAsString() : doc.getContentsAsObject().toString(); //This should work for all formats and do the best to represent java object as string in preview
+            contentType = doc.getMimeType();
         } else {
             preview = runPreviewExt();
             contentType = "application/json";
@@ -625,11 +592,6 @@ public class DataSonnetEditor implements FileEditor {
     }
 
     private void createOutputTab() {
-        ClassLoader currentCL = Thread.currentThread().getContextClassLoader();
-        Thread.currentThread().setContextClassLoader(Mapper.class.getClassLoader());
-        DataFormatService.getInstance().findAndRegisterPlugins();
-        Thread.currentThread().setContextClassLoader(currentCL);
-
         updateOutputTab("", "application/json");
     }
 
@@ -747,7 +709,7 @@ public class DataSonnetEditor implements FileEditor {
             inputTabs.setSelectedIndex(0);
 
             try {
-                editor.getDocument().addDocumentListener(refreshPreview);
+                addDocumentListener(editor.getDocument(), refreshPreview);
             } catch (Throwable e) {
             }
         }
@@ -776,6 +738,13 @@ public class DataSonnetEditor implements FileEditor {
 
     public void closeAllInputs() {
         inputTabs.getTabs().removeAllTabs();
+        for (Editor editor: editors.values()) {
+            try {
+                Disposer.dispose(((EditorImpl) editor).getDisposable());
+            } catch (Throwable e) {
+
+            }
+        }
     }
 
     private String getMimeTypeByExtension(String extension) {
@@ -816,12 +785,26 @@ public class DataSonnetEditor implements FileEditor {
                     path = path.substring(1);
                 }
                 libraries.put(path, content);
+
+                //Also put another copy with relative path
+                String relativePath = Paths.get(ds.getParent().getPath()).relativize(Paths.get(nextLib.getPath())).toString();
+                libraries.put(relativePath, content);
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
 
         return libraries;
+    }
+
+    private static void addDocumentListener(Document document, DocumentListener listener) throws Exception {
+        Method method = document.getClass().getDeclaredMethod("getListeners");
+        method.setAccessible(true);
+        DocumentListener[] listeners = (DocumentListener[])method.invoke(document);
+        if (!Arrays.asList(listeners).contains(listener)) {
+            document.addDocumentListener(listener);
+        }
     }
 
     private class SelectScenarioAction extends AnAction {
