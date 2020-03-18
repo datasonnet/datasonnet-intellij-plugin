@@ -48,7 +48,7 @@ configurations {
 
 gitVersioning {
     branch {
-        pattern = 'master'
+        pattern = 'master|release-.*'
         versionFormat = '${version}'
     }
     branch {
