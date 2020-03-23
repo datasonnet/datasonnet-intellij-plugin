@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'com.datasonnet'
-version '1.0.2'
+version '1.0.5-SNAPSHOT'
 
 sourceCompatibility = 1.8
 
@@ -48,7 +48,7 @@ configurations {
 
 gitVersioning {
     branch {
-        pattern = 'master|release-.*'
+        pattern = 'master'
         versionFormat = '${version}'
     }
     branch {
