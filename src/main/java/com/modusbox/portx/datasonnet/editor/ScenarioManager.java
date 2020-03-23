@@ -118,8 +118,9 @@ public class ScenarioManager  extends AbstractProjectComponent implements Dispos
         }
 
         for (VirtualFile testRoot : testRoots) {
-            if (findMappingTestsRoot(testRoot) != null) {
-                dataSonnetInputsFolders.put(moduleName, testRoot);
+            VirtualFile mappingTestRoot = findMappingTestsRoot(testRoot);
+            if (mappingTestRoot != null) {
+                dataSonnetInputsFolders.put(moduleName, mappingTestRoot);
                 return testRoot;
             }
         }

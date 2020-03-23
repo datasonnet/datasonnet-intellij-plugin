@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'com.datasonnet'
-version '1.0.1-SNAPSHOT'
+version '1.0.5-SNAPSHOT'
 
 sourceCompatibility = 1.8
 
@@ -40,8 +40,7 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    //compile group: 'com.datasonnet', name: 'datasonnet-mapper', version: '1.0.2-XML-Support-SNAPSHOT'
-    compile group: 'com.datasonnet', name: 'datasonnet-mapper', version: '1.0.3-SNAPSHOT'
+    compile group: 'com.datasonnet', name: 'datasonnet-mapper', version: '1.0.4'
 }
 configurations {
     compile.exclude group: 'org.slf4j'
