@@ -86,6 +86,9 @@ public class AddInputDialog extends DialogWrapper {
                 case CSV:
                     setFileContent(inputFile, "name,lastName\nJohn,Doe");
                     break;
+                case Text:
+                    setFileContent(inputFile, "HelloWorld");
+                    break;
             }
 
         });
@@ -134,7 +137,7 @@ public class AddInputDialog extends DialogWrapper {
     }
 
     private enum DataFormat {
-        JSON("json"), XML("xml"), CSV("csv");
+        JSON("json"), XML("xml"), CSV("csv"), Text("txt");
 
         final String extension;
 

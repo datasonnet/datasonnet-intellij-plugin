@@ -754,6 +754,8 @@ public class DataSonnetEditor implements FileEditor {
             inputMimeType = "application/csv";
         } else if ("xml".equalsIgnoreCase(extension)) {
             inputMimeType = "application/xml";
+        } else if ("txt".equalsIgnoreCase(extension)) {
+            inputMimeType = "text/plain";
         }
 
         return inputMimeType;
