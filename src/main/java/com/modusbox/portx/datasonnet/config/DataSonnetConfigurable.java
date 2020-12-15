@@ -25,7 +25,7 @@ public class DataSonnetConfigurable implements SearchableConfigurable, Configura
         myProjectSettingsComponent = ServiceManager.getService(project, DataSonnetProjectSettingsComponent.class);
     }
 
-    @Nls(capitalization = Nls.Capitalization.Title)
+    //@Nls(capitalization = Nls.Capitalization.Title)
     @Override
     public String getDisplayName() {
         return "Datasonnet";
