@@ -45,7 +45,6 @@ import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.ui.configuration.ProjectSettingsService;
-import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.text.StringUtil;
@@ -506,8 +505,12 @@ public class DataSonnetEditor implements FileEditor {
             @Override
             protected void run() throws Throwable {
                 for (Editor nextEditor : editors.values()) {
-                    PsiDocumentManager.getInstance(project).commitDocument(nextEditor.getDocument());
-                    FileDocumentManager.getInstance().saveDocument(nextEditor.getDocument());
+                    Document doc = nextEditor.getDocument();
+                    PsiDocumentManager psiDocumentManager = PsiDocumentManager.getInstance(project);
+                    if (psiDocumentManager.isUncommited(doc) && project.isInitialized()) {
+                        psiDocumentManager.commitDocument(doc);
+                        FileDocumentManager.getInstance().saveDocument(doc);
+                    }
                 }
 
             }
@@ -651,9 +654,16 @@ public class DataSonnetEditor implements FileEditor {
         ((EditorEx) editor).setHighlighter(EditorHighlighterFactory.getInstance().createEditorHighlighter(project, newType));
         ((EditorEx) editor).setFile(f.getVirtualFile());
 
-        PsiDocumentManager.getInstance(project).commitAllDocuments();
-        PsiFile previewPsiFile = PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument());
-        CodeStyleManager.getInstance(project).reformat(previewPsiFile);
+        if (project.isInitialized()) {
+//            Logger.getInstance(DataSonnetEditor.class).error("IS INITIALIZED " + project.isInitialized() + " ; IS DEFAULT " + project.isDefault());
+            Document doc = editor.getDocument();
+            PsiDocumentManager psiDocumentManager = PsiDocumentManager.getInstance(project);
+            if (psiDocumentManager.isUncommited(doc)) {
+                psiDocumentManager.commitDocument(doc);
+            }
+            PsiFile previewPsiFile = psiDocumentManager.getPsiFile(doc);
+            CodeStyleManager.getInstance(project).reformat(previewPsiFile);
+        }
 
         outputTabs.getTabs().getPresentation().setSideComponentVertical(true);
 
