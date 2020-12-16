@@ -651,7 +651,7 @@ public class DataSonnetEditor implements FileEditor {
         ((EditorEx) editor).setHighlighter(EditorHighlighterFactory.getInstance().createEditorHighlighter(project, newType));
         ((EditorEx) editor).setFile(f.getVirtualFile());
 
-        PsiDocumentManager.getInstance(project).commitDocument(editor.getDocument());
+        PsiDocumentManager.getInstance(project).commitAllDocuments();
         PsiFile previewPsiFile = PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument());
         CodeStyleManager.getInstance(project).reformat(previewPsiFile);
 
