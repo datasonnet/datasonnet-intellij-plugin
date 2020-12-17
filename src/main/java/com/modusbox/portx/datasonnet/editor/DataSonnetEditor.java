@@ -123,6 +123,8 @@ public class DataSonnetEditor implements FileEditor {
 
     private static final Key<ParameterizedCachedValue<Map<String, String>, VirtualFile>> DS_LIBRARIES_KEY = Key.create("DS_LIBRARIES");
 
+    private DefaultActionGroup actionGroup;
+
     public DataSonnetEditor(@NotNull Project project, @NotNull VirtualFile virtualFile, final TextEditorProvider provider) {
         this.project = project;
         this.textEditor = new PsiAwareTextEditorImpl(project, virtualFile, provider);
@@ -548,8 +550,8 @@ public class DataSonnetEditor implements FileEditor {
                     line = line.replaceAll("[^\\d.]", "");
                     column = column.replaceAll("[^\\d.]", "");
 
-                    int lineNumber = new Integer(line).intValue() - 1;
-                    int columnNumber = new Integer(column).intValue();
+                    int lineNumber = Integer.parseInt(line) - 1;
+                    int columnNumber = Integer.parseInt(column);
 
                     int startOffset = document.getLineStartOffset(lineNumber) + columnNumber;
                     int endOffset = document.getLineEndOffset(lineNumber);
@@ -677,10 +679,12 @@ public class DataSonnetEditor implements FileEditor {
         previewTabInfo.setText(title);
         previewTabInfo.setIcon(icon);
 
-        DefaultActionGroup actionGroup = new DefaultActionGroup();
-        actionGroup.add(new AutoSyncAction(this));
-        actionGroup.add(new RefreshAction(this));
-        actionGroup.add(new SelectOutputMimeTypeAction());
+        if (actionGroup == null) {
+            actionGroup = new DefaultActionGroup();
+            actionGroup.add(new AutoSyncAction(this));
+            actionGroup.add(new RefreshAction(this));
+            actionGroup.add(new SelectOutputMimeTypeAction());
+        }
         previewTabInfo.setActions(actionGroup, "DataSonnetPreview");
         outputTabs.getTabs().addTab(previewTabInfo);
     }
