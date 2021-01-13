@@ -7,7 +7,7 @@ env:
 phases:
   install:
     runtime-versions:
-      java: openjdk8
+      java: openjdk11
   build:
     commands:
       - echo $ARTIFACTORY_SETTINGS > /root/.m2/settings.xml
