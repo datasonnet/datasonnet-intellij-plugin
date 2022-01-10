@@ -30,11 +30,6 @@
     <extensions defaultExtensionNs="com.intellij">
 
         <fileEditorProvider implementation="com.modusbox.portx.datasonnet.editor.DataSonnetEditorProvider"/>
-        <fileTypeFactory implementation="com.modusbox.portx.datasonnet.language.DataSonnetFileTypeFactory"/>
-
-        <fileType name="DataSonnet" implementationClass="com.modusbox.portx.datasonnet.language.DataSonnetFileType"
-                  fieldName="INSTANCE" language="Datasonnet" extensions="ds"/>
-
         <projectConfigurable groupId="tools" displayName="DataSonnet" id="com.modusbox.portx.datasonnet.configurable"
                              instance="com.modusbox.portx.datasonnet.config.DataSonnetConfigurable" nonDefaultProject="true"/>
         <applicationService serviceImplementation="com.modusbox.portx.datasonnet.config.DataSonnetSettingsComponent"/>
@@ -42,7 +37,8 @@
 
         <lang.parserDefinition language="Datasonnet" implementationClass="com.modusbox.portx.datasonnet.language.DataSonnetParserDefinition"/>
         <lang.syntaxHighlighterFactory language="Datasonnet" implementationClass="com.modusbox.portx.datasonnet.language.DataSonnetSyntaxHighlighterFactory"/>
-        <fileTypeFactory implementation="com.modusbox.portx.datasonnet.language.DataSonnetFileTypeFactory"/>
+        <fileType name="DataSonnet" implementationClass="com.modusbox.portx.datasonnet.language.DataSonnetFileType"
+                  fieldName="INSTANCE" language="Datasonnet" extensions="ds;libsonnet" patterns="*.ds.TEMPLATE"/>
         <lang.commenter language="Datasonnet" implementationClass="com.modusbox.portx.datasonnet.language.DataSonnetCommenter"/>
         <completion.contributor language="Datasonnet" implementationClass="com.modusbox.portx.datasonnet.language.DataSonnetCompletionContributor"/>
         <lang.foldingBuilder language="Datasonnet" implementationClass="com.modusbox.portx.datasonnet.language.DataSonnetFoldingBuilder"/>
@@ -54,6 +50,8 @@
         <langCodeStyleSettingsProvider implementation="com.modusbox.portx.datasonnet.language.formatter.DataSonnetLanguageCodeStyleSettingsProvider"/>
 
         <lang.formatter language="Datasonnet" implementationClass="com.modusbox.portx.datasonnet.language.formatter.DataSonnetFormattingModelBuilder"/>
+        <lang.braceMatcher language="Datasonnet" implementationClass="com.modusbox.portx.datasonnet.language.DataSonnetBraceMatcher"/>
+
         <!--<configurationType implementation="org.mule.tooling.lang.dw.launcher.configuration.WeaveConfigurationType"/>-->
         <!--<runConfigurationProducer implementation="org.mule.tooling.lang.dw.launcher.configuration.WeaveConfigurationProducer"/>-->
 
