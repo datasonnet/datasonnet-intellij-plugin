@@ -1,9 +1,12 @@
 package com.modusbox.portx.datasonnet.editor;
 
 import com.datasonnet.Mapper;
+import com.datasonnet.MapperBuilder;
 import com.datasonnet.document.DefaultDocument;
 import com.datasonnet.document.MediaType;
 import com.datasonnet.document.MediaTypes;
+import com.datasonnet.spi.Library;
+import com.intellij.ProjectTopics;
 import com.intellij.codeHighlighting.BackgroundEditorHighlighter;
 import com.intellij.icons.AllIcons;
 import com.intellij.json.JsonLanguage;
@@ -43,6 +46,8 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ModuleRootEvent;
+import com.intellij.openapi.roots.ModuleRootListener;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.ui.configuration.ProjectSettingsService;
 import com.intellij.openapi.util.IconLoader;
@@ -68,6 +73,10 @@ import com.intellij.util.SlowOperations;
 import com.modusbox.portx.datasonnet.config.DataSonnetProjectSettingsComponent;
 import com.modusbox.portx.datasonnet.config.DataSonnetSettingsComponent;
 import com.modusbox.portx.datasonnet.language.DataSonnetFileType;
+import com.modusbox.portx.datasonnet.util.ClasspathUtils;
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ClassInfoList;
+import io.github.classgraph.ScanResult;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -82,6 +91,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.nio.file.Paths;
 import java.util.List;
@@ -125,6 +135,8 @@ public class DataSonnetEditor implements FileEditor {
     private static final Key<ParameterizedCachedValue<Map<String, String>, VirtualFile>> DS_LIBRARIES_KEY = Key.create("DS_LIBRARIES");
 
     private DefaultActionGroup actionGroup;
+
+    private List<Class<?>> libsClasses = null;
 
     public DataSonnetEditor(@NotNull Project project, @NotNull VirtualFile virtualFile, final TextEditorProvider provider) {
         this.project = project;
@@ -194,6 +206,14 @@ public class DataSonnetEditor implements FileEditor {
         gui.getOutputPanel().add(outputTabs.getComponent(), BorderLayout.CENTER);
         gui.getOutputPanel().setSize(1000, 1000);
 
+        project.getMessageBus().connect().subscribe(ProjectTopics.PROJECT_ROOTS,
+                new ModuleRootListener() {
+                    @Override
+                    public void rootsChanged(ModuleRootEvent event) {
+                        scanLibraries();
+                    }
+                });
+
         refreshPreview = new DocumentListener() {
             @Override
             public void documentChanged(@NotNull DocumentEvent event) {
@@ -256,6 +276,7 @@ public class DataSonnetEditor implements FileEditor {
                 app.invokeAndWait(action, ModalityState.current());
             }
 
+            scanLibraries();
             createOutputTab();
             this.runPreview(true);
         }
@@ -366,7 +387,8 @@ public class DataSonnetEditor implements FileEditor {
         if (currentScenario == null)
             return new DefaultDocument<>("ERROR: No mapping scenarios available!", MediaTypes.TEXT_PLAIN);
 
-        String dataSonnetScript = this.textEditor.getEditor().getDocument().getText();
+        String camelFunctions = "local cml = { exchangeProperty(str): exchangeProperty[str], header(str): header[str], properties(str): properties[str] };\n";
+        String dataSonnetScript = camelFunctions + this.textEditor.getEditor().getDocument().getText();
 
         String payload = "{}";
 
@@ -395,9 +417,38 @@ public class DataSonnetEditor implements FileEditor {
 
         try {
             ClassLoader currentCL = Thread.currentThread().getContextClassLoader();
-            Thread.currentThread().setContextClassLoader(Mapper.class.getClassLoader());
+            ClassLoader projectClassLoader = ClasspathUtils.getProjectClassLoader(project, this.getClass().getClassLoader());
 
-            Mapper mapper = new Mapper(dataSonnetScript, variables.keySet(), libraries);
+            //Thread.currentThread().setContextClassLoader(Mapper.class.getClassLoader());
+            Thread.currentThread().setContextClassLoader(projectClassLoader);
+
+            MapperBuilder builder = new MapperBuilder(dataSonnetScript)
+                    .withImports(libraries)
+                    .withInputNames(variables.keySet());
+
+            try {
+                for (Class clazz : libsClasses) {
+                    Library lib = null;
+                    try { //First see if it's a static Scala class
+                        lib = (Library) clazz.getDeclaredField("MODULE$").get(null);
+                    } catch (Exception e) { //See if it has defaut constructor
+                        try {
+                            Constructor constructor = clazz.getDeclaredConstructor(new Class[]{});
+                            lib = (Library) constructor.newInstance();
+                        } catch (Exception e2) {
+                            lib = null;
+                        }
+                    }
+                    if (lib != null) {
+                        builder = builder.withLibrary(lib);
+                    }
+                }
+            } catch (Exception e) {
+
+            }
+
+            //Mapper mapper = new Mapper(dataSonnetScript, variables.keySet(), libraries);
+            Mapper mapper = builder.build();
             com.datasonnet.document.Document transformDoc = mapper.transform(new DefaultDocument<>(payload, payloadMimeType), variables, outputMimeType);
 
             Thread.currentThread().setContextClassLoader(currentCL);
@@ -808,6 +859,24 @@ public class DataSonnetEditor implements FileEditor {
         DocumentListener[] listeners = (DocumentListener[]) method.invoke(document);
         if (!Arrays.asList(listeners).contains(listener)) {
             document.addDocumentListener(listener);
+        }
+    }
+
+    private void scanLibraries() {
+        try {
+            ClassLoader projectClassLoader = ClasspathUtils.getProjectClassLoader(project, this.getClass().getClassLoader());
+
+            ScanResult scanResult = new ClassGraph().enableAllInfo()
+                    .overrideClassLoaders(projectClassLoader)
+                    .scan();
+            ClassInfoList libs = scanResult.getSubclasses("com.datasonnet.spi.Library")
+                    .filter(classInfo -> classInfo.isPublic() &&
+                            !classInfo.isAbstract() &&
+                            !classInfo.getName().endsWith(".CML") && //Exclude Camel library
+                            !"com.datasonnet".equals(classInfo.getPackageName())); //Exclude default Datasonnet libraries
+            libsClasses = libs.loadClasses();
+        } catch (Exception e) {
+
         }
     }
 
