@@ -1,9 +1,12 @@
 package com.modusbox.portx.datasonnet.editor;
 
 import com.datasonnet.Mapper;
+import com.datasonnet.MapperBuilder;
 import com.datasonnet.document.DefaultDocument;
 import com.datasonnet.document.MediaType;
 import com.datasonnet.document.MediaTypes;
+import com.datasonnet.spi.Library;
+import com.intellij.ProjectTopics;
 import com.intellij.codeHighlighting.BackgroundEditorHighlighter;
 import com.intellij.icons.AllIcons;
 import com.intellij.json.JsonLanguage;
@@ -43,6 +46,8 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ModuleRootEvent;
+import com.intellij.openapi.roots.ModuleRootListener;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.ui.configuration.ProjectSettingsService;
 import com.intellij.openapi.util.IconLoader;
@@ -64,9 +69,14 @@ import com.intellij.ui.JBTabsPaneImpl;
 import com.intellij.ui.content.TabbedPaneContentUI;
 import com.intellij.ui.tabs.TabInfo;
 import com.intellij.util.Alarm;
+import com.intellij.util.SlowOperations;
 import com.modusbox.portx.datasonnet.config.DataSonnetProjectSettingsComponent;
 import com.modusbox.portx.datasonnet.config.DataSonnetSettingsComponent;
 import com.modusbox.portx.datasonnet.language.DataSonnetFileType;
+import com.modusbox.portx.datasonnet.util.ClasspathUtils;
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ClassInfoList;
+import io.github.classgraph.ScanResult;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -81,6 +91,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.nio.file.Paths;
 import java.util.List;
@@ -101,12 +112,12 @@ public class DataSonnetEditor implements FileEditor {
     private PsiFile psiFile;
 
     private Map<String, Editor> editors = new HashMap<String, Editor>();
-    private Map<String, VirtualFile> inputOutputFiles = new HashMap<String, VirtualFile>();
+    private Map<String, Editor> outputEditors = new HashMap<String, Editor>();
 
     private JBTabsPaneImpl outputTabs;
     private JBTabsPaneImpl inputTabs;
 
-    private TabInfo previewTabInfo;
+    private Map<String, TabInfo> previewTabInfoMap = new HashMap<>();
 
     private DataSonnetEditorUI gui;
 
@@ -124,6 +135,8 @@ public class DataSonnetEditor implements FileEditor {
     private static final Key<ParameterizedCachedValue<Map<String, String>, VirtualFile>> DS_LIBRARIES_KEY = Key.create("DS_LIBRARIES");
 
     private DefaultActionGroup actionGroup;
+
+    private List<Class<?>> libsClasses = null;
 
     public DataSonnetEditor(@NotNull Project project, @NotNull VirtualFile virtualFile, final TextEditorProvider provider) {
         this.project = project;
@@ -145,21 +158,21 @@ public class DataSonnetEditor implements FileEditor {
                 //Check if there is a test resources folder
                 List<VirtualFile> testRoots = ModuleRootManager.getInstance(module).getSourceRoots(JavaResourceRootType.TEST_RESOURCE);
                 if (testRoots == null || testRoots.isEmpty()) {
-                    Notifications.Bus.notify(new Notification("DataSonnet",
+                    Notification notification = new Notification("DataSonnet",
                             "No Test Resources folder found!",
                             "Please mark at least one directory as <strong>Test Resources</strong> folder.\n <a href=\"projectSettings\">Click here</a> to open project settings.",
-                            NotificationType.WARNING,
-                            new NotificationListener() {
-                                @Override
-                                public void hyperlinkUpdate(@NotNull Notification notification, @NotNull HyperlinkEvent event) {
-                                    if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                                        if ("projectSettings".equals(event.getDescription())) {
-                                            ProjectSettingsService.getInstance(project).openModuleSettings(module);
-                                        }
-                                    }
+                            NotificationType.WARNING);
+                    notification.setListener(new NotificationListener() {
+                        @Override
+                        public void hyperlinkUpdate(@NotNull Notification notification, @NotNull HyperlinkEvent event) {
+                            if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                                if ("projectSettings".equals(event.getDescription())) {
+                                    ProjectSettingsService.getInstance(project).openModuleSettings(module);
                                 }
-                            }));
-
+                            }
+                        }
+                    });
+                    Notifications.Bus.notify(notification);
                     return;
                 }
 
@@ -183,15 +196,23 @@ public class DataSonnetEditor implements FileEditor {
         actionGroup.add(new SelectScenarioAction());
 
         ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar("Scenarios", actionGroup, false);
+        toolbar.setTargetComponent(inputTabs.getComponent());
         toolbar.getComponent().setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, JBColor.border()));
 
         gui.getRootPanel().add(toolbar.getComponent(), BorderLayout.WEST);
 
         outputTabs = new JBTabsPaneImpl(project, SwingConstants.TOP, this);
         outputTabs.getTabs().getPresentation().setSideComponentVertical(true);
-        //((JBTabsImpl) outputTabs.getTabs()).setSideComponentVertical(true);
         gui.getOutputPanel().add(outputTabs.getComponent(), BorderLayout.CENTER);
         gui.getOutputPanel().setSize(1000, 1000);
+
+        project.getMessageBus().connect().subscribe(ProjectTopics.PROJECT_ROOTS,
+                new ModuleRootListener() {
+                    @Override
+                    public void rootsChanged(ModuleRootEvent event) {
+                        scanLibraries();
+                    }
+                });
 
         refreshPreview = new DocumentListener() {
             @Override
@@ -204,12 +225,9 @@ public class DataSonnetEditor implements FileEditor {
                     @Override
                     public void run() {
                         try {
-                            new WriteCommandAction.Simple(project, psiFile) {
-                                @Override
-                                protected void run() throws Throwable {
-                                    runPreview(false);
-                                }
-                            }.execute();
+                            WriteCommandAction.writeCommandAction(project, psiFile).run(() -> {
+                                runPreview(false);
+                            });
                         } catch (Exception e) {
                             logger.error(e);
                         }
@@ -258,10 +276,17 @@ public class DataSonnetEditor implements FileEditor {
                 app.invokeAndWait(action, ModalityState.current());
             }
 
+            scanLibraries();
             createOutputTab();
             this.runPreview(true);
         }
 
+    }
+
+    @NotNull
+    @Override
+    public VirtualFile getFile() {
+        return psiFile.getVirtualFile();
     }
 
     @NotNull
@@ -342,8 +367,6 @@ public class DataSonnetEditor implements FileEditor {
             }
         }
         EditorFactory.getInstance().releaseEditor(textEditor.getEditor());
-//        Disposer.dispose(textEditor);
-//        Disposer.dispose(this);
     }
 
     @Nullable
@@ -364,7 +387,8 @@ public class DataSonnetEditor implements FileEditor {
         if (currentScenario == null)
             return new DefaultDocument<>("ERROR: No mapping scenarios available!", MediaTypes.TEXT_PLAIN);
 
-        String dataSonnetScript = this.textEditor.getEditor().getDocument().getText();
+        String camelFunctions = "local cml = { exchangeProperty(str): exchangeProperty[str], header(str): header[str], properties(str): properties[str] };\n";
+        String dataSonnetScript = camelFunctions + this.textEditor.getEditor().getDocument().getText();
 
         String payload = "{}";
 
@@ -389,13 +413,42 @@ public class DataSonnetEditor implements FileEditor {
             }
         }
 
-        Map<String, String> libraries = getDSLibraries(this.textEditor.getFile());
+        Map<String, String> libraries = SlowOperations.allowSlowOperations(() -> getDSLibraries(this.textEditor.getFile()));
 
         try {
             ClassLoader currentCL = Thread.currentThread().getContextClassLoader();
-            Thread.currentThread().setContextClassLoader(Mapper.class.getClassLoader());
+            ClassLoader projectClassLoader = ClasspathUtils.getProjectClassLoader(project, this.getClass().getClassLoader());
 
-            Mapper mapper = new Mapper(dataSonnetScript, variables.keySet(), libraries);
+            //Thread.currentThread().setContextClassLoader(Mapper.class.getClassLoader());
+            Thread.currentThread().setContextClassLoader(projectClassLoader);
+
+            MapperBuilder builder = new MapperBuilder(dataSonnetScript)
+                    .withImports(libraries)
+                    .withInputNames(variables.keySet());
+
+            try {
+                for (Class clazz : libsClasses) {
+                    Library lib = null;
+                    try { //First see if it's a static Scala class
+                        lib = (Library) clazz.getDeclaredField("MODULE$").get(null);
+                    } catch (Exception e) { //See if it has defaut constructor
+                        try {
+                            Constructor constructor = clazz.getDeclaredConstructor(new Class[]{});
+                            lib = (Library) constructor.newInstance();
+                        } catch (Exception e2) {
+                            lib = null;
+                        }
+                    }
+                    if (lib != null) {
+                        builder = builder.withLibrary(lib);
+                    }
+                }
+            } catch (Exception e) {
+
+            }
+
+            //Mapper mapper = new Mapper(dataSonnetScript, variables.keySet(), libraries);
+            Mapper mapper = builder.build();
             com.datasonnet.document.Document transformDoc = mapper.transform(new DefaultDocument<>(payload, payloadMimeType), variables, outputMimeType);
 
             Thread.currentThread().setContextClassLoader(currentCL);
@@ -503,24 +556,25 @@ public class DataSonnetEditor implements FileEditor {
             return;
 
         //Commit all data
-        new WriteCommandAction.Simple(project, psiFile) {
-            @Override
-            protected void run() throws Throwable {
-                for (Editor nextEditor : editors.values()) {
+        WriteCommandAction.writeCommandAction(project, psiFile).run(() -> {
+            for (Editor nextEditor : editors.values()) {
+                try {
                     Document doc = nextEditor.getDocument();
                     PsiDocumentManager psiDocumentManager = PsiDocumentManager.getInstance(project);
                     if (psiDocumentManager.isUncommited(doc) && project.isInitialized()) {
                         psiDocumentManager.commitDocument(doc);
-                        FileDocumentManager.getInstance().saveDocument(doc);
+                        //FileDocumentManager.getInstance().saveDocument(doc);
+                        FileDocumentManager.getInstance().saveAllDocuments();
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-
             }
-        }.execute();
+        });
 
         this.textEditor.getEditor().getMarkupModel().removeAllHighlighters();
 
-        DataSonnetSettingsComponent mySettingsComponent = ServiceManager.getService(DataSonnetSettingsComponent.class);
+        DataSonnetSettingsComponent mySettingsComponent = ApplicationManager.getApplication().getService(DataSonnetSettingsComponent.class);
         boolean useBuiltIn = mySettingsComponent.getState().isBuiltInParser();
 
         final String contentType;
@@ -528,11 +582,8 @@ public class DataSonnetEditor implements FileEditor {
 
         if (useBuiltIn) {
             com.datasonnet.document.Document doc = runPreviewBuiltIn();
-            //preview = doc.getContentsAsString();
             preview = doc.getContent().toString();
             contentType = doc.getMediaType().toString();
-            //preview = doc.canGetContentsAs(String.class) ? doc.getContentsAsString() : doc.getContentsAsObject().toString(); //This should work for all formats and do the best to represent java object as string in preview
-            //contentType = doc.getMimeType();
         } else {
             preview = runPreviewExt();
             contentType = "application/json";
@@ -568,12 +619,9 @@ public class DataSonnetEditor implements FileEditor {
             }
 
             try {
-                new WriteCommandAction.Simple(project, psiFile) {
-                    @Override
-                    protected void run() throws Throwable {
-                        updateOutputTab(preview, contentType);
-                    }
-                }.execute();
+                WriteCommandAction.writeCommandAction(project, psiFile).run(() -> {
+                    updateOutputTab(preview, contentType);
+                });
             } catch (Exception e) {
                 logger.error(e);
             }
@@ -617,21 +665,14 @@ public class DataSonnetEditor implements FileEditor {
             language = PlainTextLanguage.INSTANCE;
         }
 
-        String title = "Preview";
+        final String title = "Preview";
+
+        Editor editor = outputEditors.get(mimeType);
         PsiFile f = PsiFileFactory.getInstance(getProject()).createFileFromText(language, contents);
-        inputOutputFiles.put(title, f.getVirtualFile());
-
-        Editor editor = editors.get(title);
-        if (editor != null && !editor.isDisposed()) {
-            try {
-                EditorFactory.getInstance().releaseEditor(editor);
-            } catch (Throwable e) {
-
-            }
+        if (editor == null) {
+            editor = EditorFactory.getInstance().createEditor(f.getViewProvider().getDocument(), getProject(), language.getAssociatedFileType(), true);
+            outputEditors.put(mimeType, editor);
         }
-        editor = EditorFactory.getInstance().createEditor(f.getViewProvider().getDocument(), getProject(), language.getAssociatedFileType(), true);
-        editors.put(title, editor);
-
         final Editor currentEditor = editor;
 
         final Application app = ApplicationManager.getApplication();
@@ -669,24 +710,27 @@ public class DataSonnetEditor implements FileEditor {
 
         outputTabs.getTabs().getPresentation().setSideComponentVertical(true);
 
-        try {
-            outputTabs.removeTabAt(outputTabs.getTabs().getIndexOf(previewTabInfo));
-        } catch (Exception e) {
+        TabInfo previewTabInfo = previewTabInfoMap.get(mimeType);
+        if (previewTabInfo == null) {
+            previewTabInfo = new TabInfo(editor.getComponent());
+            previewTabInfo.setText(title);
+            previewTabInfo.setIcon(icon);
 
+            if (actionGroup == null) {
+                actionGroup = new DefaultActionGroup();
+                actionGroup.add(new AutoSyncAction(this));
+                actionGroup.add(new RefreshAction(this));
+                actionGroup.add(new SelectOutputMimeTypeAction());
+            }
+            previewTabInfo.setActions(actionGroup, "DataSonnetPreview");
+            outputTabs.getTabs().addTab(previewTabInfo);
+            previewTabInfoMap.put(mimeType, previewTabInfo);
         }
 
-        previewTabInfo = new TabInfo(editor.getComponent());
-        previewTabInfo.setText(title);
-        previewTabInfo.setIcon(icon);
-
-        if (actionGroup == null) {
-            actionGroup = new DefaultActionGroup();
-            actionGroup.add(new AutoSyncAction(this));
-            actionGroup.add(new RefreshAction(this));
-            actionGroup.add(new SelectOutputMimeTypeAction());
+        for (Map.Entry<String, TabInfo> entry : previewTabInfoMap.entrySet()) {
+            entry.getValue().setHidden(!mimeType.equalsIgnoreCase(entry.getKey()));
         }
-        previewTabInfo.setActions(actionGroup, "DataSonnetPreview");
-        outputTabs.getTabs().addTab(previewTabInfo);
+
     }
 
     protected PsiFile getPsiFile() {
@@ -698,6 +742,7 @@ public class DataSonnetEditor implements FileEditor {
         DefaultActionGroup actionGroup = new DefaultActionGroup();
         actionGroup.add(new AddInputAction(this));
         ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar("Inputs", actionGroup, false);
+        toolbar.setTargetComponent(this.getComponent());
         gui.getSourcePanel().add(toolbar.getComponent(), BorderLayout.WEST);
 
         closeAllInputs();
@@ -817,6 +862,24 @@ public class DataSonnetEditor implements FileEditor {
         }
     }
 
+    private void scanLibraries() {
+        try {
+            ClassLoader projectClassLoader = ClasspathUtils.getProjectClassLoader(project, this.getClass().getClassLoader());
+
+            ScanResult scanResult = new ClassGraph().enableAllInfo()
+                    .overrideClassLoaders(projectClassLoader)
+                    .scan();
+            ClassInfoList libs = scanResult.getSubclasses("com.datasonnet.spi.Library")
+                    .filter(classInfo -> classInfo.isPublic() &&
+                            !classInfo.isAbstract() &&
+                            !classInfo.getName().endsWith(".CML") && //Exclude Camel library
+                            !"com.datasonnet".equals(classInfo.getPackageName())); //Exclude default Datasonnet libraries
+            libsClasses = libs.loadClasses();
+        } catch (Exception e) {
+
+        }
+    }
+
     private class SelectScenarioAction extends AnAction {
         public SelectScenarioAction() {
             super(null, "Select scenario", IconLoader.findIcon("/icons/selectScenario.svg"));
@@ -871,7 +934,7 @@ public class DataSonnetEditor implements FileEditor {
 
         @Override
         public void update(@NotNull final AnActionEvent e) {
-            DataSonnetSettingsComponent mySettingsComponent = ServiceManager.getService(DataSonnetSettingsComponent.class);
+            DataSonnetSettingsComponent mySettingsComponent = ApplicationManager.getApplication().getService(DataSonnetSettingsComponent.class);
             boolean useBuiltIn = mySettingsComponent.getState().isBuiltInParser();
             e.getPresentation().setEnabled(useBuiltIn);
         }
@@ -899,7 +962,6 @@ public class DataSonnetEditor implements FileEditor {
                 group.add(new ToggleMimeType(dataFormatId, mimeType));
             }
 */
-
             final InputEvent inputEvent = e.getInputEvent();
             final ActionPopupMenu popupMenu =
                     ((ActionManagerImpl) ActionManager.getInstance())
@@ -915,13 +977,15 @@ public class DataSonnetEditor implements FileEditor {
         }
 
         class ToggleMimeType extends ToggleAction {
+
             ToggleMimeType(String format, String mimeType) {
                 super(format, mimeType, null);
             }
 
             @Override
             public void update(@NotNull final AnActionEvent e) {
-                DataSonnetSettingsComponent mySettingsComponent = ServiceManager.getService(DataSonnetSettingsComponent.class);
+                super.update(e);
+                DataSonnetSettingsComponent mySettingsComponent = ApplicationManager.getApplication().getService(DataSonnetSettingsComponent.class);
                 boolean useBuiltIn = mySettingsComponent.getState().isBuiltInParser();
                 e.getPresentation().setEnabled(useBuiltIn);
             }
@@ -929,11 +993,14 @@ public class DataSonnetEditor implements FileEditor {
             @Override
             public boolean isSelected(@NotNull AnActionEvent e) {
                 String mimeType = e.getPresentation().getDescription();
-                return mimeType.equalsIgnoreCase(DataSonnetEditor.this.outputMimeType.toString());
+                boolean isSelected = mimeType.equalsIgnoreCase(DataSonnetEditor.this.outputMimeType.toString());
+                e.getPresentation().setIcon(isSelected ? AllIcons.Actions.Checked : null);
+                return isSelected;
             }
 
             @Override
             public void setSelected(@NotNull AnActionEvent e, boolean state) {
+                e.getPresentation().setIcon(state ? AllIcons.Actions.Checked : null);
                 DataSonnetEditor.this.outputMimeType = MediaType.valueOf(e.getPresentation().getDescription());
                 DataSonnetEditor.this.runPreview(true);
             }

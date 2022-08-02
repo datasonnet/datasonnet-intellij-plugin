@@ -130,14 +130,14 @@ public class DataSonnetBlock implements ASTBlock {
                 wrap = myChildWrap;
                 indent = Indent.getNormalIndent();
             }
-            else if (hasElementType(childNode, DATASONNET_OPEN_BRACES)) {
+            else if (hasElementType(childNode, DATASONNET_OPEN_BRACES) && myParent != null) {
                 if (isPropertyValue(myPsiElement) && propertyAlignment == ALIGN_PROPERTY_ON_VALUE) {
                     // WEB-13587 Align compound values on opening brace/bracket, not the whole block
                     assert myParent != null && myParent.myParent != null && myParent.myParent.myPropertyValueAlignment != null;
                     alignment = myParent.myParent.myPropertyValueAlignment;
                 }
             }
-        } else if (hasElementType(childNode, IF, THEN, ELSE) ) {//TODO this doesn't always produce good results, needs rethinking
+        } else if (hasElementType(childNode, IF, THEN, ELSE) && myParent != null) {//TODO this doesn't always produce good results, needs rethinking
             alignment = myParent.myPropertyValueAlignment;
             wrap = myParent.myWrap;
             indent = myParent.myIndent;
