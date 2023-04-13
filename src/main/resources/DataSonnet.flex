@@ -78,12 +78,14 @@ IDENTIFIER=[a-zA-Z_][a-zA-Z0-9_]*
   "if"                        { return IF; }
   "then"                      { return THEN; }
   "else"                      { return ELSE; }
+  "try"                       { return TRY; }
   "super"                     { return SUPER; }
   "error"                     { return ERROR; }
   "self"                      { return SELF; }
   "for"                       { return FOR; }
   "$"                         { return DOLLAR; }
   "assert"                    { return ASSERT; }
+  "default"                   { return DEFAULT; }
   {LINE_COMMENT}              { return LINE_COMMENT; }
   {BLOCK_COMMENT}             { return BLOCK_COMMENT; }
   {DOUBLE_QUOTED_STRING}      { return DOUBLE_QUOTED_STRING; }

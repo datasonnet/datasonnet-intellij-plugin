@@ -52,6 +52,7 @@ expr0 ::=	NULL | TRUE | FALSE | SELF | DOLLAR
 |	SUPER L_BRACKET expr R_BRACKET
 |   outerlocal
 |	IF expr THEN expr ( ELSE expr )?
+|	TRY expr ELSE expr
 |	L_PAREN expr R_PAREN
 |	unaryop expr
 |	FUNCTION L_PAREN ( params )? R_PAREN expr
@@ -96,7 +97,7 @@ args	::= arg ( COMMA arg )* ( COMMA )?
 param ::= IDENTIFIER0 (EQUAL expr)?
 params	::=	param (COMMA param)* ( COMMA )?
 
-binaryop	::=	ASTERISK | SLASH | PERCENT | PLUS | MINUS | DOUBLE_LESS | DOUBLE_GREATER | LESS_THAN | LESS_EQUAL | GREATER_THAN | GREATER_EQUAL | DOUBLE_EQUAL | NOT_EQUAL | IN | AND | CARAT | BAR | DOUBLE_AND | DOUBLE_BAR
+binaryop	::=	ASTERISK | SLASH | PERCENT | PLUS | MINUS | DOUBLE_LESS | DOUBLE_GREATER | LESS_THAN | LESS_EQUAL | GREATER_THAN | GREATER_EQUAL | DOUBLE_EQUAL | NOT_EQUAL | IN | AND | CARAT | BAR | DOUBLE_AND | DOUBLE_BAR | DEFAULT
 unaryop	::=	MINUS | PLUS | EXCLAMATION | TILDE
 importop ::= (IMPORT (DOUBLE_QUOTED_STRING | SINGLE_QUOTED_STRING)) {
     mixin="com.modusbox.portx.datasonnet.language.psi.impl.DataSonnetNamedElementImpl"
