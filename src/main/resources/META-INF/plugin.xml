@@ -1,5 +1,5 @@
 <idea-plugin version="2">
-    <id>com.modusbox.portx.datasonnet</id>
+    <id>io.portx.datasonnet</id>
     <name>DataSonnet Mapper</name>
     <version>0.1</version>
     <vendor email="eugene.berman@modusbox.com" url="">Eugene Berman</vendor>
@@ -29,28 +29,28 @@
 
     <extensions defaultExtensionNs="com.intellij">
 
-        <fileEditorProvider implementation="com.modusbox.portx.datasonnet.editor.DataSonnetEditorProvider"/>
-        <projectConfigurable groupId="tools" displayName="DataSonnet" id="com.modusbox.portx.datasonnet.configurable"
-                             instance="com.modusbox.portx.datasonnet.config.DataSonnetConfigurable" nonDefaultProject="true"/>
-        <applicationService serviceImplementation="com.modusbox.portx.datasonnet.config.DataSonnetSettingsComponent"/>
-        <projectService serviceImplementation="com.modusbox.portx.datasonnet.config.DataSonnetProjectSettingsComponent"/>
+        <fileEditorProvider implementation="io.portx.datasonnet.editor.DataSonnetEditorProvider"/>
+        <projectConfigurable groupId="tools" displayName="DataSonnet" id="io.portx.datasonnet.configurable"
+                             instance="io.portx.datasonnet.config.DataSonnetConfigurable" nonDefaultProject="true"/>
+        <applicationService serviceImplementation="io.portx.datasonnet.config.DataSonnetSettingsComponent"/>
+        <projectService serviceImplementation="io.portx.datasonnet.config.DataSonnetProjectSettingsComponent"/>
 
-        <lang.parserDefinition language="Datasonnet" implementationClass="com.modusbox.portx.datasonnet.language.DataSonnetParserDefinition"/>
-        <lang.syntaxHighlighterFactory language="Datasonnet" implementationClass="com.modusbox.portx.datasonnet.language.DataSonnetSyntaxHighlighterFactory"/>
-        <fileType name="DataSonnet" implementationClass="com.modusbox.portx.datasonnet.language.DataSonnetFileType"
+        <lang.parserDefinition language="Datasonnet" implementationClass="io.portx.datasonnet.language.DataSonnetParserDefinition"/>
+        <lang.syntaxHighlighterFactory language="Datasonnet" implementationClass="io.portx.datasonnet.language.DataSonnetSyntaxHighlighterFactory"/>
+        <fileType name="DataSonnet" implementationClass="io.portx.datasonnet.language.DataSonnetFileType"
                   fieldName="INSTANCE" language="Datasonnet" extensions="ds;libsonnet" patterns="*.ds.TEMPLATE"/>
-        <lang.commenter language="Datasonnet" implementationClass="com.modusbox.portx.datasonnet.language.DataSonnetCommenter"/>
-        <completion.contributor language="Datasonnet" implementationClass="com.modusbox.portx.datasonnet.language.DataSonnetCompletionContributor"/>
-        <lang.foldingBuilder language="Datasonnet" implementationClass="com.modusbox.portx.datasonnet.language.DataSonnetFoldingBuilder"/>
-        <psi.referenceContributor implementation="com.modusbox.portx.datasonnet.language.DataSonnetReferenceContributor"/>
+        <lang.commenter language="Datasonnet" implementationClass="io.portx.datasonnet.language.DataSonnetCommenter"/>
+        <completion.contributor language="Datasonnet" implementationClass="io.portx.datasonnet.language.DataSonnetCompletionContributor"/>
+        <lang.foldingBuilder language="Datasonnet" implementationClass="io.portx.datasonnet.language.DataSonnetFoldingBuilder"/>
+        <psi.referenceContributor implementation="io.portx.datasonnet.language.DataSonnetReferenceContributor"/>
 
-        <annotator language="Datasonnet" implementationClass="com.modusbox.portx.datasonnet.language.DataSonnetAnnotator"/>
+        <annotator language="Datasonnet" implementationClass="io.portx.datasonnet.language.DataSonnetAnnotator"/>
 
-        <codeStyleSettingsProvider implementation="com.modusbox.portx.datasonnet.language.formatter.DataSonnetCodeStyleSettingsProvider"/>
-        <langCodeStyleSettingsProvider implementation="com.modusbox.portx.datasonnet.language.formatter.DataSonnetLanguageCodeStyleSettingsProvider"/>
+        <codeStyleSettingsProvider implementation="io.portx.datasonnet.language.formatter.DataSonnetCodeStyleSettingsProvider"/>
+        <langCodeStyleSettingsProvider implementation="io.portx.datasonnet.language.formatter.DataSonnetLanguageCodeStyleSettingsProvider"/>
 
-        <lang.formatter language="Datasonnet" implementationClass="com.modusbox.portx.datasonnet.language.formatter.DataSonnetFormattingModelBuilder"/>
-        <lang.braceMatcher language="Datasonnet" implementationClass="com.modusbox.portx.datasonnet.language.DataSonnetBraceMatcher"/>
+        <lang.formatter language="Datasonnet" implementationClass="io.portx.datasonnet.language.formatter.DataSonnetFormattingModelBuilder"/>
+        <lang.braceMatcher language="Datasonnet" implementationClass="io.portx.datasonnet.language.DataSonnetBraceMatcher"/>
 
         <!--<configurationType implementation="org.mule.tooling.lang.dw.launcher.configuration.WeaveConfigurationType"/>-->
         <!--<runConfigurationProducer implementation="org.mule.tooling.lang.dw.launcher.configuration.WeaveConfigurationProducer"/>-->
@@ -85,24 +85,24 @@
         <!--<lang.substitutor implementationClass="org.mule.tooling.lang.dw.editor.DataSonnetEditor$WeaveIOSubstitutor" language="XML"/>-->
         <!--<lang.substitutor implementationClass="org.mule.tooling.lang.dw.editor.DataSonnetEditor$WeaveIOSubstitutor" language="TEXT"/>-->
 
+        <xdebugger.breakpointType implementation="io.portx.datasonnet.debug.breakpoint.DataSonnetBreakpointType"/>
+        <configurationType implementation="io.portx.datasonnet.debug.runner.DataSonnetRunConfigurationType"/>
+
+        <programRunner id="Debug" implementation="io.portx.datasonnet.debug.runner.DataSonnetProgramRunner" order="first"/>
+<!--        <java.programPatcher implementation="com.github.cameltooling.idea.runner.debugger.CamelDebuggerPatcher"/>-->
+
+
+        <projectService
+                serviceInterface="io.portx.datasonnet.engine.ScenarioManager"
+                serviceImplementation="io.portx.datasonnet.engine.ScenarioManagerImpl"/>
+
     </extensions>
 
-    <project-components>
-        <component>
-            <implementation-class>com.modusbox.portx.datasonnet.editor.ScenarioManager</implementation-class>
-        </component>
-    </project-components>
-
-    <application-components>
-        <!--<component>-->
-            <!--<implementation-class>com.modusbox.portx.datasonnet.config.DataSonnetSettingsComponent</implementation-class>-->
-        <!--</component>-->
-    </application-components>
 
 
     <actions>
         <action id="DataSonnet.CreateNewFileAction"
-                class="com.modusbox.portx.datasonnet.actions.CreateNewFileAction" text="DataSonnet File"
+                class="io.portx.datasonnet.actions.CreateNewFileAction" text="DataSonnet File"
                 description="Create New DataSonnet File">
             <add-to-group group-id="NewGroup" anchor="first"/>
         </action>

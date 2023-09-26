@@ -6,6 +6,9 @@ plugins {
     id 'me.qoomon.git-versioning' version '1.2.3'
 }
 
+apply plugin: 'java'
+apply plugin: 'org.jetbrains.intellij'
+
 group 'com.datasonnet'
 version '2.1.1-SNAPSHOT'
 
@@ -44,7 +47,7 @@ dependencies {
     testImplementation group: 'junit', name: 'junit', version: '4.12'
 //     compile group: 'com.datasonnet', name: 'datasonnet-mapper', version: '2.5.1'
 //     compile group: 'io.github.classgraph', name: 'classgraph', version: '4.8.147'
-    implementation group: 'com.datasonnet', name: 'datasonnet-mapper', version: '2.1.1'
+    implementation group: 'com.datasonnet', name: 'datasonnet-mapper', version: '2.5.3-SNAPSHOT'
     implementation group: 'io.github.classgraph', name: 'classgraph', version: '4.8.147'
 }
 configurations.implementation {
@@ -70,11 +73,17 @@ gitVersioning {
 }
 
 intellij {
-    version.set("IC-2023.1")
-    //intellij.updateSinceUntilBuild false
+    version = ideaVersion
+    downloadSources = true
+    type = project.hasProperty('intellij_type') ? project.intellij_type : 'IC'
+    plugins = ['java']
 }
 // patchPluginXml {
 //     changeNotes """
 //       Add change notes here.<br>
 //       <em>most HTML tags may be used</em>"""
 // }
+patchPluginXml {
+    sinceBuild = "223"
+    untilBuild = "241.*"
+}
