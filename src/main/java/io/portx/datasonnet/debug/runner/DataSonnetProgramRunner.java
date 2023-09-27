@@ -47,14 +47,7 @@ public class DataSonnetProgramRunner extends GenericDebuggerRunner {
     @Nullable
     @Override
     protected RunContentDescriptor createContentDescriptor(@NotNull RunProfileState state,
-                                                           @NotNull ExecutionEnvironment environment) throws ExecutionException {
-        return attachVirtualMachine(state, environment, null, false);
-    }
-
-    @Override
-    @Nullable
-    protected RunContentDescriptor attachVirtualMachine(final RunProfileState state, final @NotNull ExecutionEnvironment env, RemoteConnection connection, boolean pollConnection)
-            throws ExecutionException {
+                                                           @NotNull ExecutionEnvironment env) throws ExecutionException {
         AtomicReference<ExecutionException> ex = new AtomicReference<>();
         AtomicReference<RunContentDescriptor> result = new AtomicReference<>();
 
@@ -72,9 +65,7 @@ public class DataSonnetProgramRunner extends GenericDebuggerRunner {
                 };
 
                 XDebugSession xDebugSession = XDebuggerManager.getInstance(env.getProject()).startSession(env, starter);
-
                 RunContentDescriptor descriptor = xDebugSession.getRunContentDescriptor();
-
                 DataSonnetRunProfileState dsState = (DataSonnetRunProfileState)state;
                 dsState.setConsoleView((ConsoleView) descriptor.getExecutionConsole());
                 state.execute(env.getExecutor(), this);
