@@ -1,5 +1,7 @@
 package io.portx.datasonnet.debug;
 
+import com.datasonnet.debugger.StoppedProgramContext;
+import com.datasonnet.debugger.da.DataSonnetDebugListener;
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.util.ArrayUtil;
 import com.intellij.xdebugger.XDebugProcess;
@@ -9,6 +11,7 @@ import com.intellij.xdebugger.breakpoints.XBreakpointHandler;
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
 import com.intellij.xdebugger.frame.XSuspendContext;
 import io.portx.datasonnet.debug.breakpoint.DataSonnetBreakpointHandler;
+import io.portx.datasonnet.debug.stack.DataSonnetStackFrame;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,6 +28,29 @@ public class DataSonnetDebugProcess extends XDebugProcess {
         this.dataSonnetDebuggerEditorsProvider = new DataSonnetDebuggerEditorsProvider();
         this.dataSonnetDebuggerSession = dataSonnetDebuggerSession;
         this.dataSonnetBreakpointHandler = new DataSonnetBreakpointHandler(dataSonnetDebuggerSession);
+
+        dataSonnetDebuggerSession.addDebuggerListener(new DataSonnetDebugListener() {
+            @Override
+            public void stopped(StoppedProgramContext stoppedProgramContext) {
+                DataSonnetStackFrame frame = new DataSonnetStackFrame(dataSonnetDebuggerSession, stoppedProgramContext);
+                getSession().positionReached(new DataSonnetSuspendContext(frame));
+
+                /*
+                final CamelMessageInfo camelMessageInfo = selectCamelMessageInfo(messages);
+            if (camelMessageInfo != null) {
+                //List frames
+                List<CamelStackFrame> stackFrames = new ArrayList<>();
+                for (CamelMessageInfo info : camelMessageInfo.getStack()) {
+                    CamelStackFrame nextFrame = new CamelStackFrame(camelDebuggerSession, info);
+                    stackFrames.add(nextFrame);
+                }
+                getSession().positionReached(new CamelSuspendContext(stackFrames.toArray(new CamelStackFrame[0])));
+                this.lastProcessed = camelMessageInfo;
+                LOG.debug("New camel message processed");
+            }
+                 */
+            }
+        });
 
         dataSonnetDebuggerSession.connect();
     }

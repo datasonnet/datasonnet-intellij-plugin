@@ -1,5 +1,6 @@
 package io.portx.datasonnet.debug.runner;
 
+import com.datasonnet.debugger.DataSonnetDebugger;
 import com.intellij.execution.process.ProcessOutputType;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
@@ -47,7 +48,12 @@ public class DataSonnetProcessHandler extends DefaultDebugProcessHandler {
         return dataSonnetEngine;
     }
 
+    public DataSonnetDebugger getDebugger() {
+        return dataSonnetEngine.getDebugger();
+    }
+
     public void startProcess() {
+        dataSonnetEngine.attach();
         ApplicationManager.getApplication().executeOnPooledThread(this::runDataSonnetMapping);
     }
 

@@ -39,17 +39,25 @@ public class DataSonnetEngine {
     private String outputMimeType;
     private boolean isDebug = false;
 
+    private DataSonnetDebugger dataSonnetDebugger;
+
     public DataSonnetEngine(@NotNull Project project, @NotNull String script, @NotNull String scenario, @NotNull String outputMimeType, boolean isDebug) {
         this.project = project;
         this.mappingFile = LocalFileSystem.getInstance().findFileByPath(script);
         this.scenario = ScenarioManager.getInstance(project).findScenario(this.mappingFile, scenario);
         this.outputMimeType = outputMimeType;
         this.isDebug = isDebug;
+
+        if (isDebug) {
+            dataSonnetDebugger = DataSonnetDebugger.getDebugger();
+        }
     }
 
     public String runDataSonnetMapping() {
-        String mappingScript = ApplicationManager.getApplication().runReadAction((Computable<String>) () ->
-                FileDocumentManager.getInstance().getDocument(mappingFile).getText());
+        com.intellij.openapi.editor.Document document = ApplicationManager.getApplication().runReadAction((Computable<com.intellij.openapi.editor.Document>) () ->
+                FileDocumentManager.getInstance().getDocument(mappingFile));
+        String mappingScript = document.getText();
+
         String camelFunctions = "local cml = { exchangeProperty(str): exchangeProperty[str], header(str): header[str], properties(str): properties[str] };\n";
         String dataSonnetScript = camelFunctions + mappingScript;
 
@@ -111,12 +119,14 @@ public class DataSonnetEngine {
 
             Mapper mapper = builder.build();
             if (isDebug) {
-                DataSonnetDebugger.getDebugger().attach();
+                getDebugger().attach();
+                String[] lines = mappingScript.trim().split("\n|\r|\r\n");
+                getDebugger().setLineCount(lines.length);
             }
             com.datasonnet.document.Document transformDoc =
                     mapper.transform(new DefaultDocument<>(payload, payloadMimeType), variables, MediaType.valueOf(outputMimeType));
             if (isDebug) {
-                DataSonnetDebugger.getDebugger().detach();
+                getDebugger().detach();
             }
 
             Thread.currentThread().setContextClassLoader(currentCL);
@@ -191,5 +201,13 @@ public class DataSonnetEngine {
     }
     public void detach() {
         DataSonnetDebugger.getDebugger().detach();
+    }
+
+    public VirtualFile getMappingFile() {
+        return mappingFile;
+    }
+
+    public DataSonnetDebugger getDebugger() {
+        return dataSonnetDebugger;
     }
 }

@@ -1,6 +1,7 @@
 package io.portx.datasonnet.debug;
 
 import com.datasonnet.debugger.DataSonnetDebugger;
+import com.datasonnet.debugger.da.DataSonnetDebugListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.xdebugger.AbstractDebuggerSession;
 import com.intellij.xdebugger.XSourcePosition;
@@ -9,7 +10,7 @@ import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
 import io.portx.datasonnet.debug.runner.DataSonnetProcessHandler;
 import org.jetbrains.annotations.NotNull;
 
-public class DataSonnetDebuggerSession  implements AbstractDebuggerSession {
+public class DataSonnetDebuggerSession implements AbstractDebuggerSession {
     private DataSonnetProcessHandler dataSonnetProcessHandler;
     private final Project project;
 
@@ -36,21 +37,22 @@ public class DataSonnetDebuggerSession  implements AbstractDebuggerSession {
     }
 
     public void addBreakpoint(XLineBreakpoint<XBreakpointProperties<?>> xBreakpoint) {
-        DataSonnetDebugger.getDebugger().addBreakpoint(xBreakpoint.getLine());
+        dataSonnetProcessHandler.getDebugger().addBreakpoint(xBreakpoint.getLine());
     }
 
     public void removeBreakpoint(XLineBreakpoint<XBreakpointProperties<?>> xBreakpoint) {
-        DataSonnetDebugger.getDebugger().removeBreakpoint(xBreakpoint.getLine());
+        dataSonnetProcessHandler.getDebugger().removeBreakpoint(xBreakpoint.getLine());
     }
     public void resume() {
-
+        dataSonnetProcessHandler.getDebugger().resume();
     }
     public void stepInto(XSourcePosition position) {
 
     }
 
     public void stepOver(XSourcePosition position) {
-
+        dataSonnetProcessHandler.getDebugger().addBreakpoint(position.getLine() + 1, true);
+        resume();
     }
 
     public void stepOut(XSourcePosition position) {
@@ -64,7 +66,15 @@ public class DataSonnetDebuggerSession  implements AbstractDebuggerSession {
         return dataSonnetProcessHandler;
     }
 
-/*    private void runDataSonnetProcess() {
+    public void addDebuggerListener(DataSonnetDebugListener listener) {
+        dataSonnetProcessHandler.getDebugger().setDebuggerAdapter(listener);
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    /*    private void runDataSonnetProcess() {
         final TextConsoleBuilder consoleBuilder = TextConsoleBuilderFactory.getInstance().createBuilder(project);
         final ConsoleView console = consoleBuilder.getConsole();
         console.print("TEST SYSOUT\n", ConsoleViewContentType.SYSTEM_OUTPUT);
