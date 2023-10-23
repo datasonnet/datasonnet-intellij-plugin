@@ -35,6 +35,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 
 public class DataSonnetDebuggerEditorsProvider extends XDebuggerEditorsProvider {
@@ -55,6 +56,6 @@ public class DataSonnetDebuggerEditorsProvider extends XDebuggerEditorsProvider 
     @NotNull
     @Override
     public Collection<Language> getSupportedLanguages(@NotNull Project project, @Nullable XSourcePosition sourcePosition) {
-        return Arrays.asList(DataSonnetLanguage.INSTANCE);
+        return List.of(DataSonnetLanguage.INSTANCE);
     }
 }

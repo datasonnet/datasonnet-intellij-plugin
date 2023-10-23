@@ -13,18 +13,19 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class DataSonnetRunProfileState implements RunProfileState {
-    private DataSonnetProcessHandler dataSonnetProcessHandler;
+    private final DataSonnetProcessHandler dataSonnetProcessHandler;
     private ConsoleView consoleView;
 
     private final Project project;
+
     public DataSonnetRunProfileState(DataSonnetRunConfiguration dataSonnetRunConfiguration) {
         this.project = dataSonnetRunConfiguration.getProject();
         DataSonnetEngine dataSonnetEngine =
                 new DataSonnetEngine(
                         dataSonnetRunConfiguration.getProject(),
-                    dataSonnetRunConfiguration.getScriptName(),
-                    dataSonnetRunConfiguration.getMappingScenario(),
-                    dataSonnetRunConfiguration.getOutputMimeType(), true);
+                        dataSonnetRunConfiguration.getScriptName(),
+                        dataSonnetRunConfiguration.getMappingScenario(),
+                        dataSonnetRunConfiguration.getOutputMimeType(), true);
         dataSonnetProcessHandler =
                 new DataSonnetProcessHandler(this.project, dataSonnetEngine);
     }

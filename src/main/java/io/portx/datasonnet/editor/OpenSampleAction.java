@@ -25,8 +25,7 @@ public class OpenSampleAction extends AnAction {
 
     Document document;
 
-    public OpenSampleAction(Document document)
-    {
+    public OpenSampleAction(Document document) {
         super("Load Sample", "Load Sample Data", loadSampleIcon);
         this.document = document;
     }

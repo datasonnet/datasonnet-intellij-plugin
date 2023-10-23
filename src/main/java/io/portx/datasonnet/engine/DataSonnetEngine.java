@@ -33,10 +33,10 @@ import java.util.*;
 
 public class DataSonnetEngine {
 
-    private VirtualFile mappingFile;
-    private Scenario scenario;
-    private Project project;
-    private String outputMimeType;
+    private final VirtualFile mappingFile;
+    private final Scenario scenario;
+    private final Project project;
+    private final String outputMimeType;
     private boolean isDebug = false;
 
     private DataSonnetDebugger dataSonnetDebugger;
@@ -84,7 +84,7 @@ public class DataSonnetEngine {
         }
 
         Map<String, String> libraries = SlowOperations.allowSlowOperations(() ->
-                ApplicationManager.getApplication().runReadAction((Computable<Map<String, String>>) () ->getDSLibraries())
+                ApplicationManager.getApplication().runReadAction((Computable<Map<String, String>>) () -> getDSLibraries())
         );
 
         try {
@@ -103,7 +103,7 @@ public class DataSonnetEngine {
                         lib = (Library) clazz.getDeclaredField("MODULE$").get(null);
                     } catch (Exception e) { //See if it has defaut constructor
                         try {
-                            Constructor constructor = clazz.getDeclaredConstructor(new Class[]{});
+                            Constructor constructor = clazz.getDeclaredConstructor();
                             lib = (Library) constructor.newInstance();
                         } catch (Exception e2) {
                             lib = null;
@@ -199,6 +199,7 @@ public class DataSonnetEngine {
     public void attach() {
         DataSonnetDebugger.getDebugger().attach();
     }
+
     public void detach() {
         DataSonnetDebugger.getDebugger().detach();
     }

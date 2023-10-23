@@ -2,7 +2,6 @@ package io.portx.datasonnet.engine;
 
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.WriteAction;
-import com.intellij.openapi.components.Service;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
@@ -29,10 +28,10 @@ public class ScenarioManagerImpl implements ScenarioManager, Disposable {
     public static final String NO_SCENARIO = "No scenario";
     public static final String DEFAULT_SCENARIO_NAME = "default_scenario";
 
-    private Map<String, Scenario> selectedScenariosByMapping = new HashMap<>();
-    private Map<String, VirtualFile> dataSonnetInputsFolders = new HashMap<>();
+    private final Map<String, Scenario> selectedScenariosByMapping = new HashMap<>();
+    private final Map<String, VirtualFile> dataSonnetInputsFolders = new HashMap<>();
 
-    private Project myProject;
+    private final Project myProject;
 
     protected ScenarioManagerImpl(Project project) {
         myProject = project;
@@ -52,6 +51,7 @@ public class ScenarioManagerImpl implements ScenarioManager, Disposable {
             return null;
         }
     }
+
     public VirtualFile findOrCreateMappingTestFolder(PsiFile psiFile) {
         VirtualFile testFolder = findMappingTestFolder(psiFile);
         if (testFolder == null) {
@@ -59,6 +59,7 @@ public class ScenarioManagerImpl implements ScenarioManager, Disposable {
         }
         return testFolder;
     }
+
     @Nullable
     public VirtualFile findMappingTestFolder(PsiFile psiFile) {
         if (psiFile != null) {
@@ -70,6 +71,7 @@ public class ScenarioManagerImpl implements ScenarioManager, Disposable {
         }
         return null;
     }
+
     @Nullable
     public VirtualFile createMappingTestFolder(PsiFile dataSonnetFile) {
         return WriteAction.compute(() -> {
@@ -83,6 +85,7 @@ public class ScenarioManagerImpl implements ScenarioManager, Disposable {
             }
         });
     }
+
     @Nullable
     public VirtualFile getScenariosRootFolder(PsiFile dataSonnetFile) {
         final Module module = ModuleUtil.findModuleForFile(dataSonnetFile.getVirtualFile(), dataSonnetFile.getProject());
@@ -151,7 +154,7 @@ public class ScenarioManagerImpl implements ScenarioManager, Disposable {
                 ModifiableRootModel model = ModuleRootManager.getInstance(module).getModifiableModel();
                 ContentEntry[] entries = model.getContentEntries();
                 for (ContentEntry entry : entries) {
-                    if (entry.getFile() == moduleRoot)
+                    if (entry.getFile().equals(moduleRoot))
                         entry.addSourceFolder(dataSonnetInputsFile, true);
                 }
 
@@ -187,7 +190,7 @@ public class ScenarioManagerImpl implements ScenarioManager, Disposable {
     @Nullable
     public Scenario findScenario(@NotNull VirtualFile dsMappingFile, @NotNull String scenarioName) {
         PsiFile dsPsiFile = PsiManager.getInstance(myProject).findFile(dsMappingFile);
-        for (Scenario s: getScenariosFor(dsPsiFile)) {
+        for (Scenario s : getScenariosFor(dsPsiFile)) {
             if (scenarioName.equals(s.getPresentableText())) {
                 return s;
             }

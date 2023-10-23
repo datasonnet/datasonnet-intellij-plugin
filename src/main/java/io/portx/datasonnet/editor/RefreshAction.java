@@ -21,8 +21,7 @@ public class RefreshAction extends AnAction {
 
     DataSonnetEditor editor;
 
-    public RefreshAction(DataSonnetEditor editor)
-    {
+    public RefreshAction(DataSonnetEditor editor) {
         super("Refresh", "Force Refresh Mapping", refreshIcon);
         this.editor = editor;
     }

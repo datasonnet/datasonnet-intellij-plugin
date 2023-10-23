@@ -9,7 +9,6 @@ import com.intellij.psi.TokenType;
 import com.intellij.psi.codeStyle.CodeStyleSettings;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
-import io.portx.datasonnet.language.psi.*;
 import io.portx.datasonnet.language.DataSonnetParserDefinition;
 import io.portx.datasonnet.language.psi.*;
 import org.jetbrains.annotations.NotNull;
@@ -49,22 +48,22 @@ public class DataSonnetBlock implements ASTBlock {
     @Deprecated
     @SuppressWarnings("unused") //used externally
     public DataSonnetBlock(@Nullable DataSonnetBlock parent,
-                     @NotNull ASTNode node,
-                     @NotNull CodeStyleSettings settings,
-                     @Nullable Alignment alignment,
-                     @NotNull Indent indent,
-                     @Nullable Wrap wrap) {
+                           @NotNull ASTNode node,
+                           @NotNull CodeStyleSettings settings,
+                           @Nullable Alignment alignment,
+                           @NotNull Indent indent,
+                           @Nullable Wrap wrap) {
         this(parent, node, settings.getCustomSettings(DataSonnetCodeStyleSettings.class), alignment, indent, wrap,
                 DataSonnetFormattingModelBuilder.createSpacingBuilder(settings));
     }
 
     public DataSonnetBlock(@Nullable DataSonnetBlock parent,
-                     @NotNull ASTNode node,
-                     @NotNull DataSonnetCodeStyleSettings customSettings,
-                     @Nullable Alignment alignment,
-                     @NotNull Indent indent,
-                     @Nullable Wrap wrap,
-                     @NotNull SpacingBuilder spacingBuilder) {
+                           @NotNull ASTNode node,
+                           @NotNull DataSonnetCodeStyleSettings customSettings,
+                           @Nullable Alignment alignment,
+                           @NotNull Indent indent,
+                           @Nullable Wrap wrap,
+                           @NotNull SpacingBuilder spacingBuilder) {
         myParent = parent;
         myNode = node;
         myPsiElement = node.getPsi();
@@ -76,18 +75,16 @@ public class DataSonnetBlock implements ASTBlock {
 
         if (myPsiElement instanceof DataSonnetObj) {
             myChildWrap = Wrap.createWrap(myCustomSettings.OBJECT_WRAPPING, true);
-        }
-        else if (myPsiElement instanceof DataSonnetArr || myPsiElement instanceof DataSonnetArrcomp) {
+        } else if (myPsiElement instanceof DataSonnetArr || myPsiElement instanceof DataSonnetArrcomp) {
             myChildWrap = Wrap.createWrap(myCustomSettings.ARRAY_WRAPPING, true);
-        }
-        else {
+        } else {
             myChildWrap = null;
         }
 
         myPropertyValueAlignment = myPsiElement instanceof DataSonnetObj ||
-                                   myPsiElement instanceof DataSonnetField ||
-                                   myPsiElement instanceof DataSonnetExpr ||
-                                   myPsiElement instanceof DataSonnetMember ? Alignment.createAlignment(true) : null;
+                myPsiElement instanceof DataSonnetField ||
+                myPsiElement instanceof DataSonnetExpr ||
+                myPsiElement instanceof DataSonnetMember ? Alignment.createAlignment(true) : null;
         //myPropertyValueAlignment = Alignment.createAlignment(true);
     }
 
@@ -109,7 +106,7 @@ public class DataSonnetBlock implements ASTBlock {
             int propertyAlignment = myCustomSettings.PROPERTY_ALIGNMENT;
             ASTNode[] children = myNode.getChildren(null);
             mySubBlocks = new ArrayList<>(children.length);
-            for (ASTNode child: children) {
+            for (ASTNode child : children) {
                 if (isWhitespaceOrEmpty(child)) continue;
                 mySubBlocks.add(makeSubBlock(child, propertyAlignment));
             }
@@ -125,13 +122,11 @@ public class DataSonnetBlock implements ASTBlock {
         if (hasElementType(myNode, DataSonnetParserDefinition.DATASONNET_CONTAINERS)) {
             if (hasElementType(childNode, COMMA)) {
                 wrap = Wrap.createWrap(WrapType.NONE, true);
-            }
-            else if (!hasElementType(childNode, DATASONNET_ALL_BRACES)) {
+            } else if (!hasElementType(childNode, DATASONNET_ALL_BRACES)) {
                 assert myChildWrap != null;
                 wrap = myChildWrap;
                 indent = Indent.getNormalIndent();
-            }
-            else if (hasElementType(childNode, DATASONNET_OPEN_BRACES) && myParent != null) {
+            } else if (hasElementType(childNode, DATASONNET_OPEN_BRACES) && myParent != null) {
                 if (isPropertyValue(myPsiElement) && propertyAlignment == ALIGN_PROPERTY_ON_VALUE) {
                     // WEB-13587 Align compound values on opening brace/bracket, not the whole block
                     assert myParent != null && myParent.myParent != null && myParent.myParent.myPropertyValueAlignment != null;
@@ -144,12 +139,11 @@ public class DataSonnetBlock implements ASTBlock {
             indent = myParent.myIndent;
             //System.out.println("I am " + myPsiElement.getText());
             // System.out.println("My Parent " + myParent.myPsiElement.getText());
-        } else if (hasElementType(myNode, FIELD) ) {
+        } else if (hasElementType(myNode, FIELD)) {
             assert myParent != null && myParent.myPropertyValueAlignment != null;
             if (hasElementType(childNode, COLON) && propertyAlignment == ALIGN_PROPERTY_ON_COLON) {
                 alignment = myParent.myPropertyValueAlignment;
-            }
-            else if (isPropertyValue(childNode.getPsi()) && propertyAlignment == ALIGN_PROPERTY_ON_VALUE) {
+            } else if (isPropertyValue(childNode.getPsi()) && propertyAlignment == ALIGN_PROPERTY_ON_VALUE) {
                 if (!hasElementType(childNode, DataSonnetParserDefinition.DATASONNET_CONTAINERS)) {
                     alignment = myParent.myPropertyValueAlignment;
                 }
@@ -190,8 +184,7 @@ public class DataSonnetBlock implements ASTBlock {
             // indents to consist solely of spaces when both USE_TABS and SMART_TAB
             // options are enabled.
             return new ChildAttributes(Indent.getNormalIndent(), null);
-        }
-        else if (myNode.getPsi() instanceof PsiFile) {
+        } else if (myNode.getPsi() instanceof PsiFile) {
             return new ChildAttributes(Indent.getNoneIndent(), null);
         }
         // Will use continuation indent for cases like { "foo"<caret>  }
@@ -203,12 +196,10 @@ public class DataSonnetBlock implements ASTBlock {
         final ASTNode lastChildNode = myNode.getLastChildNode();
         if (hasElementType(myNode, OBJ)) {
             return lastChildNode != null && lastChildNode.getElementType() != R_CURLY;
-        }
-        else if (hasElementType(myNode, ARR)) {
+        } else if (hasElementType(myNode, ARR)) {
             return lastChildNode != null && lastChildNode.getElementType() != R_BRACKET;
-        }
-        else if (hasElementType(myNode, FIELD)) {
-            return ((DataSonnetField)myPsiElement).getExpr() == null;
+        } else if (hasElementType(myNode, FIELD)) {
+            return ((DataSonnetField) myPsiElement).getExpr() == null;
         }
         return false;
     }
@@ -247,7 +238,7 @@ public class DataSonnetBlock implements ASTBlock {
      */
     private boolean isPropertyValue(@NotNull PsiElement element) {
         final PsiElement parent = element.getParent();
-        return parent instanceof DataSonnetField && element == ((DataSonnetField)parent).getExpr();
+        return parent instanceof DataSonnetField && element == ((DataSonnetField) parent).getExpr();
     }
 
     private boolean hasOuterLocalParent() {

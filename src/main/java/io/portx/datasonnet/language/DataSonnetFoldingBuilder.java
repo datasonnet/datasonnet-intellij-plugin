@@ -1,17 +1,22 @@
 package io.portx.datasonnet.language;
 
 import com.intellij.lang.ASTNode;
-import com.intellij.lang.folding.*;
-import com.intellij.openapi.editor.*;
+import com.intellij.lang.folding.FoldingBuilderEx;
+import com.intellij.lang.folding.FoldingDescriptor;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.FoldingGroup;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import io.portx.datasonnet.language.psi.DataSonnetArr;
 import io.portx.datasonnet.language.psi.DataSonnetArrcomp;
 import io.portx.datasonnet.language.psi.DataSonnetObj;
-import org.jetbrains.annotations.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class DataSonnetFoldingBuilder extends FoldingBuilderEx {
     @NotNull
@@ -23,25 +28,25 @@ public class DataSonnetFoldingBuilder extends FoldingBuilderEx {
         literalExpressions.addAll(PsiTreeUtil.findChildrenOfType(root, DataSonnetArrcomp.class));
         for (final PsiElement literalExpression : literalExpressions) {
             FoldingGroup group = FoldingGroup.newGroup(
-                "dataSonnet-" + literalExpression.getTextRange().getStartOffset() +
-                "-" + literalExpression.getTextRange().getEndOffset()
+                    "dataSonnet-" + literalExpression.getTextRange().getStartOffset() +
+                            "-" + literalExpression.getTextRange().getEndOffset()
             );
             int start = literalExpression.getTextRange().getStartOffset() + 1;
             int end = literalExpression.getTextRange().getEndOffset() - 1;
             if (end > start)
-            descriptors.add(
-                new FoldingDescriptor(
-                    literalExpression.getNode(),
-                    new TextRange(start, end),
-                    group
-                ) {
-                    @Nullable
-                    @Override
-                    public String getPlaceholderText() {
-                        return "...";
-                    }
-                }
-            );
+                descriptors.add(
+                        new FoldingDescriptor(
+                                literalExpression.getNode(),
+                                new TextRange(start, end),
+                                group
+                        ) {
+                            @Nullable
+                            @Override
+                            public String getPlaceholderText() {
+                                return "...";
+                            }
+                        }
+                );
         }
         return descriptors.toArray(new FoldingDescriptor[descriptors.size()]);
     }

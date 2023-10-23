@@ -45,11 +45,9 @@ public class DataSonnetLanguageCodeStyleSettingsProvider extends LanguageCodeSty
             consumer.renameStandardOption("SPACE_WITHIN_BRACES", "Braces");
             consumer.showCustomOption(DataSonnetCodeStyleSettings.class, "SPACE_BEFORE_COLON", "Before ':'", SPACES_OTHER);
             consumer.showCustomOption(DataSonnetCodeStyleSettings.class, "SPACE_AFTER_COLON", "After ':'", SPACES_OTHER);
-        }
-        else if (settingsType == SettingsType.BLANK_LINES_SETTINGS) {
+        } else if (settingsType == SettingsType.BLANK_LINES_SETTINGS) {
             consumer.showStandardOptions("KEEP_BLANK_LINES_IN_CODE");
-        }
-        else if (settingsType == SettingsType.WRAPPING_AND_BRACES_SETTINGS) {
+        } else if (settingsType == SettingsType.WRAPPING_AND_BRACES_SETTINGS) {
             consumer.showStandardOptions("RIGHT_MARGIN",
                     "WRAP_ON_TYPING",
                     "KEEP_LINE_BREAKS",

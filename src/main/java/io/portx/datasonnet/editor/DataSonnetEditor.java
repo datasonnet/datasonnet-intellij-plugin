@@ -70,15 +70,15 @@ import com.intellij.ui.content.TabbedPaneContentUI;
 import com.intellij.ui.tabs.TabInfo;
 import com.intellij.util.Alarm;
 import com.intellij.util.SlowOperations;
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ClassInfoList;
+import io.github.classgraph.ScanResult;
 import io.portx.datasonnet.config.DataSonnetProjectSettingsComponent;
 import io.portx.datasonnet.config.DataSonnetSettingsComponent;
 import io.portx.datasonnet.engine.Scenario;
 import io.portx.datasonnet.engine.ScenarioManager;
 import io.portx.datasonnet.language.DataSonnetFileType;
 import io.portx.datasonnet.util.ClasspathUtils;
-import io.github.classgraph.ClassGraph;
-import io.github.classgraph.ClassInfoList;
-import io.github.classgraph.ScanResult;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -107,21 +107,21 @@ import java.util.*;
 public class DataSonnetEditor implements FileEditor {
 
     private Project project;
-    private Module module;
+    private final Module module;
 
-    private PsiAwareTextEditorImpl textEditor;
+    private final PsiAwareTextEditorImpl textEditor;
 
-    private PsiFile psiFile;
+    private final PsiFile psiFile;
 
-    private Map<String, Editor> editors = new HashMap<String, Editor>();
-    private Map<String, Editor> outputEditors = new HashMap<String, Editor>();
+    private final Map<String, Editor> editors = new HashMap<String, Editor>();
+    private final Map<String, Editor> outputEditors = new HashMap<String, Editor>();
 
-    private JBTabsPaneImpl outputTabs;
-    private JBTabsPaneImpl inputTabs;
+    private final JBTabsPaneImpl outputTabs;
+    private final JBTabsPaneImpl inputTabs;
 
-    private Map<String, TabInfo> previewTabInfoMap = new HashMap<>();
+    private final Map<String, TabInfo> previewTabInfoMap = new HashMap<>();
 
-    private DataSonnetEditorUI gui;
+    private final DataSonnetEditorUI gui;
 
     final static Logger logger = Logger.getInstance(DataSonnetEditor.class);
 
@@ -433,7 +433,7 @@ public class DataSonnetEditor implements FileEditor {
                         lib = (Library) clazz.getDeclaredField("MODULE$").get(null);
                     } catch (Exception e) { //See if it has defaut constructor
                         try {
-                            Constructor constructor = clazz.getDeclaredConstructor(new Class[]{});
+                            Constructor constructor = clazz.getDeclaredConstructor();
                             lib = (Library) constructor.newInstance();
                         } catch (Exception e2) {
                             lib = null;
@@ -606,11 +606,11 @@ public class DataSonnetEditor implements FileEditor {
                     int startOffset = document.getLineStartOffset(lineNumber) + columnNumber;
                     int endOffset = document.getLineEndOffset(lineNumber);
 
-                    TextAttributes err = new TextAttributes(null, null, Color.RED, EffectType.WAVE_UNDERSCORE, Font.PLAIN);
+                    TextAttributes err = new TextAttributes(null, null, JBColor.RED, EffectType.WAVE_UNDERSCORE, Font.PLAIN);
 
                     if (startOffset < endOffset) {
                         RangeHighlighter rangeHighlighter = this.textEditor.getEditor().getMarkupModel().addRangeHighlighter(startOffset, endOffset, 0, err, HighlighterTargetArea.EXACT_RANGE);
-                        rangeHighlighter.setErrorStripeMarkColor(Color.RED);
+                        rangeHighlighter.setErrorStripeMarkColor(JBColor.RED);
                     }
                 } catch (Exception e) {
 

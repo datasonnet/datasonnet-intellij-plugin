@@ -6,6 +6,6 @@ import java.io.Reader;
 
 public class DataSonnetLexerAdapter extends FlexAdapter {
     public DataSonnetLexerAdapter() {
-        super(new DataSonnetLexer((Reader) null));
+        super(new DataSonnetLexer(null));
     }
 }

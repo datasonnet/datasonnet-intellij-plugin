@@ -3,7 +3,6 @@ package io.portx.datasonnet.language.psi;
 import com.intellij.extapi.psi.PsiFileBase;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.psi.FileViewProvider;
-import io.portx.datasonnet.language.*;
 import io.portx.datasonnet.language.DataSonnetFileType;
 import io.portx.datasonnet.language.DataSonnetLanguage;
 import org.jetbrains.annotations.NotNull;

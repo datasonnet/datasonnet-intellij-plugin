@@ -21,7 +21,7 @@ import java.util.List;
 public final class ClasspathUtils {
     private static final Key<ParameterizedCachedValue<List<URL>, Module>> URLS_KEY = Key.create("MODULE.URLS");
 
-    private static ClasspathUtils classpathUtils = new ClasspathUtils();
+    private static final ClasspathUtils classpathUtils = new ClasspathUtils();
 
     private ClasspathUtils() {
 
@@ -41,7 +41,7 @@ public final class ClasspathUtils {
             loaderUrls.addAll(getURLsForModule(nextModule));
         }
 
-        fullClassLoader = new URLClassLoader(loaderUrls.toArray(new URL[] {}), parent);
+        fullClassLoader = new URLClassLoader(loaderUrls.toArray(new URL[]{}), parent);
 
         return fullClassLoader;
     }
@@ -51,7 +51,7 @@ public final class ClasspathUtils {
 
         List<URL> loaderUrls = getURLsForModule(module);
 
-        moduleClassLoader = new URLClassLoader(loaderUrls.toArray(new URL[] {}), parent);
+        moduleClassLoader = new URLClassLoader(loaderUrls.toArray(new URL[]{}), parent);
 
         return moduleClassLoader;
     }

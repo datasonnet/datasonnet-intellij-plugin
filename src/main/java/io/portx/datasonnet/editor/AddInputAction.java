@@ -12,8 +12,7 @@ import io.portx.datasonnet.engine.ScenarioManager;
 public class AddInputAction extends AnAction {
     DataSonnetEditor editor;
 
-    public AddInputAction(DataSonnetEditor editor)
-    {
+    public AddInputAction(DataSonnetEditor editor) {
         super("Add new input", "Adds a new input to the scenario", IconLoader.findIcon("/icons/addInput.svg"));
         this.editor = editor;
     }

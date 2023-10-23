@@ -58,7 +58,7 @@ public class DataSonnetSettingsPanel {
             protected void textChanged(DocumentEvent e) {
                 myDataSonnetExecPathField
                         .getTextField().setForeground(StringUtil.equals(myDataSonnetExecPathField.getText(), mySettingsComponent.getState().getDataSonnetExecPath()) ?
-                        getDefaultValueColor() : getChangedValueColor());
+                                getDefaultValueColor() : getChangedValueColor());
             }
         });
 
@@ -102,9 +102,9 @@ public class DataSonnetSettingsPanel {
 
     public boolean isModified() {
         return !Comparing.equal(myDataSonnetExecPathField.getText(), mySettingsComponent.getState().getDataSonnetExecPath()) ||
-               !Comparing.equal(myDataSonnetPathsModel.getItems(), myProjectSettingsComponent.getState().getDataSonnetLibraryPaths()) ||
-               !Comparing.equal(extVars.isSelected(), mySettingsComponent.getState().isExtVars()) ||
-               !Comparing.equal(builtInParser.isSelected(), mySettingsComponent.getState().isBuiltInParser());
+                !Comparing.equal(myDataSonnetPathsModel.getItems(), myProjectSettingsComponent.getState().getDataSonnetLibraryPaths()) ||
+                !Comparing.equal(extVars.isSelected(), mySettingsComponent.getState().isExtVars()) ||
+                !Comparing.equal(builtInParser.isSelected(), mySettingsComponent.getState().isBuiltInParser());
     }
 
     public void apply() {

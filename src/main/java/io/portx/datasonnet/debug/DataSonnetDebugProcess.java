@@ -6,10 +6,12 @@ import com.intellij.execution.process.ProcessHandler;
 import com.intellij.util.ArrayUtil;
 import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugSession;
+import com.intellij.xdebugger.XDebugSessionListener;
 import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.breakpoints.XBreakpointHandler;
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
 import com.intellij.xdebugger.frame.XSuspendContext;
+import com.intellij.xdebugger.impl.ui.tree.XDebuggerTreeState;
 import io.portx.datasonnet.debug.breakpoint.DataSonnetBreakpointHandler;
 import io.portx.datasonnet.debug.stack.DataSonnetStackFrame;
 import org.jetbrains.annotations.NotNull;
@@ -20,6 +22,7 @@ public class DataSonnetDebugProcess extends XDebugProcess {
     private final DataSonnetDebuggerEditorsProvider dataSonnetDebuggerEditorsProvider;
     private final DataSonnetBreakpointHandler dataSonnetBreakpointHandler;
     //private final DataSonnetProcessHandler dataSonnetProcessHandler;
+
     /**
      * @param session pass {@code session} parameter of {@link XDebugProcessStarter#start} method to this constructor
      */
@@ -52,6 +55,20 @@ public class DataSonnetDebugProcess extends XDebugProcess {
             }
         });
 
+        session.addSessionListener(new XDebugSessionListener() {
+            private XDebuggerTreeState state = null;
+            @Override
+            public void sessionPaused() {
+                //if (state != null) XDebuggerTree.rebuildAndRestore(state);
+                XDebugSessionListener.super.sessionPaused();
+            }
+
+            @Override
+            public void sessionResumed() {
+                //state = XDebuggerTreeState.saveState(tree)
+                XDebugSessionListener.super.sessionResumed();
+            }
+        });
         dataSonnetDebuggerSession.connect();
     }
 
@@ -89,6 +106,7 @@ public class DataSonnetDebugProcess extends XDebugProcess {
     public void runToPosition(@NotNull XSourcePosition xSourcePosition, @Nullable XSuspendContext context) {
         dataSonnetDebuggerSession.runToPosition(context.getActiveExecutionStack().getTopFrame().getSourcePosition(), xSourcePosition);
     }
+
     @NotNull
     @Override
     public XBreakpointHandler<?>[] getBreakpointHandlers() {

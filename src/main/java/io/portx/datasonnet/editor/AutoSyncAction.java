@@ -14,8 +14,7 @@ public class AutoSyncAction extends ToggleAction {
 
     final static Icon autosyncIcon = IconLoader.findIcon("/icons/autosync.png");
 
-    public AutoSyncAction(DataSonnetEditor editor)
-    {
+    public AutoSyncAction(DataSonnetEditor editor) {
         super("Auto Refresh", "Toggle Auto Refresh Mapping On/Off", autosyncIcon);
         this.editor = editor;
         setSelected(null, true);

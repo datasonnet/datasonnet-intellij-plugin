@@ -63,7 +63,7 @@ public class DataSonnetProgramRunner extends GenericDebuggerRunner {
 
                 XDebugSession xDebugSession = XDebuggerManager.getInstance(env.getProject()).startSession(env, starter);
                 RunContentDescriptor descriptor = xDebugSession.getRunContentDescriptor();
-                DataSonnetRunProfileState dsState = (DataSonnetRunProfileState)state;
+                DataSonnetRunProfileState dsState = (DataSonnetRunProfileState) state;
                 dsState.setConsoleView((ConsoleView) descriptor.getExecutionConsole());
                 state.execute(env.getExecutor(), this);
                 result.set(descriptor);

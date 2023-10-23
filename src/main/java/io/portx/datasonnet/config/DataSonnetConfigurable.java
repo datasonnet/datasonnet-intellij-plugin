@@ -52,6 +52,7 @@ public class DataSonnetConfigurable implements SearchableConfigurable, Configura
     public void apply() throws ConfigurationException {
         myPanel.apply();
     }
+
     @Override
     public void reset() {
         myPanel.reset();

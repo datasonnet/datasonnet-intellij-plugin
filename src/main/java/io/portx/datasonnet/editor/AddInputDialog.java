@@ -20,9 +20,9 @@ public class AddInputDialog extends DialogWrapper {
     private JPanel mainPanel;
     private JTextField nameField;
     private JComboBox<DataFormat> formatCombo;
-    private Scenario currentScenarioMaybe;
-    private PsiFile currentFile;
-    private Project project;
+    private final Scenario currentScenarioMaybe;
+    private final PsiFile currentFile;
+    private final Project project;
 
     public AddInputDialog(@Nullable Project project, Scenario currentScenario, PsiFile currentFile) {
         super(project);
@@ -113,7 +113,7 @@ public class AddInputDialog extends DialogWrapper {
             return;
         }
         if (!inputFile.isValid()) {
-            System.out.println("Input file is invalid. " + inputFile.toString());
+            System.out.println("Input file is invalid. " + inputFile);
             return;
         }
 

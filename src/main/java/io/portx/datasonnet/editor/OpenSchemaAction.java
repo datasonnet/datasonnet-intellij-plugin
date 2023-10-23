@@ -15,8 +15,7 @@ public class OpenSchemaAction extends AnAction {
     final static Logger logger = Logger.getInstance(OpenSchemaAction.class);
     final static Icon loadSchemaIcon = IconLoader.findIcon("/openschema.png");
 
-    public OpenSchemaAction()
-    {
+    public OpenSchemaAction() {
         super("Load Schema", "Load XSD or Json Schema", loadSchemaIcon);
     }
 

@@ -1,7 +1,8 @@
 package io.portx.datasonnet.language;
 
 import com.intellij.lexer.Lexer;
-import com.intellij.openapi.editor.*;
+import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
+import com.intellij.openapi.editor.HighlighterColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.TokenType;
@@ -47,33 +48,33 @@ public class DataSonnetSyntaxHighlighter extends SyntaxHighlighterBase {
         } else if (tokenType.equals(DataSonnetTypes.LINE_COMMENT)) {
             return COMMENT_KEYS;
         } else if (
-            tokenType.equals(DataSonnetTypes.TRUE) ||
-            tokenType.equals(DataSonnetTypes.FALSE) ||
-            tokenType.equals(DataSonnetTypes.NULL) ||
-            tokenType.equals(DataSonnetTypes.IMPORT) ||
-            tokenType.equals(DataSonnetTypes.IMPORTSTR) ||
-            tokenType.equals(DataSonnetTypes.LOCAL) ||
-            tokenType.equals(DataSonnetTypes.FUNCTION) ||
-            tokenType.equals(DataSonnetTypes.IN) ||
-            tokenType.equals(DataSonnetTypes.IF) ||
-            tokenType.equals(DataSonnetTypes.THEN) ||
-            tokenType.equals(DataSonnetTypes.ELSE) ||
-            tokenType.equals(DataSonnetTypes.SUPER) ||
-            tokenType.equals(DataSonnetTypes.ERROR) ||
-            tokenType.equals(DataSonnetTypes.SELF) ||
-            tokenType.equals(DataSonnetTypes.FOR) ||
-            tokenType.equals(DataSonnetTypes.ASSERT) ||
-            tokenType.equals(DataSonnetTypes.DOLLAR)
+                tokenType.equals(DataSonnetTypes.TRUE) ||
+                        tokenType.equals(DataSonnetTypes.FALSE) ||
+                        tokenType.equals(DataSonnetTypes.NULL) ||
+                        tokenType.equals(DataSonnetTypes.IMPORT) ||
+                        tokenType.equals(DataSonnetTypes.IMPORTSTR) ||
+                        tokenType.equals(DataSonnetTypes.LOCAL) ||
+                        tokenType.equals(DataSonnetTypes.FUNCTION) ||
+                        tokenType.equals(DataSonnetTypes.IN) ||
+                        tokenType.equals(DataSonnetTypes.IF) ||
+                        tokenType.equals(DataSonnetTypes.THEN) ||
+                        tokenType.equals(DataSonnetTypes.ELSE) ||
+                        tokenType.equals(DataSonnetTypes.SUPER) ||
+                        tokenType.equals(DataSonnetTypes.ERROR) ||
+                        tokenType.equals(DataSonnetTypes.SELF) ||
+                        tokenType.equals(DataSonnetTypes.FOR) ||
+                        tokenType.equals(DataSonnetTypes.ASSERT) ||
+                        tokenType.equals(DataSonnetTypes.DOLLAR)
         ) {
             return KEYWORD_KEYS;
         } else if (tokenType.equals(DataSonnetTypes.NUMBER)) {
             return NUMBER_KEYS;
         } else if (
                 tokenType.equals(DataSonnetTypes.SINGLE_QUOTED_STRING) ||
-                tokenType.equals(DataSonnetTypes.DOUBLE_QUOTED_STRING) ||
-                tokenType.equals(DataSonnetTypes.VERBATIM_DOUBLE_QUOTED_STRING) ||
-                tokenType.equals(DataSonnetTypes.VERBATIM_SINGLE_QUOTED_STRING) ||
-                tokenType.equals(DataSonnetTypes.TRIPLE_BAR_QUOTED_STRING)) {
+                        tokenType.equals(DataSonnetTypes.DOUBLE_QUOTED_STRING) ||
+                        tokenType.equals(DataSonnetTypes.VERBATIM_DOUBLE_QUOTED_STRING) ||
+                        tokenType.equals(DataSonnetTypes.VERBATIM_SINGLE_QUOTED_STRING) ||
+                        tokenType.equals(DataSonnetTypes.TRIPLE_BAR_QUOTED_STRING)) {
             return STRING_KEYS;
         } else if (tokenType.equals(TokenType.BAD_CHARACTER)) {
             return BAD_CHAR_KEYS;

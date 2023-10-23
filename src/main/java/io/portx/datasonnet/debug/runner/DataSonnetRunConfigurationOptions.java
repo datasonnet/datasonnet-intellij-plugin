@@ -12,6 +12,7 @@ public class DataSonnetRunConfigurationOptions extends RunConfigurationOptions {
 
     private final StoredProperty<String> outputMimeType =
             string("").provideDelegate(this, "outputMimeType");
+
     public String getScriptName() {
         return dsScriptName.getValue(this);
     }

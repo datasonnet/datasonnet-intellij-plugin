@@ -7,7 +7,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.ProcessingContext;
 import io.portx.datasonnet.language.psi.*;
-import io.portx.datasonnet.language.psi.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -37,38 +36,38 @@ public class DataSonnetCompletionContributor extends CompletionContributor {
                                 return;
                             } else if (element instanceof DataSonnetOuterlocal) {
                                 List<DataSonnetBind> binds = DataSonnetIdentifierReference.findBindInOuterLocal((DataSonnetOuterlocal) element);
-                                for (DataSonnetBind b: binds) {
+                                for (DataSonnetBind b : binds) {
                                     resultSet.addElement(LookupElementBuilder.create(b.getIdentifier0().getText()));
                                 }
                             } else if (element instanceof DataSonnetExpr0 && DataSonnetIdentifierReference.isFunctionExpr((DataSonnetExpr0) element)) {
                                 List<DataSonnetIdentifier0> identifiers = DataSonnetIdentifierReference.findIdentifierFromFunctionExpr0((DataSonnetExpr0) element);
-                                for (DataSonnetIdentifier0 i: identifiers) {
+                                for (DataSonnetIdentifier0 i : identifiers) {
                                     resultSet.addElement(LookupElementBuilder.create(i.getText()));
                                 }
                             } else if (element instanceof DataSonnetObjinside) {
                                 List<DataSonnetObjlocal> locals = ((DataSonnetObjinside) element).getObjlocalList();
                                 DataSonnetMembers members = ((DataSonnetObjinside) element).getMembers();
                                 if (members != null) {
-                                    for (DataSonnetMember m: members.getMemberList()){
-                                        if (m.getObjlocal() != null){
+                                    for (DataSonnetMember m : members.getMemberList()) {
+                                        if (m.getObjlocal() != null) {
                                             locals.add(m.getObjlocal());
                                         }
                                     }
                                 }
-                                for (DataSonnetObjlocal local: locals) {
+                                for (DataSonnetObjlocal local : locals) {
                                     DataSonnetBind b = local.getBind();
                                     resultSet.addElement(LookupElementBuilder.create(b.getIdentifier0().getText()));
                                 }
                             } else if (element.getParent() instanceof DataSonnetBind &&
-                                    ((DataSonnetBind)element.getParent()).getExpr() == element){
-                                List<DataSonnetIdentifier0> idents = DataSonnetIdentifierReference.findIdentifierFromParams(((DataSonnetBind)element.getParent()).getParams());
-                                for(DataSonnetIdentifier0 ident: idents){
+                                    ((DataSonnetBind) element.getParent()).getExpr() == element) {
+                                List<DataSonnetIdentifier0> idents = DataSonnetIdentifierReference.findIdentifierFromParams(((DataSonnetBind) element.getParent()).getParams());
+                                for (DataSonnetIdentifier0 ident : idents) {
                                     resultSet.addElement(LookupElementBuilder.create(ident.getText()));
                                 }
                             } else if (element.getParent() instanceof DataSonnetField &&
-                                    ((DataSonnetField)element.getParent()).getExpr() == element){
-                                List<DataSonnetIdentifier0> idents = DataSonnetIdentifierReference.findIdentifierFromParams(((DataSonnetField)element.getParent()).getParams());
-                                for(DataSonnetIdentifier0 ident: idents){
+                                    ((DataSonnetField) element.getParent()).getExpr() == element) {
+                                List<DataSonnetIdentifier0> idents = DataSonnetIdentifierReference.findIdentifierFromParams(((DataSonnetField) element.getParent()).getParams());
+                                for (DataSonnetIdentifier0 ident : idents) {
                                     resultSet.addElement(LookupElementBuilder.create(ident.getText()));
                                 }
                             }
@@ -109,10 +108,10 @@ public class DataSonnetCompletionContributor extends CompletionContributor {
 
             if (member.getField() != null && member.getField().getFieldname() != null) {
                 String fieldName = member.getField().getFieldname().getText();
-                if (fieldName.startsWith("\"") || fieldName.startsWith("\'")) {
+                if (fieldName.startsWith("\"") || fieldName.startsWith("'")) {
                     fieldName = fieldName.substring(1);
                 }
-                if (fieldName.endsWith("\"") || fieldName.endsWith("\'")) {
+                if (fieldName.endsWith("\"") || fieldName.endsWith("'")) {
                     fieldName = fieldName.substring(0, fieldName.length() - 1);
                 }
                 resultSet.addElement(LookupElementBuilder.create(fieldName));
@@ -141,15 +140,16 @@ public class DataSonnetCompletionContributor extends CompletionContributor {
             for (DataSonnetSelect select : expr.getSelectList()) {
                 if (!select.getIdentifier0().getText().endsWith(Constants.INTELLIJ_RULES.trim())) {
                     selectList.add(select.getIdentifier0());
-                }else{
+                } else {
                     break;
                 }
             }
             return resolveExprToObj(expr, visited, selectList);
-        }finally{
+        } finally {
             visited.remove(expr);
         }
     }
+
     static DataSonnetObj resolveExprToObj(DataSonnetExpr expr, List<DataSonnetExpr> visited, List<DataSonnetIdentifier0> selectList) {
         DataSonnetExpr0 first = expr.getExpr0();
         DataSonnetObj curr = resolveExpr0ToObj(first, visited);
@@ -188,10 +188,10 @@ public class DataSonnetCompletionContributor extends CompletionContributor {
                     }
                 } else if (member.getField().getFieldname() != null) {
                     String fieldName = member.getField().getFieldname().getText();
-                    if (fieldName.startsWith("\"") || fieldName.startsWith("\'")) {
+                    if (fieldName.startsWith("\"") || fieldName.startsWith("'")) {
                         fieldName = fieldName.substring(1);
                     }
-                    if (fieldName.endsWith("\"") || fieldName.endsWith("\'")) {
+                    if (fieldName.endsWith("\"") || fieldName.endsWith("'")) {
                         fieldName = fieldName.substring(0, fieldName.length() - 1);
                     }
                     if (fieldName.equals(name)) {
@@ -204,13 +204,13 @@ public class DataSonnetCompletionContributor extends CompletionContributor {
     }
 
     private static DataSonnetObj resolveExpr0ToObj(DataSonnetExpr0 expr0, List<DataSonnetExpr> visited) {
-        if (expr0.getExpr() != null){
+        if (expr0.getExpr() != null) {
             return resolveExprToObj(expr0.getExpr(), visited);
         }
-        if (expr0.getOuterlocal() != null){
+        if (expr0.getOuterlocal() != null) {
             return resolveExprToObj(expr0.getOuterlocal().getExpr(), visited);
         }
-        if (expr0.getObj() != null){
+        if (expr0.getObj() != null) {
             return expr0.getObj();
         }
         if (expr0.getText().equals("self")) {
@@ -229,7 +229,7 @@ public class DataSonnetCompletionContributor extends CompletionContributor {
                 return null;
             }
 
-            for(PsiElement c: file.getChildren()){
+            for (PsiElement c : file.getChildren()) {
                 // Apparently children can be line comments and other unwanted rubbish
                 if (c instanceof DataSonnetExpr) {
                     DataSonnetObj res = resolveExprToObj((DataSonnetExpr) c, visited);
@@ -266,14 +266,14 @@ public class DataSonnetCompletionContributor extends CompletionContributor {
 
     private static boolean checkIfImport(PsiElement position) {
         return position.getPrevSibling() != null &&
-          position.getPrevSibling().getPrevSibling().getNode().getElementType().equals(DataSonnetTypes.IMPORT);
+                position.getPrevSibling().getPrevSibling().getNode().getElementType().equals(DataSonnetTypes.IMPORT);
     }
 
     private static void addFileCompletions(PsiFile file, String current, CompletionResultSet set) {
         // current always begins with a "
         String cleanedCurrent = current.substring(1);
         if (cleanedCurrent.endsWith("\"")) {
-           cleanedCurrent = cleanedCurrent.substring(0, cleanedCurrent.length() - 1);
+            cleanedCurrent = cleanedCurrent.substring(0, cleanedCurrent.length() - 1);
         }
 
         if (!cleanedCurrent.endsWith(Constants.INTELLIJ_RULES)) {
@@ -289,19 +289,19 @@ public class DataSonnetCompletionContributor extends CompletionContributor {
         if (stripped.endsWith("/")) {
             prefixFile = currentPath.resolve(Paths.get(stripped)).toFile();
             input = "";
-        } else if (strippedPathCount == 1){
+        } else if (strippedPathCount == 1) {
             prefixFile = currentPath.toFile();
             input = stripped;
         } else {
             prefixFile = currentPath.resolve(strippedPath.subpath(0, strippedPathCount - 1)).toFile();
-            input = strippedPath.subpath(strippedPathCount-1, strippedPathCount).toString();
+            input = strippedPath.subpath(strippedPathCount - 1, strippedPathCount).toString();
         }
 
         CompletionResultSet replaceSet = set.withPrefixMatcher(stripped);
         if (prefixFile.isDirectory()) {
             File[] files = prefixFile.listFiles((dir, name) -> name.startsWith(input));
             if (files != null) {
-                for (File f: files) {
+                for (File f : files) {
                     String result = stripped + f.getName().substring(input.length());
                     replaceSet.addElement(LookupElementBuilder.create(result));
                 }

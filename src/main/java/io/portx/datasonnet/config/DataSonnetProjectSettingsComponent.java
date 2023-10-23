@@ -1,6 +1,9 @@
 package io.portx.datasonnet.config;
 
-import com.intellij.openapi.components.*;
+import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.ProjectComponent;
+import com.intellij.openapi.components.State;
+import com.intellij.openapi.components.Storage;
 import org.jetbrains.annotations.NotNull;
 
 @State(name = "DataSonnetProjectSettings", storages = {@Storage("dataSonnet-settings.xml")})

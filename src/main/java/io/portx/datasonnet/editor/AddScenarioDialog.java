@@ -17,8 +17,8 @@ public class AddScenarioDialog extends DialogWrapper {
 
     private JPanel mainPanel;
     private JTextField nameField;
-    private ScenarioManager manager;
-    private PsiFile currentFile;
+    private final ScenarioManager manager;
+    private final PsiFile currentFile;
     private final OnOkAction onOkAction;
 
     public AddScenarioDialog(@Nullable Project project, ScenarioManager manager, PsiFile currentFile, OnOkAction action) {

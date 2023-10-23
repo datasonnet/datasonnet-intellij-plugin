@@ -26,7 +26,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.ui.PanelWithAnchor;
-import io.portx.datasonnet.editor.DataSonnetEditor;
 import io.portx.datasonnet.engine.Scenario;
 import io.portx.datasonnet.engine.ScenarioManager;
 import io.portx.datasonnet.language.DataSonnetFileType;
@@ -46,7 +45,7 @@ public class DataSonnetRunnerConfPanel implements PanelWithAnchor {
     private JComboBox outputMimeType;
     protected JComponent anchor;
 
-    private Project project;
+    private final Project project;
 
     public DataSonnetRunnerConfPanel(@NotNull Project project) {
         this.project = project;
@@ -106,11 +105,13 @@ public class DataSonnetRunnerConfPanel implements PanelWithAnchor {
         dsScriptFile.getComponent().getTextField().setText(scriptFile);
         loadMappingScenarios();
     }
+
     protected void setMappingScenario(String mappingScenario) {
         if (mappingScenario != null) {
             mappingScenarioSelector.setSelectedItem(mappingScenario);
         }
     }
+
     protected void setOutputMimeType(String mimeType) {
         if (mimeType != null) {
             outputMimeType.setSelectedItem(mimeType);

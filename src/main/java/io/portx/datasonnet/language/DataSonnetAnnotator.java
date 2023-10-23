@@ -15,12 +15,13 @@ import static com.intellij.openapi.editor.colors.TextAttributesKey.createTextAtt
 
 public class DataSonnetAnnotator implements Annotator {
     TextAttributesKey MEMBER = createTextAttributesKey("DataSonnet_MEMBER", DefaultLanguageHighlighterColors.INSTANCE_FIELD);
+
     @Override
     public void annotate(@NotNull PsiElement psiElement, @NotNull AnnotationHolder annotationHolder) {
-        if (psiElement instanceof DataSonnetIdentifier0 && psiElement.getParent() instanceof DataSonnetFieldname){
+        if (psiElement instanceof DataSonnetIdentifier0 && psiElement.getParent() instanceof DataSonnetFieldname) {
             annotationHolder.newAnnotation(HighlightSeverity.WEAK_WARNING, "").textAttributes(MEMBER).range(psiElement).create();
         }
-        if (psiElement instanceof DataSonnetIdentifier0 && psiElement.getParent() instanceof DataSonnetSelect){
+        if (psiElement instanceof DataSonnetIdentifier0 && psiElement.getParent() instanceof DataSonnetSelect) {
             annotationHolder.newAnnotation(HighlightSeverity.WEAK_WARNING, "").textAttributes(MEMBER).range(psiElement).create();
         }
     }
