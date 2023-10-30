@@ -91,6 +91,7 @@
         <programRunner id="Debug" implementation="io.portx.datasonnet.debug.runner.DataSonnetProgramRunner" order="first"/>
 <!--        <java.programPatcher implementation="com.github.cameltooling.idea.runner.debugger.CamelDebuggerPatcher"/>-->
 
+<!--        <editor.linePainter implementation="io.portx.datasonnet.debug.DataSonnetEditorLinePainter" />-->
 
         <projectService
                 serviceInterface="io.portx.datasonnet.engine.ScenarioManager"

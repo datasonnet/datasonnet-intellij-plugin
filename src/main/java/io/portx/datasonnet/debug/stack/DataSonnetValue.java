@@ -18,24 +18,24 @@ package io.portx.datasonnet.debug.stack;
 
 import com.datasonnet.debugger.ValueInfo;
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.PlatformIcons;
-import com.intellij.util.ThreeState;
 import com.intellij.xdebugger.XDebuggerUtil;
 import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.frame.*;
 import io.portx.datasonnet.debug.DataSonnetDebuggerSession;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
 
-public class DataSonnetValue extends XValue {
+public class DataSonnetValue extends XNamedValue {
     private final DataSonnetDebuggerSession session;
     private final Object value;
 
     public DataSonnetValue(DataSonnetDebuggerSession session, Object value) {
+        super(renderValueName(value));
         this.session = session;
         this.value = value;
     }
@@ -53,12 +53,12 @@ public class DataSonnetValue extends XValue {
             } else if (infoObject instanceof List) {
                 node.setPresentation(AllIcons.Json.Array, "Array", "", true);
             } else if (infoObject instanceof Throwable) {
-                node.setPresentation(AllIcons.General.Error, "Error", "", true);
+                node.setPresentation(AllIcons.General.Error, "Error", value.toString(), true);
             } else {
                 node.setPresentation(PlatformIcons.VARIABLE_ICON, "Value", infoObject != null ? infoObject.toString() : "null", false);
             }
         } else if (value instanceof Throwable) {
-            node.setPresentation(AllIcons.General.Error, "Error", "", true);
+            node.setPresentation(AllIcons.General.Error, "Error", value.toString(), true);
         } else {
             node.setPresentation(PlatformIcons.VARIABLE_ICON, "Value", value != null ? value.toString() : "null", false);
         }
@@ -91,7 +91,7 @@ public class DataSonnetValue extends XValue {
                 }
             }
         } else if (value instanceof Throwable) {
-            //TODO HOW?
+            list.add("message", new DataSonnetValue(session, ((Throwable) value).getMessage()));
         }
 
         node.addChildren(list, false);
@@ -111,23 +111,33 @@ public class DataSonnetValue extends XValue {
 
     @Override
     public void computeSourcePosition(@NotNull XNavigatable navigatable) {
-        /* Slow operations are prohibited on EDT. Executing on pooled thread */
-        ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            if (value instanceof ValueInfo valueInfo) {
-                if (valueInfo.getOffset() != 0) {
-                    VirtualFile mappingFile = session.getDataSonnetProcessHandler().getDataSonnetEngine().getMappingFile();
-                    XSourcePosition valuePosition = XDebuggerUtil.getInstance().createPositionByOffset(mappingFile, valueInfo.getOffset());
-                    navigatable.setSourcePosition(valuePosition);
-                }
+        if (value instanceof ValueInfo valueInfo) {
+            if (valueInfo.getOffset() != 0) {
+                VirtualFile mappingFile = session.getDataSonnetProcessHandler().getDataSonnetEngine().getMappingFile();
+                XSourcePosition valuePosition = XDebuggerUtil.getInstance().createPositionByOffset(mappingFile, valueInfo.getOffset());
+                navigatable.setSourcePosition(valuePosition);
             }
-        });
+        }
     }
 
+    private static String renderValueName(@Nullable Object value) {
+        if (value == null) {
+            return "null";
+        }
+        if (value instanceof ValueInfo) {
+            return ((ValueInfo)value).getKey();
+        }
+
+        return value.getClass().getSimpleName();
+    }
+
+/*
     @Override
     @NotNull
     public ThreeState computeInlineDebuggerData(@NotNull XInlineDebuggerDataCallback callback) {
-        return ThreeState.YES;
+        return ThreeState.UNSURE;
     }
+*/
 
 /*    @Override
     public @Nullable XValueModifier getModifier() {

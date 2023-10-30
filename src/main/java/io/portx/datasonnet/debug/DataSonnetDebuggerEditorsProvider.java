@@ -22,6 +22,7 @@ import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.PlainTextFileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDocumentManager;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 import com.intellij.util.LocalTimeCounter;
@@ -29,6 +30,7 @@ import com.intellij.xdebugger.XExpression;
 import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.evaluation.EvaluationMode;
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
+import com.intellij.xdebugger.evaluation.XDebuggerEditorsProviderBase;
 import io.portx.datasonnet.language.DataSonnetLanguage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -38,7 +40,7 @@ import java.util.Collection;
 import java.util.List;
 
 
-public class DataSonnetDebuggerEditorsProvider extends XDebuggerEditorsProvider {
+public class DataSonnetDebuggerEditorsProvider extends XDebuggerEditorsProviderBase {
     @NotNull
     @Override
     public FileType getFileType() {
@@ -49,8 +51,13 @@ public class DataSonnetDebuggerEditorsProvider extends XDebuggerEditorsProvider 
     @Override
     public Document createDocument(@NotNull Project project, @NotNull XExpression expression, @Nullable XSourcePosition xSourcePosition, @NotNull EvaluationMode evaluationMode) {
         final PsiFile psiFile = PsiFileFactory.getInstance(project)
-                .createFileFromText("camelExpr." + getFileType().getDefaultExtension(), getFileType(), expression.getExpression(), LocalTimeCounter.currentTime(), true);
+                .createFileFromText("dataSonnetExpr." + getFileType().getDefaultExtension(), getFileType(), expression.getExpression(), LocalTimeCounter.currentTime(), true);
         return PsiDocumentManager.getInstance(project).getDocument(psiFile);
+    }
+
+    @Override
+    protected PsiFile createExpressionCodeFragment(@NotNull Project project, @NotNull String text, @Nullable PsiElement context, boolean isPhysical) {
+        return null;
     }
 
     @NotNull

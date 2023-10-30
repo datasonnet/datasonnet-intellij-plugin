@@ -36,24 +36,33 @@ public class DataSonnetEngine {
     private final VirtualFile mappingFile;
     private final Scenario scenario;
     private final Project project;
-    private final String outputMimeType;
+    private final MediaType outputMimeType;
     private boolean isDebug = false;
 
     private DataSonnetDebugger dataSonnetDebugger;
 
-    public DataSonnetEngine(@NotNull Project project, @NotNull String script, @NotNull String scenario, @NotNull String outputMimeType, boolean isDebug) {
+
+    public DataSonnetEngine(@NotNull Project project, @NotNull String scriptPath, @NotNull String scenario, @NotNull String outputMimeTypeName, boolean isDebug) {
         this.project = project;
-        this.mappingFile = LocalFileSystem.getInstance().findFileByPath(script);
-        this.scenario = ScenarioManager.getInstance(project).findScenario(this.mappingFile, scenario);
-        this.outputMimeType = outputMimeType;
+        this.outputMimeType = MediaType.valueOf(outputMimeTypeName);
         this.isDebug = isDebug;
+        this.mappingFile = LocalFileSystem.getInstance().findFileByPath(scriptPath);
+        this.scenario = ScenarioManager.getInstance(project).findScenario(mappingFile, scenario);
 
         if (isDebug) {
             dataSonnetDebugger = DataSonnetDebugger.getDebugger();
         }
     }
 
-    public String runDataSonnetMapping() {
+    public DataSonnetEngine(@NotNull Project project, @NotNull VirtualFile mappingFile, @NotNull Scenario scenario, @NotNull MediaType outputMimeType) {
+        this.project = project;
+        this.scenario = scenario;
+        this.outputMimeType = outputMimeType;
+        this.isDebug = false;
+        this.mappingFile = mappingFile;
+    }
+
+    public com.datasonnet.document.Document runDataSonnetMapping() {
         com.intellij.openapi.editor.Document document = ApplicationManager.getApplication().runReadAction((Computable<com.intellij.openapi.editor.Document>) () ->
                 FileDocumentManager.getInstance().getDocument(mappingFile));
         String mappingScript = document.getText();
@@ -124,16 +133,16 @@ public class DataSonnetEngine {
                 getDebugger().setLineCount(lines.length);
             }
             com.datasonnet.document.Document transformDoc =
-                    mapper.transform(new DefaultDocument<>(payload, payloadMimeType), variables, MediaType.valueOf(outputMimeType));
+                    mapper.transform(new DefaultDocument<>(payload, payloadMimeType), variables, outputMimeType);
             if (isDebug) {
                 getDebugger().detach();
             }
 
             Thread.currentThread().setContextClassLoader(currentCL);
 
-            return transformDoc.getContent().toString();
+            return transformDoc;
         } catch (Exception e) {
-            return e.getMessage() != null ? e.getMessage() : e.toString();
+            return new DefaultDocument(e.getMessage() != null ? e.getMessage() : e.toString(), MediaTypes.TEXT_PLAIN);
         }
     }
 

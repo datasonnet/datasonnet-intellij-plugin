@@ -58,7 +58,7 @@ public class DataSonnetProcessHandler extends DefaultDebugProcessHandler {
     }
 
     private void runDataSonnetMapping() {
-        String result = dataSonnetEngine.runDataSonnetMapping();
+        String result = dataSonnetEngine.runDataSonnetMapping().getContent().toString();
         detachProcess();
         notifyTextAvailable(result, ProcessOutputType.STDOUT);
     }

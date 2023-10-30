@@ -37,7 +37,8 @@ public class DataSonnetStackFrame extends XStackFrame {
     public void computeChildren(@NotNull XCompositeNode node) {
         final XValueChildrenList children = new XValueChildrenList();
 
-        children.add("Named Variables", new DataSonnetValue(this.session, context.getNamedVariables()));
+        context.getNamedVariables().forEach((k, v) -> children.add(k, new DataSonnetValue(this.session, v)));
+        //children.add("Named Variables", new DataSonnetValue(this.session, context.getNamedVariables()));
         //TODO Local variables and fields?
 
         node.addChildren(children, true);

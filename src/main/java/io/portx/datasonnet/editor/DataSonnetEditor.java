@@ -75,6 +75,7 @@ import io.github.classgraph.ClassInfoList;
 import io.github.classgraph.ScanResult;
 import io.portx.datasonnet.config.DataSonnetProjectSettingsComponent;
 import io.portx.datasonnet.config.DataSonnetSettingsComponent;
+import io.portx.datasonnet.engine.DataSonnetEngine;
 import io.portx.datasonnet.engine.Scenario;
 import io.portx.datasonnet.engine.ScenarioManager;
 import io.portx.datasonnet.language.DataSonnetFileType;
@@ -389,73 +390,9 @@ public class DataSonnetEditor implements FileEditor {
         if (currentScenario == null)
             return new DefaultDocument<>("ERROR: No mapping scenarios available!", MediaTypes.TEXT_PLAIN);
 
-        String camelFunctions = "local cml = { exchangeProperty(str): exchangeProperty[str], header(str): header[str], properties(str): properties[str] };\n";
-        String dataSonnetScript = camelFunctions + this.textEditor.getEditor().getDocument().getText();
-
-        String payload = "{}";
-
-        Map<String, VirtualFile> inputFiles = currentScenario.getInputFiles();
-        HashMap<String, com.datasonnet.document.Document<?>> variables = new HashMap<>();
-
-        MediaType payloadMimeType = MediaTypes.APPLICATION_JSON;
-
-        for (Map.Entry<String, VirtualFile> f : inputFiles.entrySet()) {
-
-            String contents = null;
-            try {
-                contents = new String(f.getValue().contentsToByteArray());
-                if (f.getKey().equals("payload")) {
-                    payload = contents;
-                    payloadMimeType = MediaTypes.forExtension(f.getValue().getExtension()).get();
-                } else {
-                    variables.put(f.getKey(), new DefaultDocument<>(contents, MediaTypes.forExtension(f.getValue().getExtension()).get()));
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        Map<String, String> libraries = SlowOperations.allowSlowOperations(() -> getDSLibraries(this.textEditor.getFile()));
-
-        try {
-            MapperBuilder builder = new MapperBuilder(dataSonnetScript)
-                    .withImports(libraries)
-                    .withInputNames(variables.keySet());
-
-            ClassLoader currentCL = Thread.currentThread().getContextClassLoader();
-            ClassLoader projectClassLoader = ClasspathUtils.getProjectClassLoader(project, this.getClass().getClassLoader());
-            Thread.currentThread().setContextClassLoader(projectClassLoader);
-
-            try {
-                for (Class clazz : libsClasses) {
-                    Library lib = null;
-                    try { //First see if it's a static Scala class
-                        lib = (Library) clazz.getDeclaredField("MODULE$").get(null);
-                    } catch (Exception e) { //See if it has defaut constructor
-                        try {
-                            Constructor constructor = clazz.getDeclaredConstructor();
-                            lib = (Library) constructor.newInstance();
-                        } catch (Exception e2) {
-                            lib = null;
-                        }
-                    }
-                    if (lib != null) {
-                        builder = builder.withLibrary(lib);
-                    }
-                }
-            } catch (Exception e) {
-
-            }
-
-            Thread.currentThread().setContextClassLoader(currentCL);
-
-            Mapper mapper = builder.build();
-            com.datasonnet.document.Document transformDoc = mapper.transform(new DefaultDocument<>(payload, payloadMimeType), variables, outputMimeType);
-
-            return transformDoc;
-        } catch (Exception e) {
-            return new DefaultDocument<>(e.getMessage() != null ? e.getMessage() : e.toString(), MediaTypes.TEXT_PLAIN);
-        }
+        DataSonnetEngine dataSonnetEngine =
+                new DataSonnetEngine(project, this.textEditor.getFile(), currentScenario, outputMimeType);
+        return dataSonnetEngine.runDataSonnetMapping();
     }
 
     private String runPreviewExt() {
@@ -469,7 +406,6 @@ public class DataSonnetEditor implements FileEditor {
 
         DataSonnetSettingsComponent mySettingsComponent = ServiceManager.getService(DataSonnetSettingsComponent.class);
         String pathToDataSonnet = mySettingsComponent.getState().getDataSonnetExecPath();
-        String pathToMappingFile = psiFile.getVirtualFile().getCanonicalPath();
 
         if (pathToDataSonnet == null ||
                 StringUtils.isEmpty(pathToDataSonnet) ||
