@@ -65,7 +65,7 @@ public class DataSonnetDebuggerSession implements AbstractDebuggerSession {
     }
 
     public void runToPosition(XSourcePosition fromPosition, XSourcePosition toPosition) {
-        dataSonnetProcessHandler.getDebugger().addBreakpoint(toPosition.getLine());
+        dataSonnetProcessHandler.getDebugger().addBreakpoint(toPosition.getLine(), true);
         dataSonnetProcessHandler.getDebugger().setStepMode(false);
         _resume();
     }
@@ -89,14 +89,4 @@ public class DataSonnetDebuggerSession implements AbstractDebuggerSession {
     private void _resume() {
         dataSonnetProcessHandler.getDebugger().resume();
     }
-    /*    private void runDataSonnetProcess() {
-        final TextConsoleBuilder consoleBuilder = TextConsoleBuilderFactory.getInstance().createBuilder(project);
-        final ConsoleView console = consoleBuilder.getConsole();
-        console.print("TEST SYSOUT\n", ConsoleViewContentType.SYSTEM_OUTPUT);
-        console.print("TEST SYSERR\n", ConsoleViewContentType.ERROR_OUTPUT);
-        console.print("TEST NORMAL", ConsoleViewContentType.NORMAL_OUTPUT);
-
-//        dataSonnetProcess = new DataSonnetProcess(project, mapping, scenario, outputMimeType, true);
-//        dataSonnetProcess.run();
-    }*/
 }

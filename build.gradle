@@ -1,6 +1,5 @@
 plugins {
     id 'java'
-    //id 'org.jetbrains.intellij' version '0.4.10'
     id 'org.jetbrains.intellij' version '1.13.3'
     id "org.datlowe.maven-publish-auth" version "2.0.2"
     id 'me.qoomon.git-versioning' version '1.2.3'
@@ -43,16 +42,15 @@ repositories {
 }
 
 dependencies {
-    //testCompile group: 'junit', name: 'junit', version: '4.12'
     testImplementation group: 'junit', name: 'junit', version: '4.12'
-//     compile group: 'com.datasonnet', name: 'datasonnet-mapper', version: '2.5.1'
-//     compile group: 'io.github.classgraph', name: 'classgraph', version: '4.8.147'
     implementation group: 'com.datasonnet', name: 'datasonnet-mapper', version: '2.5.3-SNAPSHOT'
     implementation group: 'io.github.classgraph', name: 'classgraph', version: '4.8.147'
 }
+/*
 configurations.implementation {
     exclude group: 'org.slf4j'
 }
+ */
 
 gitVersioning {
     branch {
@@ -85,5 +83,5 @@ intellij {
 // }
 patchPluginXml {
     sinceBuild = "223"
-    untilBuild = "241.*"
+    untilBuild = "250.*"
 }

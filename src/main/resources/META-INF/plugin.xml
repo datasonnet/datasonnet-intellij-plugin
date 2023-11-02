@@ -2,27 +2,20 @@
     <id>io.portx.datasonnet</id>
     <name>DataSonnet Mapper</name>
     <version>0.1</version>
-    <vendor email="eugene.berman@modusbox.com" url="">Eugene Berman</vendor>
+    <vendor email="eugene.berman@portx.io" url="https://portx.io">PortX</vendor>
     <description><![CDATA[
-     DataSonnet Plugin for IntelliJ. This plugin allows to edit and preview DataSonnet mappings in the editor pane. It is based on the Databricks Jsonnet plugin but provides additional functionality
+     DataSonnet Plugin for IntelliJ. This plugin allows to edit and preview DataSonnet mappings in the editor pane. It is based on the Databricks Jsonnet plugin but provides additional functionality.
     ]]></description>
-
-    <!--<depends>com.databricks</depends>-->
 
     <idea-version since-build="180.*"/>
 
     <change-notes><![CDATA[
-
-    <h1>v0.1</h1>
+    <h1>Version 3.0.0</h1>
       <ul>
-       <li>
-          <p>Initial implementation</p>
-          <ul>
-            <li>Preview editor pane</li>
-            <li></li>
-            <li></li>
-          </ul>
-        </li>
+       <li>Preview editor pane</li>
+       <li>Initial implementation of the DataSonnet debugger</li>
+       <li>DataSonnet run configuration</li>
+       <li>Formatting and color highlighting</li>
       </ul>
     ]]>
     </change-notes>
@@ -89,7 +82,6 @@
         <configurationType implementation="io.portx.datasonnet.debug.runner.DataSonnetRunConfigurationType"/>
 
         <programRunner id="Debug" implementation="io.portx.datasonnet.debug.runner.DataSonnetProgramRunner" order="first"/>
-<!--        <java.programPatcher implementation="com.github.cameltooling.idea.runner.debugger.CamelDebuggerPatcher"/>-->
 
 <!--        <editor.linePainter implementation="io.portx.datasonnet.debug.DataSonnetEditorLinePainter" />-->
 
@@ -99,15 +91,12 @@
 
     </extensions>
 
-
-
     <actions>
         <action id="DataSonnet.CreateNewFileAction"
                 class="io.portx.datasonnet.actions.CreateNewFileAction" text="DataSonnet File"
                 description="Create New DataSonnet File">
             <add-to-group group-id="NewGroup" anchor="first"/>
         </action>
-
     </actions>
 
 </idea-plugin>
