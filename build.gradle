@@ -43,7 +43,7 @@ repositories {
 
 dependencies {
     testImplementation group: 'junit', name: 'junit', version: '4.12'
-    implementation group: 'com.datasonnet', name: 'datasonnet-mapper', version: '2.5.3-SNAPSHOT'
+    implementation group: 'com.datasonnet', name: 'datasonnet-mapper', version: '3.0.0-RC1'
     implementation group: 'io.github.classgraph', name: 'classgraph', version: '4.8.147'
 }
 /*
