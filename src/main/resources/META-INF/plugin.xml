@@ -20,6 +20,12 @@
     ]]>
     </change-notes>
 
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.xml</depends>
+    <depends>com.intellij.modules.lang</depends>
+    <depends>com.intellij.modules.xdebugger</depends>
+    <depends>com.intellij.modules.java</depends>
+
     <extensions defaultExtensionNs="com.intellij">
 
         <fileEditorProvider implementation="io.portx.datasonnet.editor.DataSonnetEditorProvider"/>
