@@ -1,0 +1,37 @@
+// This is a generated file. Not intended for manual editing.
+package io.portx.datasonnet.language.psi.impl;
+
+import java.util.List;
+
+import io.portx.datasonnet.language.psi.DataSonnetMember;
+import io.portx.datasonnet.language.psi.DataSonnetMembers;
+import io.portx.datasonnet.language.psi.DataSonnetVisitor;
+import org.jetbrains.annotations.*;
+import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import io.portx.datasonnet.language.psi.*;
+
+public class DataSonnetMembersImpl extends ASTWrapperPsiElement implements DataSonnetMembers {
+
+  public DataSonnetMembersImpl(@NotNull ASTNode node) {
+    super(node);
+  }
+
+  public void accept(@NotNull DataSonnetVisitor visitor) {
+    visitor.visitMembers(this);
+  }
+
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof DataSonnetVisitor) accept((DataSonnetVisitor)visitor);
+    else super.accept(visitor);
+  }
+
+  @Override
+  @NotNull
+  public List<DataSonnetMember> getMemberList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, DataSonnetMember.class);
+  }
+
+}

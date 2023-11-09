@@ -1,16 +1,16 @@
 {
-  parserClass="com.modusbox.portx.datasonnet.language.parser.DataSonnetParser"
+  parserClass="io.portx.datasonnet.language.parser.DataSonnetParser"
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
 
   psiClassPrefix="DataSonnet"
   psiImplClassSuffix="Impl"
-  psiPackage="com.modusbox.portx.datasonnet.language.psi"
-  psiImplPackage="com.modusbox.portx.datasonnet.language.psi.impl"
+  psiPackage="io.portx.datasonnet.language.psi"
+  psiImplPackage="io.portx.datasonnet.language.psi.impl"
 
-  elementTypeHolderClass="com.modusbox.portx.datasonnet.language.psi.DataSonnetTypes"
-  elementTypeClass="com.modusbox.portx.datasonnet.language.psi.DataSonnetElementType"
-  tokenTypeClass="com.modusbox.portx.datasonnet.language.psi.DataSonnetTokenType"
+  elementTypeHolderClass="io.portx.datasonnet.language.psi.DataSonnetTypes"
+  elementTypeClass="io.portx.datasonnet.language.psi.DataSonnetElementType"
+  tokenTypeClass="io.portx.datasonnet.language.psi.DataSonnetTokenType"
 
   tokens = [
     LINE_COMMENT='regexp://.*'
@@ -18,7 +18,7 @@
     BLOCK_COMMENT='regexp:/\*([^*]|\*+[^*/])*(\*+/)?'
   ]
 
-//  psiImplUtilClass="com.modusbox.portx.datasonnet.language.psi.impl.DataSonnetPsiImplUtil"
+//  psiImplUtilClass="io.portx.datasonnet.language.psi.impl.DataSonnetPsiImplUtil"
 
 }
 
@@ -100,19 +100,19 @@ params	::=	param (COMMA param)* ( COMMA )?
 binaryop	::=	ASTERISK | SLASH | PERCENT | PLUS | MINUS | DOUBLE_LESS | DOUBLE_GREATER | LESS_THAN | LESS_EQUAL | GREATER_THAN | GREATER_EQUAL | DOUBLE_EQUAL | NOT_EQUAL | IN | AND | CARAT | BAR | DOUBLE_AND | DOUBLE_BAR | DEFAULT
 unaryop	::=	MINUS | PLUS | EXCLAMATION | TILDE
 importop ::= (IMPORT (DOUBLE_QUOTED_STRING | SINGLE_QUOTED_STRING)) {
-    mixin="com.modusbox.portx.datasonnet.language.psi.impl.DataSonnetNamedElementImpl"
-    implements="com.modusbox.portx.datasonnet.language.psi.DataSonnetNamedElement"
+    mixin="io.portx.datasonnet.language.psi.impl.DataSonnetNamedElementImpl"
+    implements="io.portx.datasonnet.language.psi.DataSonnetNamedElement"
     //methods=[getKey getValue getName setName getNameIdentifier]
 }
 
 importstrop ::= (IMPORTSTR (DOUBLE_QUOTED_STRING | SINGLE_QUOTED_STRING)) {
-    mixin="com.modusbox.portx.datasonnet.language.psi.impl.DataSonnetNamedElementImpl"
-    implements="com.modusbox.portx.datasonnet.language.psi.DataSonnetNamedElement"
+    mixin="io.portx.datasonnet.language.psi.impl.DataSonnetNamedElementImpl"
+    implements="io.portx.datasonnet.language.psi.DataSonnetNamedElement"
     //methods=[getKey getValue getName setName getNameIdentifier]
 }
 outerlocal ::= LOCAL bind ( COMMA bind )* SEMICOLON expr
 IDENTIFIER0 ::= IDENTIFIER {
-    mixin="com.modusbox.portx.datasonnet.language.psi.impl.DataSonnetNamedElementImpl"
-    implements="com.modusbox.portx.datasonnet.language.psi.DataSonnetNamedElement"
+    mixin="io.portx.datasonnet.language.psi.impl.DataSonnetNamedElementImpl"
+    implements="io.portx.datasonnet.language.psi.DataSonnetNamedElement"
 }
 
