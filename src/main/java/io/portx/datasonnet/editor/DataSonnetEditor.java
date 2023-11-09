@@ -1,11 +1,8 @@
 package io.portx.datasonnet.editor;
 
-import com.datasonnet.Mapper;
-import com.datasonnet.MapperBuilder;
 import com.datasonnet.document.DefaultDocument;
 import com.datasonnet.document.MediaType;
 import com.datasonnet.document.MediaTypes;
-import com.datasonnet.spi.Library;
 import com.intellij.ProjectTopics;
 import com.intellij.codeHighlighting.BackgroundEditorHighlighter;
 import com.intellij.icons.AllIcons;
@@ -69,7 +66,6 @@ import com.intellij.ui.JBTabsPaneImpl;
 import com.intellij.ui.content.TabbedPaneContentUI;
 import com.intellij.ui.tabs.TabInfo;
 import com.intellij.util.Alarm;
-import com.intellij.util.SlowOperations;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfoList;
 import io.github.classgraph.ScanResult;
@@ -94,7 +90,6 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.nio.file.Paths;
 import java.util.List;

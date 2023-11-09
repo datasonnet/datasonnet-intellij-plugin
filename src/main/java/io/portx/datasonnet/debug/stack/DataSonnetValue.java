@@ -130,39 +130,4 @@ public class DataSonnetValue extends XNamedValue {
 
         return value.getClass().getSimpleName();
     }
-
-/*
-    @Override
-    @NotNull
-    public ThreeState computeInlineDebuggerData(@NotNull XInlineDebuggerDataCallback callback) {
-        return ThreeState.UNSURE;
-    }
-*/
-
-/*    @Override
-    public @Nullable XValueModifier getModifier() {
-
-        return new XValueModifier() {
-            @Override
-            public void setValue(@NotNull XExpression expression, @NotNull XModificationCallback callback) {
-                String type = fieldDefinition.getType();
-                if (StringUtils.isEmpty(type)) {
-                    type = String.class.getName();
-                }
-                session.getCamelDebugProcess().setValue(
-                    target, targetName, StringUtil.unquoteString(expression.getExpression()),
-                    CamelLanguages.SIMPLE_LANGUAGE.getID(), type, null, null
-                );
-                callback.valueModified();
-            }
-
-            @Override
-            public @Nullable String getInitialValueEditorText() {
-                if (StringUtils.isEmpty(fieldDefinition.getType())) {
-                    return "\"\"";
-                }
-                return String.format("\"%s\"", fieldDefinition.getValue());
-            }
-        };
-    }*/
 }

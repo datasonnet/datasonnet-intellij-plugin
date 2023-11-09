@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Created by eberman on 11/3/16.
  */
-public class DataSonnetEditorProvider extends PsiAwareTextEditorProvider { //implements FileEditorProvider {
+public class DataSonnetEditorProvider extends PsiAwareTextEditorProvider {
 
     @Override
     public boolean accept(@NotNull Project project, @NotNull VirtualFile virtualFile) {

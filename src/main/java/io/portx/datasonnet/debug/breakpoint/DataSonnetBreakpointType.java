@@ -39,25 +39,6 @@ import org.jetbrains.annotations.Nullable;
 
 public class DataSonnetBreakpointType extends XLineBreakpointType<XBreakpointProperties<?>> {
 
-/*
-    private static final List<String> NO_BREAKPOINTS_AT = Arrays.asList(
-        "routes",
-        "route",
-        "from",
-        "routeConfiguration",
-        "routeConfigurationId",
-        "exception",
-        "handled",
-        "simple",
-        "constant",
-        "datasonnet",
-        "groovy",
-        "steps",
-        "name",
-        "constant",
-        "uri");
-*/
-
     protected DataSonnetBreakpointType() {
         super("datasonnet", "DataSonnet Breakpoints");
     }

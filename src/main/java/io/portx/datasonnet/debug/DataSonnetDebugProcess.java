@@ -21,7 +21,6 @@ public class DataSonnetDebugProcess extends XDebugProcess {
     private final DataSonnetDebuggerSession dataSonnetDebuggerSession;
     private final DataSonnetDebuggerEditorsProvider dataSonnetDebuggerEditorsProvider;
     private final DataSonnetBreakpointHandler dataSonnetBreakpointHandler;
-    //private final DataSonnetProcessHandler dataSonnetProcessHandler;
 
     /**
      * @param session pass {@code session} parameter of {@link XDebugProcessStarter#start} method to this constructor
@@ -37,21 +36,6 @@ public class DataSonnetDebugProcess extends XDebugProcess {
             public void stopped(StoppedProgramContext stoppedProgramContext) {
                 DataSonnetStackFrame frame = new DataSonnetStackFrame(dataSonnetDebuggerSession, stoppedProgramContext);
                 getSession().positionReached(new DataSonnetSuspendContext(frame));
-
-                /*
-                final CamelMessageInfo camelMessageInfo = selectCamelMessageInfo(messages);
-            if (camelMessageInfo != null) {
-                //List frames
-                List<CamelStackFrame> stackFrames = new ArrayList<>();
-                for (CamelMessageInfo info : camelMessageInfo.getStack()) {
-                    CamelStackFrame nextFrame = new CamelStackFrame(camelDebuggerSession, info);
-                    stackFrames.add(nextFrame);
-                }
-                getSession().positionReached(new CamelSuspendContext(stackFrames.toArray(new CamelStackFrame[0])));
-                this.lastProcessed = camelMessageInfo;
-                LOG.debug("New camel message processed");
-            }
-                 */
             }
         });
 
@@ -59,13 +43,11 @@ public class DataSonnetDebugProcess extends XDebugProcess {
             private XDebuggerTreeState state = null;
             @Override
             public void sessionPaused() {
-                //if (state != null) XDebuggerTree.rebuildAndRestore(state);
                 XDebugSessionListener.super.sessionPaused();
             }
 
             @Override
             public void sessionResumed() {
-                //state = XDebuggerTreeState.saveState(tree)
                 XDebugSessionListener.super.sessionResumed();
             }
         });
