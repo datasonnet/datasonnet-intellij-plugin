@@ -55,7 +55,7 @@ public class DataSonnetBreakpointType extends XLineBreakpointType<XBreakpointPro
                 if (element instanceof LeafPsiElement) {
                     LeafPsiElement leafPsiElement = (LeafPsiElement) element;
                     IElementType type = leafPsiElement.getElementType();
-                    String name = type.getDebugName();
+                    String name = type.toString();
                     if (!name.equals("COMMA") &&
                         !name.equals("R_CURLY") &&
                         !name.equals("R_BRACKET") &&
