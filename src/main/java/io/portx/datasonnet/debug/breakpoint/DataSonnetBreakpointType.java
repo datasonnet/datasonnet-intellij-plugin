@@ -45,9 +45,11 @@ public class DataSonnetBreakpointType extends XLineBreakpointType<XBreakpointPro
 
     @Override
     public boolean canPutAt(@NotNull VirtualFile file, int line, @NotNull Project project) {
-
         //XDebuggerUtil.iterateLine - if element is anything but Comment, whitespace COMMA, R_CURLY, L_CURLY, R_BRACKET, L_BRACKET
         final Document document = FileDocumentManager.getInstance().getDocument(file);
+        if (!"DataSonnet".equals(file.getFileType().getName())) {
+            return false;
+        }
         Ref<Boolean> res = Ref.create(false);
 
         XDebuggerUtil.getInstance().iterateLine(project, document, line, element -> {

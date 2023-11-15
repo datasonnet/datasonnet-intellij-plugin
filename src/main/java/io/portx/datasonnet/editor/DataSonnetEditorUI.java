@@ -1,6 +1,7 @@
 package io.portx.datasonnet.editor;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.impl.text.TextEditorImpl;
 import com.intellij.ui.JBSplitter;
 
@@ -23,7 +24,7 @@ public class DataSonnetEditorUI {
 
     final static Logger logger = Logger.getInstance(DataSonnetEditorUI.class);
 
-    public DataSonnetEditorUI(TextEditorImpl textEditor) {
+    public DataSonnetEditorUI(FileEditor textEditor) {
         editorPanel.add(textEditor.getComponent(), BorderLayout.CENTER);
 
         JBSplitter splitter = new JBSplitter(false);

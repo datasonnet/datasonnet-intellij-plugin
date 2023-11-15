@@ -36,6 +36,7 @@ import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.fileEditor.*;
 import com.intellij.openapi.fileEditor.impl.text.PsiAwareTextEditorImpl;
+import com.intellij.openapi.fileEditor.impl.text.TextEditorImpl;
 import com.intellij.openapi.fileEditor.impl.text.TextEditorProvider;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.PlainTextLanguage;
@@ -105,7 +106,7 @@ public class DataSonnetEditor implements FileEditor {
     private Project project;
     private final Module module;
 
-    private final PsiAwareTextEditorImpl textEditor;
+    private final TextEditorImpl textEditor;
 
     private final PsiFile psiFile;
 
@@ -136,9 +137,9 @@ public class DataSonnetEditor implements FileEditor {
 
     private List<Class<?>> libsClasses = null;
 
-    public DataSonnetEditor(@NotNull Project project, @NotNull VirtualFile virtualFile, final TextEditorProvider provider) {
+    public DataSonnetEditor(@NotNull Project project, @NotNull VirtualFile virtualFile, final TextEditorImpl psiAwareEditor) {
         this.project = project;
-        this.textEditor = new PsiAwareTextEditorImpl(project, virtualFile, provider);
+        this.textEditor = psiAwareEditor; //new PsiAwareTextEditorImpl(project, virtualFile, provider);
         this.module = ModuleUtilCore.findModuleForFile(virtualFile, project);
 
         gui = new DataSonnetEditorUI(textEditor);

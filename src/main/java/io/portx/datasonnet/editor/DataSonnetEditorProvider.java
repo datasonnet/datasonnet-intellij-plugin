@@ -1,15 +1,20 @@
 package io.portx.datasonnet.editor;
 
+import com.intellij.openapi.fileEditor.AsyncFileEditorProvider;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorPolicy;
+import com.intellij.openapi.fileEditor.impl.text.PsiAwareTextEditorImpl;
 import com.intellij.openapi.fileEditor.impl.text.PsiAwareTextEditorProvider;
+import com.intellij.openapi.fileEditor.impl.text.TextEditorImpl;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import io.portx.datasonnet.language.DataSonnetFileType;
 import io.portx.datasonnet.language.psi.DataSonnetFile;
+import kotlin.coroutines.Continuation;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -31,10 +36,22 @@ public class DataSonnetEditorProvider extends PsiAwareTextEditorProvider {
         return isDataSonnetFile;
     }
 
+    @Nullable
+    @Override
+    public Object createEditorBuilder(@NotNull Project project, @NotNull VirtualFile file, @NotNull Continuation<? super Builder> $completion) {
+        return new Builder() {
+            @NotNull
+            @Override
+            public FileEditor build() {
+                return new DataSonnetEditor(project, file, (TextEditorImpl)DataSonnetEditorProvider.super.createEditor(project, file));
+            }
+        };
+    }
+
     @NotNull
     @Override
     public FileEditor createEditor(@NotNull Project project, @NotNull VirtualFile virtualFile) {
-        return new DataSonnetEditor(project, virtualFile, this);
+        return new DataSonnetEditor(project, virtualFile, (TextEditorImpl)super.createEditor(project, virtualFile));
     }
 
     @NotNull

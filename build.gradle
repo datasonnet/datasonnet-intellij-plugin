@@ -9,7 +9,7 @@ apply plugin: 'java'
 apply plugin: 'org.jetbrains.intellij'
 
 group 'com.datasonnet'
-version '3.0.0'
+version '3.0.1'
 
 sourceCompatibility = 17
 
@@ -82,6 +82,6 @@ intellij {
 //       <em>most HTML tags may be used</em>"""
 // }
 patchPluginXml {
-    sinceBuild = "223"
+    sinceBuild = "232"
     untilBuild = "250.*"
 }
