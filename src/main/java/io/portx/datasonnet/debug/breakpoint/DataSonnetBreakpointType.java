@@ -58,12 +58,12 @@ public class DataSonnetBreakpointType extends XLineBreakpointType<XBreakpointPro
                     LeafPsiElement leafPsiElement = (LeafPsiElement) element;
                     IElementType type = leafPsiElement.getElementType();
                     String name = type.toString();
-                    if (!name.equals("COMMA") &&
-                        !name.equals("R_CURLY") &&
-                        !name.equals("R_BRACKET") &&
-                        !name.equals("L_CURLY") &&
-                        !name.equals("L_BRACKET") &&
-                        !name.equals("SEMICOLON")
+                    if (!name.endsWith(".COMMA") &&
+                        !name.endsWith(".R_CURLY") &&
+                        !name.endsWith(".R_BRACKET") &&
+                        !name.endsWith(".L_CURLY") &&
+                        !name.endsWith(".L_BRACKET") &&
+                        !name.endsWith(".SEMICOLON")
                     ) {
                         res.set(true);
                         return false; //We found element that can have breakpoint, stop processing
