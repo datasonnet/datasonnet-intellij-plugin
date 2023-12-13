@@ -2,6 +2,7 @@ package io.portx.datasonnet.config;
 
 import java.io.Serializable;
 
+@Deprecated
 public class DataSonnetSettings implements Serializable {
 
     private String dataSonnetExecPath;

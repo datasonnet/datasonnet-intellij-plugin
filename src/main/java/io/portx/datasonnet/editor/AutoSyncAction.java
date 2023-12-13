@@ -12,7 +12,7 @@ import javax.swing.*;
 public class AutoSyncAction extends ToggleAction {
     DataSonnetEditor editor;
 
-    final static Icon autosyncIcon = IconLoader.findIcon("/icons/autosync.png");
+    final static Icon autosyncIcon = IconLoader.findIcon("/icons/autosync.png", AutoSyncAction.class);
 
     public AutoSyncAction(DataSonnetEditor editor) {
         super("Auto Refresh", "Toggle Auto Refresh Mapping On/Off", autosyncIcon);

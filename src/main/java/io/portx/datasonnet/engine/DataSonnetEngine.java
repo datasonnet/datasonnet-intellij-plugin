@@ -148,7 +148,7 @@ public class DataSonnetEngine {
 
     @NotNull
     private Map<String, String> getDSLibraries() {
-
+//TODO Use settings component to search in additional directories
         Map<String, String> libraries = new HashMap();
 
         Collection<VirtualFile> libs = FilenameIndex.getAllFilesByExt(project, "libsonnet", GlobalSearchScope.allScope(project));

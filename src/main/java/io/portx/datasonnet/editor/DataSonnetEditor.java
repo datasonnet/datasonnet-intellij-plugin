@@ -21,7 +21,6 @@ import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.command.WriteCommandAction;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
@@ -35,14 +34,11 @@ import com.intellij.openapi.editor.markup.HighlighterTargetArea;
 import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.fileEditor.*;
-import com.intellij.openapi.fileEditor.impl.text.PsiAwareTextEditorImpl;
 import com.intellij.openapi.fileEditor.impl.text.TextEditorImpl;
-import com.intellij.openapi.fileEditor.impl.text.TextEditorProvider;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.PlainTextLanguage;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
-import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootEvent;
 import com.intellij.openapi.roots.ModuleRootListener;
@@ -61,7 +57,6 @@ import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.ParameterizedCachedValue;
-import com.intellij.ui.EditorNotificationPanel;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.JBTabsPaneImpl;
 import com.intellij.ui.content.TabbedPaneContentUI;
@@ -70,14 +65,11 @@ import com.intellij.util.Alarm;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfoList;
 import io.github.classgraph.ScanResult;
-import io.portx.datasonnet.config.DataSonnetProjectSettingsComponent;
-import io.portx.datasonnet.config.DataSonnetSettingsComponent;
 import io.portx.datasonnet.engine.DataSonnetEngine;
 import io.portx.datasonnet.engine.Scenario;
 import io.portx.datasonnet.engine.ScenarioManager;
 import io.portx.datasonnet.language.DataSonnetFileType;
 import io.portx.datasonnet.util.ClasspathUtils;
-import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jps.model.java.JavaResourceRootType;
@@ -88,9 +80,7 @@ import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeListener;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.nio.file.Paths;
 import java.util.List;
@@ -151,7 +141,7 @@ public class DataSonnetEditor implements FileEditor {
         gui.getSourcePanel().add(inputTabs.getComponent(), BorderLayout.CENTER);
 
         DefaultActionGroup actionGroup = new DefaultActionGroup();
-        actionGroup.add(new AnAction("Add new scenario", "Adds a new scenario for the current mapping", IconLoader.findIcon("/icons/addScenario.svg")) {
+        actionGroup.add(new AnAction("Add new scenario", "Adds a new scenario for the current mapping", IconLoader.findIcon("/icons/addScenario.svg", DataSonnetEditor.class)) {
             @Override
             public void actionPerformed(AnActionEvent e) {
                 //Check if there is a test resources folder
@@ -171,6 +161,7 @@ public class DataSonnetEditor implements FileEditor {
                             }
                         }
                     });
+
                     Notifications.Bus.notify(notification);
                     return;
                 }
@@ -205,13 +196,13 @@ public class DataSonnetEditor implements FileEditor {
         gui.getOutputPanel().add(outputTabs.getComponent(), BorderLayout.CENTER);
         gui.getOutputPanel().setSize(1000, 1000);
 
-        project.getMessageBus().connect().subscribe(ProjectTopics.PROJECT_ROOTS,
+/*        project.getMessageBus().connect().subscribe(ProjectTopics.PROJECT_ROOTS,
                 new ModuleRootListener() {
                     @Override
                     public void rootsChanged(ModuleRootEvent event) {
                         scanLibraries();
                     }
-                });
+                });*/
 
         refreshPreview = new DocumentListener() {
             @Override
@@ -275,7 +266,7 @@ public class DataSonnetEditor implements FileEditor {
                 app.invokeAndWait(action, ModalityState.current());
             }
 
-            scanLibraries();
+            //scanLibraries();
             createOutputTab();
             this.runPreview(true);
         }
@@ -391,97 +382,6 @@ public class DataSonnetEditor implements FileEditor {
         return dataSonnetEngine.runDataSonnetMapping();
     }
 
-    private String runPreviewExt() {
-        ScenarioManager manager = ScenarioManager.getInstance(project);
-        Scenario currentScenario = manager.getCurrentScenario(getPsiFile().getVirtualFile().getCanonicalPath());
-
-        if (currentScenario == null)
-            return "ERROR: No mapping scenarios available!";
-
-        String output = null;
-
-        DataSonnetSettingsComponent mySettingsComponent = ServiceManager.getService(DataSonnetSettingsComponent.class);
-        String pathToDataSonnet = mySettingsComponent.getState().getDataSonnetExecPath();
-
-        if (pathToDataSonnet == null ||
-                StringUtils.isEmpty(pathToDataSonnet) ||
-                !(new File(pathToDataSonnet).exists() && !new File(pathToDataSonnet).isDirectory())) {
-            EditorNotificationPanel panel = new EditorNotificationPanel();
-            panel.setText("Unable to find Datasonnt/DataSonnet executable in path.");
-            panel.createActionLabel("Configure DataSonnet path", new Runnable() {
-                @Override
-                public void run() {
-                    editors.get("Preview").setHeaderComponent(null);
-                    ShowSettingsUtil.getInstance().showSettingsDialog(project, "datasonnet");
-                }
-            });
-
-            editors.get("Preview").setHeaderComponent(panel);
-
-            return "";
-        }
-
-        editors.get("Preview").setHeaderComponent(null);
-
-        java.util.List<String> args = new ArrayList<String>();
-        args.add(pathToDataSonnet);
-
-        DataSonnetProjectSettingsComponent myProjectSettingsComponent = ServiceManager.getService(project, DataSonnetProjectSettingsComponent.class);
-        for (String path : myProjectSettingsComponent.getState().getDataSonnetLibraryPaths()) {
-            args.add("-J");
-            args.add(path);
-        }
-
-        Map<String, VirtualFile> inputFiles = currentScenario.getInputFiles();
-
-        String dataSonnetScriptHeader = "";
-
-        boolean isExtVars = mySettingsComponent.getState().isExtVars();
-        if (isExtVars) {
-            for (Map.Entry<String, VirtualFile> f : inputFiles.entrySet()) {
-                args.add("--ext-code-file");
-                args.add(f.getKey() + "=" + f.getValue().getCanonicalPath());
-                dataSonnetScriptHeader = dataSonnetScriptHeader + "local " + f.getKey() + " = std.extVar(\"" + f.getKey() + "\");\n";
-            }
-        } else {
-            for (Map.Entry<String, VirtualFile> f : inputFiles.entrySet()) {
-                args.add("--tla-code-file");
-                args.add(f.getKey() + "=" + f.getValue().getCanonicalPath());
-                dataSonnetScriptHeader = dataSonnetScriptHeader + (StringUtils.isEmpty(dataSonnetScriptHeader) ? "function(" : ", ") + f.getKey();
-            }
-            dataSonnetScriptHeader = dataSonnetScriptHeader + ") \n";
-        }
-
-        String dataSonnetScript = dataSonnetScriptHeader + this.textEditor.getEditor().getDocument().getText();
-        args.add("-e");
-        args.add(dataSonnetScript);
-
-        try {
-            Process proc = Runtime.getRuntime().exec(args.toArray(new String[]{}));
-            InputStream is = proc.getInputStream();
-            Scanner s = new Scanner(is).useDelimiter("\\A");
-
-            if (s.hasNext()) {
-                output = s.next();
-            } else {
-                InputStream es = proc.getErrorStream();
-                s = new Scanner(es).useDelimiter("\\A");
-                if (s.hasNext()) {
-                    output = s.next();
-                } else {
-                    output = "";
-                }
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        final String preview = output;
-
-        return preview;
-    }
-
     protected void runPreview(boolean forceRefresh) {
         if (!isAutoSync() && !forceRefresh)
             return;
@@ -505,20 +405,9 @@ public class DataSonnetEditor implements FileEditor {
 
         this.textEditor.getEditor().getMarkupModel().removeAllHighlighters();
 
-        DataSonnetSettingsComponent mySettingsComponent = ApplicationManager.getApplication().getService(DataSonnetSettingsComponent.class);
-        boolean useBuiltIn = mySettingsComponent.getState().isBuiltInParser();
-
-        final String contentType;
-        final String preview;
-
-        if (useBuiltIn) {
-            com.datasonnet.document.Document doc = runPreviewBuiltIn();
-            preview = doc.getContent().toString();
-            contentType = doc.getMediaType().toString();
-        } else {
-            preview = runPreviewExt();
-            contentType = "application/json";
-        }
+        com.datasonnet.document.Document doc = runPreviewBuiltIn();
+        String preview = doc.getContent().toString();
+        String contentType = doc.getMediaType().toString();
 
         if (preview != null) {
             if (preview.startsWith("Problem")) {
@@ -745,45 +634,6 @@ public class DataSonnetEditor implements FileEditor {
         }
     }
 
-    @NotNull
-    private Map<String, String> getDSLibraries(@NotNull final VirtualFile ds) {
-        Map<String, String> libraries = new HashMap();
-
-        Collection<VirtualFile> libs = FilenameIndex.getAllFilesByExt(project, "libsonnet", GlobalSearchScope.allScope(project));
-        for (VirtualFile nextLib : libs) {
-            try {
-                String content = VfsUtil.loadText(nextLib);
-                String path = nextLib.getPath();
-                if (path.toLowerCase().contains(".jar!")) {
-                    path = path.substring(path.lastIndexOf("!") + 1);
-                } else {
-                    List<VirtualFile> roots = new ArrayList(Arrays.asList(ModuleRootManager.getInstance(module).getSourceRoots()));
-                    roots.addAll(Arrays.asList(ModuleRootManager.getInstance(module).getContentRoots()));
-
-                    for (VirtualFile root : roots) {
-                        if (path.startsWith(root.getPath())) {
-                            path = path.replace(root.getPath(), "");
-                            break;
-                        }
-                    }
-                }
-                if (path.startsWith("/")) {
-                    path = path.substring(1);
-                }
-                libraries.put(path, content);
-
-                //Also put another copy with relative path
-                String relativePath = Paths.get(ds.getParent().getPath()).relativize(Paths.get(nextLib.getPath())).toString();
-                libraries.put(relativePath, content);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return libraries;
-    }
-
     private static void addDocumentListener(Document document, DocumentListener listener) throws Exception {
         Method method = document.getClass().getDeclaredMethod("getListeners");
         method.setAccessible(true);
@@ -793,27 +643,9 @@ public class DataSonnetEditor implements FileEditor {
         }
     }
 
-    private void scanLibraries() {
-        try {
-            ClassLoader projectClassLoader = ClasspathUtils.getProjectClassLoader(project, this.getClass().getClassLoader());
-
-            ScanResult scanResult = new ClassGraph().enableAllInfo()
-                    .overrideClassLoaders(projectClassLoader)
-                    .scan();
-            ClassInfoList libs = scanResult.getSubclasses("com.datasonnet.spi.Library")
-                    .filter(classInfo -> classInfo.isPublic() &&
-                            !classInfo.isAbstract() &&
-                            !classInfo.getName().endsWith(".CML") && //Exclude Camel library
-                            !"com.datasonnet".equals(classInfo.getPackageName())); //Exclude default Datasonnet libraries
-            libsClasses = libs.loadClasses();
-        } catch (Exception e) {
-
-        }
-    }
-
     private class SelectScenarioAction extends AnAction {
         public SelectScenarioAction() {
-            super(null, "Select scenario", IconLoader.findIcon("/icons/selectScenario.svg"));
+            super(null, "Select scenario", IconLoader.findIcon("/icons/selectScenario.svg", SelectScenarioAction.class));
         }
 
         @Override
@@ -860,14 +692,12 @@ public class DataSonnetEditor implements FileEditor {
 
     private class SelectOutputMimeTypeAction extends AnAction {
         public SelectOutputMimeTypeAction() {
-            super(null, "Select Output Mime Type", IconLoader.findIcon("/icons/selectScenario.svg"));
+            super(null, "Select Output Mime Type", IconLoader.findIcon("/icons/selectScenario.svg", SelectOutputMimeTypeAction.class));
         }
 
         @Override
         public void update(@NotNull final AnActionEvent e) {
-            DataSonnetSettingsComponent mySettingsComponent = ApplicationManager.getApplication().getService(DataSonnetSettingsComponent.class);
-            boolean useBuiltIn = mySettingsComponent.getState().isBuiltInParser();
-            e.getPresentation().setEnabled(useBuiltIn);
+            e.getPresentation().setEnabled(true);
         }
 
         @Override
@@ -916,9 +746,7 @@ public class DataSonnetEditor implements FileEditor {
             @Override
             public void update(@NotNull final AnActionEvent e) {
                 super.update(e);
-                DataSonnetSettingsComponent mySettingsComponent = ApplicationManager.getApplication().getService(DataSonnetSettingsComponent.class);
-                boolean useBuiltIn = mySettingsComponent.getState().isBuiltInParser();
-                e.getPresentation().setEnabled(useBuiltIn);
+                e.getPresentation().setEnabled(true);
             }
 
             @Override

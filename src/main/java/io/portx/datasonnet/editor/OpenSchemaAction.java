@@ -13,7 +13,7 @@ import javax.swing.*;
 public class OpenSchemaAction extends AnAction {
 
     final static Logger logger = Logger.getInstance(OpenSchemaAction.class);
-    final static Icon loadSchemaIcon = IconLoader.findIcon("/openschema.png");
+    final static Icon loadSchemaIcon = IconLoader.findIcon("/openschema.png", OpenSchemaAction.class);
 
     public OpenSchemaAction() {
         super("Load Schema", "Load XSD or Json Schema", loadSchemaIcon);

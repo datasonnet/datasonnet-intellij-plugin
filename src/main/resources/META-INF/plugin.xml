@@ -31,7 +31,7 @@
         <fileEditorProvider implementation="io.portx.datasonnet.editor.DataSonnetEditorProvider"/>
         <projectConfigurable groupId="tools" displayName="DataSonnet" id="io.portx.datasonnet.configurable"
                              instance="io.portx.datasonnet.config.DataSonnetConfigurable" nonDefaultProject="true"/>
-        <applicationService serviceImplementation="io.portx.datasonnet.config.DataSonnetSettingsComponent"/>
+<!--        <applicationService serviceImplementation="io.portx.datasonnet.config.DataSonnetSettingsComponent"/>-->
         <projectService serviceImplementation="io.portx.datasonnet.config.DataSonnetProjectSettingsComponent"/>
 
         <lang.parserDefinition language="Datasonnet" implementationClass="io.portx.datasonnet.language.DataSonnetParserDefinition"/>

@@ -8,6 +8,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.psi.PsiFile;
+import com.intellij.util.ThrowableRunnable;
 
 import javax.swing.*;
 
@@ -17,7 +18,7 @@ import javax.swing.*;
 public class RefreshAction extends AnAction {
 
     final static Logger logger = Logger.getInstance(RefreshAction.class);
-    final static Icon refreshIcon = IconLoader.findIcon("/icons/refresh.png");
+    final static Icon refreshIcon = IconLoader.findIcon("/icons/refresh.png", RefreshAction.class);
 
     DataSonnetEditor editor;
 
@@ -32,16 +33,14 @@ public class RefreshAction extends AnAction {
         final Project project = anActionEvent.getProject();
         final PsiFile psiFile = anActionEvent.getData(CommonDataKeys.PSI_FILE);
         try {
-            new WriteCommandAction.Simple(project, psiFile) {
+            WriteCommandAction.writeCommandAction(project, psiFile).run(new ThrowableRunnable<Throwable>() {
                 @Override
-                protected void run() throws Throwable {
+                public void run() throws Throwable {
                     editor.runPreview(true);
                 }
-            }.execute();
-        } catch (Exception e) {
+            });
+        } catch (Throwable e) {
             logger.error(e);
         }
-
     }
-
 }
