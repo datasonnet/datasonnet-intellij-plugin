@@ -5,15 +5,13 @@ import com.datasonnet.document.MediaType;
 import com.datasonnet.document.MediaTypes;
 import com.intellij.ProjectTopics;
 import com.intellij.codeHighlighting.BackgroundEditorHighlighter;
+import com.intellij.codeInspection.InspectionsBundle;
 import com.intellij.icons.AllIcons;
 import com.intellij.json.JsonLanguage;
 import com.intellij.lang.Language;
 import com.intellij.lang.xml.XMLLanguage;
 import com.intellij.navigation.ItemPresentation;
-import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationListener;
-import com.intellij.notification.NotificationType;
-import com.intellij.notification.Notifications;
+import com.intellij.notification.*;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.impl.ActionManagerImpl;
 import com.intellij.openapi.actionSystem.impl.MenuItemPresentationFactory;
@@ -149,16 +147,14 @@ public class DataSonnetEditor implements FileEditor {
                 if (testRoots == null || testRoots.isEmpty()) {
                     Notification notification = new Notification("DataSonnet",
                             "No Test Resources folder found!",
-                            "Please mark at least one directory as <strong>Test Resources</strong> folder.\n <a href=\"projectSettings\">Click here</a> to open project settings.",
+                            "Please mark at least one directory as <strong>Test Resources</strong> folder.",
                             NotificationType.WARNING);
-                    notification.setListener(new NotificationListener() {
+
+                    notification.addAction(new NotificationAction("Open project settings") {
                         @Override
-                        public void hyperlinkUpdate(@NotNull Notification notification, @NotNull HyperlinkEvent event) {
-                            if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                                if ("projectSettings".equals(event.getDescription())) {
-                                    ProjectSettingsService.getInstance(project).openModuleSettings(module);
-                                }
-                            }
+                        public void actionPerformed(@NotNull AnActionEvent e, @NotNull Notification notification) {
+                            notification.expire();
+                            ProjectSettingsService.getInstance(project).openModuleSettings(module);
                         }
                     });
 
