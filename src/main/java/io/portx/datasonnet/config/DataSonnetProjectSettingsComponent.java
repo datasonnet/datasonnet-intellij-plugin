@@ -1,13 +1,12 @@
 package io.portx.datasonnet.config;
 
 import com.intellij.openapi.components.PersistentStateComponent;
-import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import org.jetbrains.annotations.NotNull;
 
 @State(name = "DataSonnetProjectSettings", storages = {@Storage("dataSonnet-settings.xml")})
-public class DataSonnetProjectSettingsComponent implements PersistentStateComponent<DataSonnetProjectSettings>, ProjectComponent {
+public class DataSonnetProjectSettingsComponent implements PersistentStateComponent<DataSonnetProjectSettings> {
     private DataSonnetProjectSettings settings = new DataSonnetProjectSettings();
 
     public DataSonnetProjectSettings getState() {
@@ -29,10 +28,4 @@ public class DataSonnetProjectSettingsComponent implements PersistentStateCompon
         return "DataSonnetProjectSettings";
     }
 
-    public void initComponent() {
-    }
-
-    public void disposeComponent() {
-        this.settings = null;
-    }
 }

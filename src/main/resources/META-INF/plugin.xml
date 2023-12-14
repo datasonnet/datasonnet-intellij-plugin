@@ -10,6 +10,11 @@
     <idea-version since-build="180.*"/>
 
     <change-notes><![CDATA[
+    <h1>Version 3.0.2</h1>
+      <ul>
+       <li>Improved compatibility with latest versions of IDEA</li>
+       <li>Additional DataSonnet libraries search paths implemented</li>
+=      </ul>
     <h1>Version 3.0.0</h1>
       <ul>
        <li>Preview editor pane</li>
@@ -31,7 +36,6 @@
         <fileEditorProvider implementation="io.portx.datasonnet.editor.DataSonnetEditorProvider"/>
         <projectConfigurable groupId="tools" displayName="DataSonnet" id="io.portx.datasonnet.configurable"
                              instance="io.portx.datasonnet.config.DataSonnetConfigurable" nonDefaultProject="true"/>
-        <applicationService serviceImplementation="io.portx.datasonnet.config.DataSonnetSettingsComponent"/>
         <projectService serviceImplementation="io.portx.datasonnet.config.DataSonnetProjectSettingsComponent"/>
 
         <lang.parserDefinition language="Datasonnet" implementationClass="io.portx.datasonnet.language.DataSonnetParserDefinition"/>

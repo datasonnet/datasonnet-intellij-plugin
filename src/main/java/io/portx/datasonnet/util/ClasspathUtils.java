@@ -13,6 +13,7 @@ import com.intellij.psi.util.ParameterizedCachedValue;
 import com.intellij.psi.util.ParameterizedCachedValueProvider;
 import org.jetbrains.annotations.Nullable;
 
+import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -79,7 +80,7 @@ public final class ClasspathUtils {
             String[] cpEntries = fullClasspath.split(":");
             for (String nextEntry : cpEntries) {
                 try {
-                    URL url = nextEntry.endsWith(".jar") ? new URL("jar:file://" + nextEntry + "!/") : new URL("file://" + nextEntry);
+                    URL url = nextEntry.endsWith(".jar") ? URI.create("jar:file://" + nextEntry + "!/").toURL() : URI.create("file://" + nextEntry).toURL();
                     loaderUrls.add(url);
                 } catch (Exception e) {
 
@@ -94,7 +95,7 @@ public final class ClasspathUtils {
                 }
 
                 try {
-                    loaderUrls.add(new URL(nextUrlString));
+                    loaderUrls.add(URI.create(nextUrlString).toURL());
                 } catch (Exception e) {
 
                 }

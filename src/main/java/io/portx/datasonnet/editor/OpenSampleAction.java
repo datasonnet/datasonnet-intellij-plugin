@@ -12,6 +12,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
+import com.intellij.util.ThrowableRunnable;
 
 import javax.swing.*;
 
@@ -21,7 +22,7 @@ import javax.swing.*;
 public class OpenSampleAction extends AnAction {
 
     final static Logger logger = Logger.getInstance(OpenSampleAction.class);
-    final static Icon loadSampleIcon = IconLoader.findIcon("/opensample.png");
+    final static Icon loadSampleIcon = IconLoader.findIcon("/opensample.png", OpenSampleAction.class);
 
     Document document;
 
@@ -44,14 +45,13 @@ public class OpenSampleAction extends AnAction {
 
         try {
             final String text = new String(sample.contentsToByteArray(), sample.getCharset());
-
-            new WriteCommandAction.Simple(project, psiFile) {
+            WriteCommandAction.writeCommandAction(project, psiFile).run(new ThrowableRunnable<Throwable>() {
                 @Override
-                protected void run() throws Throwable {
+                public void run() throws Throwable {
                     document.setText(text);
                 }
-            }.execute();
-        } catch (Exception e) {
+            });
+        } catch (Throwable e) {
             logger.error(e);
         }
 

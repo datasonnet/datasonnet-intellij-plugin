@@ -12,7 +12,9 @@ import static io.portx.datasonnet.language.psi.DataSonnetTypes.*;
 public class DataSonnetFormattingModelBuilder implements FormattingModelBuilder {
     @NotNull
     @Override
-    public FormattingModel createModel(PsiElement element, CodeStyleSettings settings) {
+    public FormattingModel createModel(@NotNull FormattingContext formattingContext) {
+        PsiElement element = formattingContext.getPsiElement();
+        CodeStyleSettings settings = formattingContext.getCodeStyleSettings();
         DataSonnetCodeStyleSettings customSettings = settings.getCustomSettings(DataSonnetCodeStyleSettings.class);
         SpacingBuilder spacingBuilder = createSpacingBuilder(settings);
         final DataSonnetBlock block = new DataSonnetBlock(null, element.getNode(), customSettings, null, Indent.getSmartIndent(Indent.Type.CONTINUATION), null, spacingBuilder);

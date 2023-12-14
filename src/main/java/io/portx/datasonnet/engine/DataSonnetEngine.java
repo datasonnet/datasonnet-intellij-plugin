@@ -8,21 +8,21 @@ import com.datasonnet.document.Document;
 import com.datasonnet.document.MediaType;
 import com.datasonnet.document.MediaTypes;
 import com.datasonnet.spi.Library;
+import com.intellij.codeInspection.AbstractDependencyVisitor;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ContentIterator;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.util.Computable;
-import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VfsUtil;
-import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.*;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.util.SlowOperations;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfoList;
 import io.github.classgraph.ScanResult;
+import io.portx.datasonnet.config.DataSonnetProjectSettingsComponent;
 import io.portx.datasonnet.util.ClasspathUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -63,8 +63,7 @@ public class DataSonnetEngine {
     }
 
     public com.datasonnet.document.Document runDataSonnetMapping() {
-        com.intellij.openapi.editor.Document document = ApplicationManager.getApplication().runReadAction((Computable<com.intellij.openapi.editor.Document>) () ->
-                FileDocumentManager.getInstance().getDocument(mappingFile));
+        com.intellij.openapi.editor.Document document = ApplicationManager.getApplication().runReadAction((Computable<com.intellij.openapi.editor.Document>) () -> FileDocumentManager.getInstance().getDocument(mappingFile));
         String mappingScript = document.getText();
 
         String camelFunctions = "local cml = { exchangeProperty(str): exchangeProperty[str], header(str): header[str], properties(str): properties[str] };\n";
@@ -92,18 +91,14 @@ public class DataSonnetEngine {
             }
         }
 
-        Map<String, String> libraries = SlowOperations.allowSlowOperations(() ->
-                ApplicationManager.getApplication().runReadAction((Computable<Map<String, String>>) () -> getDSLibraries())
-        );
+        Map<String, String> libraries = getDSLibraries();
 
         try {
             ClassLoader currentCL = Thread.currentThread().getContextClassLoader();
             ClassLoader projectClassLoader = ClasspathUtils.getProjectClassLoader(project, this.getClass().getClassLoader());
             Thread.currentThread().setContextClassLoader(projectClassLoader);
 
-            MapperBuilder builder = new MapperBuilder(dataSonnetScript)
-                    .withImports(libraries)
-                    .withInputNames(variables.keySet());
+            MapperBuilder builder = new MapperBuilder(dataSonnetScript).withImports(libraries).withInputNames(variables.keySet());
 
             try {
                 for (Class clazz : scanLibraries()) {
@@ -132,8 +127,7 @@ public class DataSonnetEngine {
                 String[] lines = mappingScript.trim().split("\n|\r|\r\n");
                 getDebugger().setLineCount(lines.length);
             }
-            com.datasonnet.document.Document transformDoc =
-                    mapper.transform(new DefaultDocument<>(payload, payloadMimeType), variables, outputMimeType);
+            com.datasonnet.document.Document transformDoc = mapper.transform(new DefaultDocument<>(payload, payloadMimeType), variables, outputMimeType);
             if (isDebug) {
                 getDebugger().detach();
             }
@@ -148,9 +142,9 @@ public class DataSonnetEngine {
 
     @NotNull
     private Map<String, String> getDSLibraries() {
-
         Map<String, String> libraries = new HashMap();
 
+        //Search in all scopes of the project
         Collection<VirtualFile> libs = FilenameIndex.getAllFilesByExt(project, "libsonnet", GlobalSearchScope.allScope(project));
         for (VirtualFile nextLib : libs) {
             try {
@@ -184,6 +178,28 @@ public class DataSonnetEngine {
             }
         }
 
+        //Search in additional paths
+        DataSonnetProjectSettingsComponent projectSettings = project.getService(DataSonnetProjectSettingsComponent.class);
+        List<String> libraryPaths = projectSettings.getState().getDataSonnetLibraryPaths();
+        for (String libPath : libraryPaths) {
+            VirtualFile libDir = VfsUtil.findFile(Paths.get(libPath), true);
+
+            VfsUtilCore.iterateChildrenRecursively(libDir, null, fileOrDir -> {
+                if (!fileOrDir.isDirectory() && fileOrDir.getExtension() != null &&
+                        "libsonnet".equals(fileOrDir.getExtension().toLowerCase())) {
+                    try {
+                        String content = VfsUtil.loadText(fileOrDir);
+                        String relativePath = Paths.get(libPath).relativize(Paths.get(fileOrDir.getPath())).toString();
+                        libraries.put(relativePath, content);
+                        libraries.put(fileOrDir.getPath(), content);
+                    }
+                    catch (IOException e) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+        }
         return libraries;
     }
 
@@ -191,14 +207,9 @@ public class DataSonnetEngine {
         try {
             ClassLoader projectClassLoader = ClasspathUtils.getProjectClassLoader(project, this.getClass().getClassLoader());
 
-            ScanResult scanResult = new ClassGraph().enableAllInfo()
-                    .overrideClassLoaders(projectClassLoader)
-                    .scan();
-            ClassInfoList libs = scanResult.getSubclasses("com.datasonnet.spi.Library")
-                    .filter(classInfo -> classInfo.isPublic() &&
-                            !classInfo.isAbstract() &&
-                            !classInfo.getName().endsWith(".CML") && //Exclude Camel library
-                            !"com.datasonnet".equals(classInfo.getPackageName())); //Exclude default Datasonnet libraries
+            ScanResult scanResult = new ClassGraph().enableAllInfo().overrideClassLoaders(projectClassLoader).scan();
+            ClassInfoList libs = scanResult.getSubclasses("com.datasonnet.spi.Library").filter(classInfo -> classInfo.isPublic() && !classInfo.isAbstract() && !classInfo.getName().endsWith(".CML") && //Exclude Camel library
+                    !"com.datasonnet".equals(classInfo.getPackageName())); //Exclude default Datasonnet libraries
             return libs.loadClasses();
         } catch (Exception e) {
             return new ArrayList<>();

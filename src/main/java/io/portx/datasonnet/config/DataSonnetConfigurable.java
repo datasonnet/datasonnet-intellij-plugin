@@ -1,7 +1,7 @@
 package io.portx.datasonnet.config;
 
 import com.intellij.openapi.Disposable;
-import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
@@ -14,14 +14,12 @@ import javax.swing.*;
 
 public class DataSonnetConfigurable implements SearchableConfigurable, Configurable.NoScroll, Disposable {
 
-    private final DataSonnetSettingsComponent mySettingsComponent;
     private final DataSonnetProjectSettingsComponent myProjectSettingsComponent;
 
     private DataSonnetSettingsPanel myPanel;
 
     public DataSonnetConfigurable(Project project) {
-        mySettingsComponent = ServiceManager.getService(DataSonnetSettingsComponent.class);
-        myProjectSettingsComponent = ServiceManager.getService(project, DataSonnetProjectSettingsComponent.class);
+        myProjectSettingsComponent = project.getService(DataSonnetProjectSettingsComponent.class);
     }
 
     //@Nls(capitalization = Nls.Capitalization.Title)
@@ -40,7 +38,7 @@ public class DataSonnetConfigurable implements SearchableConfigurable, Configura
     @Override
     public JComponent createComponent() {
         myPanel = new DataSonnetSettingsPanel();
-        return myPanel.createPanel(mySettingsComponent, myProjectSettingsComponent);
+        return myPanel.createPanel(myProjectSettingsComponent);
     }
 
     @Override
