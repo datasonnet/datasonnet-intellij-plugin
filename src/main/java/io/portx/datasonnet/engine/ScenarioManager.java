@@ -1,6 +1,7 @@
 package io.portx.datasonnet.engine;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
@@ -38,4 +39,5 @@ public interface ScenarioManager {
 
     Scenario getCurrentScenario(String dataSonnetMappingName);
 
+    void setModule(Module module);
 }

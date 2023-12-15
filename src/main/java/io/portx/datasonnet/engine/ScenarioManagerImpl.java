@@ -1,6 +1,7 @@
 package io.portx.datasonnet.engine;
 
 import com.intellij.openapi.Disposable;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
@@ -8,6 +9,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ContentEntry;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
@@ -32,6 +34,7 @@ public class ScenarioManagerImpl implements ScenarioManager, Disposable {
     private final Map<String, VirtualFile> dataSonnetInputsFolders = new HashMap<>();
 
     private final Project myProject;
+    private Module module;
 
     protected ScenarioManagerImpl(Project project) {
         myProject = project;
@@ -88,7 +91,6 @@ public class ScenarioManagerImpl implements ScenarioManager, Disposable {
 
     @Nullable
     public VirtualFile getScenariosRootFolder(PsiFile dataSonnetFile) {
-        final Module module = ModuleUtil.findModuleForFile(dataSonnetFile.getVirtualFile(), dataSonnetFile.getProject());
         if (module != null) {
             return getScenariosRootFolder(module);
         }
@@ -176,6 +178,11 @@ public class ScenarioManagerImpl implements ScenarioManager, Disposable {
         return selectedScenariosByMapping.get(dataSonnetMappingName);
     }
 
+    @Override
+    public void setModule(Module module) {
+        this.module = module;
+    }
+
     @NotNull
     public List<Scenario> getScenariosFor(PsiFile dataSonnetMappingFile) {
         final List<Scenario> result = new ArrayList<>();
@@ -201,7 +208,7 @@ public class ScenarioManagerImpl implements ScenarioManager, Disposable {
     private List<VirtualFile> findScenarios(PsiFile psiFile) {
         VirtualFile mappingTestFolder = findMappingTestFolder(psiFile);
         if (mappingTestFolder != null) {
-            return Arrays.asList(mappingTestFolder.getChildren());
+            return Arrays.asList(mappingTestFolder.getChildren()).stream().filter(file -> !".DS_Store".equals(file.getName())).toList();
         }
         return new ArrayList<>();
     }

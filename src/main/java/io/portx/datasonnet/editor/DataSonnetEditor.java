@@ -3,15 +3,16 @@ package io.portx.datasonnet.editor;
 import com.datasonnet.document.DefaultDocument;
 import com.datasonnet.document.MediaType;
 import com.datasonnet.document.MediaTypes;
-import com.intellij.ProjectTopics;
 import com.intellij.codeHighlighting.BackgroundEditorHighlighter;
-import com.intellij.codeInspection.InspectionsBundle;
 import com.intellij.icons.AllIcons;
 import com.intellij.json.JsonLanguage;
 import com.intellij.lang.Language;
 import com.intellij.lang.xml.XMLLanguage;
 import com.intellij.navigation.ItemPresentation;
-import com.intellij.notification.*;
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationAction;
+import com.intellij.notification.NotificationType;
+import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.impl.ActionManagerImpl;
 import com.intellij.openapi.actionSystem.impl.MenuItemPresentationFactory;
@@ -38,10 +39,9 @@ import com.intellij.openapi.fileTypes.PlainTextLanguage;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ModuleRootEvent;
-import com.intellij.openapi.roots.ModuleRootListener;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.ui.configuration.ProjectSettingsService;
+import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.text.StringUtil;
@@ -52,37 +52,30 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.codeStyle.CodeStyleManager;
-import com.intellij.psi.search.FilenameIndex;
-import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.ParameterizedCachedValue;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.JBTabsPaneImpl;
 import com.intellij.ui.content.TabbedPaneContentUI;
 import com.intellij.ui.tabs.TabInfo;
 import com.intellij.util.Alarm;
-import io.github.classgraph.ClassGraph;
-import io.github.classgraph.ClassInfoList;
-import io.github.classgraph.ScanResult;
 import io.portx.datasonnet.engine.DataSonnetEngine;
 import io.portx.datasonnet.engine.Scenario;
 import io.portx.datasonnet.engine.ScenarioManager;
 import io.portx.datasonnet.language.DataSonnetFileType;
-import io.portx.datasonnet.util.ClasspathUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jps.model.java.JavaResourceRootType;
 
 import javax.swing.*;
-import javax.swing.event.HyperlinkEvent;
 import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeListener;
-import java.io.IOException;
 import java.lang.reflect.Method;
-import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
-import java.util.*;
+import java.util.Map;
 
 //import com.datasonnet.StringDocument;
 
@@ -92,7 +85,7 @@ import java.util.*;
 public class DataSonnetEditor implements FileEditor {
 
     private Project project;
-    private final Module module;
+    //private final Module module;
 
     private final TextEditorImpl textEditor;
 
@@ -128,7 +121,8 @@ public class DataSonnetEditor implements FileEditor {
     public DataSonnetEditor(@NotNull Project project, @NotNull VirtualFile virtualFile, final TextEditorImpl psiAwareEditor) {
         this.project = project;
         this.textEditor = psiAwareEditor; //new PsiAwareTextEditorImpl(project, virtualFile, provider);
-        this.module = ModuleUtilCore.findModuleForFile(virtualFile, project);
+
+        //this.module = ApplicationManager.getApplication().runReadAction((Computable<Module>) () -> ModuleUtilCore.findModuleForFile(virtualFile, project));
 
         gui = new DataSonnetEditorUI(textEditor);
 
@@ -143,6 +137,7 @@ public class DataSonnetEditor implements FileEditor {
             @Override
             public void actionPerformed(AnActionEvent e) {
                 //Check if there is a test resources folder
+                Module module = ApplicationManager.getApplication().runReadAction((Computable<Module>) () -> ModuleUtilCore.findModuleForFile(virtualFile, project));
                 List<VirtualFile> testRoots = ModuleRootManager.getInstance(module).getSourceRoots(JavaResourceRootType.TEST_RESOURCE);
                 if (testRoots == null || testRoots.isEmpty()) {
                     Notification notification = new Notification("DataSonnet",
@@ -163,6 +158,7 @@ public class DataSonnetEditor implements FileEditor {
                 }
 
                 final ScenarioManager manager = ScenarioManager.getInstance(project);
+                manager.setModule(module);
                 AddScenarioDialog dialog = new AddScenarioDialog(project, manager, psiFile, (scenario) -> {
                     manager.setCurrentScenario(psiFile.getVirtualFile().getCanonicalPath(), scenario);
                     loadScenario(scenario);
@@ -191,14 +187,6 @@ public class DataSonnetEditor implements FileEditor {
         outputTabs.getTabs().getPresentation().setSideComponentVertical(true);
         gui.getOutputPanel().add(outputTabs.getComponent(), BorderLayout.CENTER);
         gui.getOutputPanel().setSize(1000, 1000);
-
-/*        project.getMessageBus().connect().subscribe(ProjectTopics.PROJECT_ROOTS,
-                new ModuleRootListener() {
-                    @Override
-                    public void rootsChanged(ModuleRootEvent event) {
-                        scanLibraries();
-                    }
-                });*/
 
         refreshPreview = new DocumentListener() {
             @Override
@@ -231,9 +219,9 @@ public class DataSonnetEditor implements FileEditor {
         psiFile = PsiManager.getInstance(project).findFile(virtualFile);
 
         if (psiFile != null && psiFile.getFileType() == DataSonnetFileType.INSTANCE) {
-
+            Module module = ApplicationManager.getApplication().runReadAction((Computable<Module>) () -> ModuleUtilCore.findModuleForFile(virtualFile, project));
             ScenarioManager manager = ScenarioManager.getInstance(project);
-
+            manager.setModule(module);
             final Application app = ApplicationManager.getApplication();
             Runnable action = new Runnable() {
                 @Override
@@ -264,9 +252,13 @@ public class DataSonnetEditor implements FileEditor {
 
             //scanLibraries();
             createOutputTab();
-            this.runPreview(true);
+            ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
+                @Override
+                public void run() {
+                    runPreview(true);
+                }
+            });
         }
-
     }
 
     @NotNull

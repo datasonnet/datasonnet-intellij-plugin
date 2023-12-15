@@ -9,6 +9,7 @@ import com.datasonnet.document.MediaType;
 import com.datasonnet.document.MediaTypes;
 import com.datasonnet.spi.Library;
 import com.intellij.codeInspection.AbstractDependencyVisitor;
+import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.module.ModuleUtil;
@@ -17,6 +18,7 @@ import com.intellij.openapi.roots.ContentIterator;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.vfs.*;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import io.github.classgraph.ClassGraph;
@@ -91,7 +93,7 @@ public class DataSonnetEngine {
             }
         }
 
-        Map<String, String> libraries = getDSLibraries();
+        Map<String, String> libraries = ApplicationManager.getApplication().runReadAction((Computable<Map>) () -> getDSLibraries());
 
         try {
             ClassLoader currentCL = Thread.currentThread().getContextClassLoader();

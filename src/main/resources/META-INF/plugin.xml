@@ -7,9 +7,14 @@
      DataSonnet Plugin for IntelliJ. This plugin allows to edit and preview DataSonnet mappings in the editor pane. It is based on the Databricks Jsonnet plugin but provides additional functionality.
     ]]></description>
 
-    <idea-version since-build="180.*"/>
+    <idea-version since-build="233.*"/>
 
     <change-notes><![CDATA[
+    <h1>Version 3.0.3</h1>
+      <ul>
+       <li>Compatibility with IntelliJ 2023.3.1</li>
+       <li>Minor bug fixes</li>
+=      </ul>
     <h1>Version 3.0.2</h1>
       <ul>
        <li>Improved compatibility with latest versions of IDEA</li>
