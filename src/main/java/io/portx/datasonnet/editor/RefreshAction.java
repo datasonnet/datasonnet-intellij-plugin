@@ -1,5 +1,6 @@
 package io.portx.datasonnet.editor;
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
@@ -9,6 +10,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.ThrowableRunnable;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 
@@ -42,5 +44,10 @@ public class RefreshAction extends AnAction {
         } catch (Throwable e) {
             logger.error(e);
         }
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 }

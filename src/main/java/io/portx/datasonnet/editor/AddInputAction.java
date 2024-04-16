@@ -1,10 +1,12 @@
 package io.portx.datasonnet.editor;
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.util.IconLoader;
 import io.portx.datasonnet.engine.Scenario;
 import io.portx.datasonnet.engine.ScenarioManager;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by eberman on 4/22/17.
@@ -24,5 +26,10 @@ public class AddInputAction extends AnAction {
         AddInputDialog dialog = new AddInputDialog(e.getProject(), currentScenario, this.editor.getPsiFile());
         dialog.show();
         editor.loadScenario(currentScenario);
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 }

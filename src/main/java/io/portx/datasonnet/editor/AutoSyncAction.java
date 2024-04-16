@@ -29,4 +29,5 @@ public class AutoSyncAction extends ToggleAction {
     public void setSelected(AnActionEvent anActionEvent, boolean b) {
         editor.setAutoSync(b);
     }
+
 }

@@ -725,6 +725,11 @@ public class DataSonnetEditor implements FileEditor {
             popupMenu.getComponent().show(inputEvent.getComponent(), x, y);
         }
 
+        @Override
+        public @NotNull ActionUpdateThread getActionUpdateThread() {
+            return ActionUpdateThread.BGT;
+        }
+
         class ToggleMimeType extends ToggleAction {
 
             ToggleMimeType(String format, String mimeType) {
