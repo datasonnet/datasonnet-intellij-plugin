@@ -138,7 +138,7 @@ public class DataSonnetEditor implements FileEditor {
             public void actionPerformed(AnActionEvent e) {
                 //Check if there is a test resources folder
                 Module module = ApplicationManager.getApplication().runReadAction((Computable<Module>) () -> ModuleUtilCore.findModuleForFile(virtualFile, project));
-                List<VirtualFile> testRoots = ModuleRootManager.getInstance(module).getSourceRoots(JavaResourceRootType.TEST_RESOURCE);
+                List<VirtualFile> testRoots = module != null ? ModuleRootManager.getInstance(module).getSourceRoots(JavaResourceRootType.TEST_RESOURCE) : null;
                 if (testRoots == null || testRoots.isEmpty()) {
                     Notification notification = new Notification("DataSonnet",
                             "No Test Resources folder found!",
@@ -173,6 +173,11 @@ public class DataSonnetEditor implements FileEditor {
             @Override
             public void update(AnActionEvent e) {
 
+            }
+
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
             }
         });
         actionGroup.add(new SelectScenarioAction());
