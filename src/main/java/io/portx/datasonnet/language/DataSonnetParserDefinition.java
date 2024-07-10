@@ -22,8 +22,7 @@ public class DataSonnetParserDefinition implements ParserDefinition {
     public static final TokenSet WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE);
     public static final TokenSet COMMENTS = TokenSet.create(LINE_COMMENT, BLOCK_COMMENT);
     public static final TokenSet DATASONNET_CONTAINERS = TokenSet.create(OBJ, ARR, ARRCOMP);
-
-
+    
     public static final IFileElementType FILE = new IFileElementType(DataSonnetLanguage.INSTANCE);
 
     @NotNull
@@ -57,11 +56,13 @@ public class DataSonnetParserDefinition implements ParserDefinition {
         return FILE;
     }
 
+    @Override
     public PsiFile createFile(FileViewProvider viewProvider) {
         return new DataSonnetFile(viewProvider);
     }
 
-    public SpaceRequirements spaceExistanceTypeBetweenTokens(ASTNode left, ASTNode right) {
+    @Override
+    public SpaceRequirements spaceExistenceTypeBetweenTokens(ASTNode left, ASTNode right) {
         return SpaceRequirements.MAY;
     }
 
