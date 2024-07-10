@@ -9,7 +9,7 @@ apply plugin: 'java'
 apply plugin: 'org.jetbrains.intellij'
 
 group 'com.datasonnet'
-version '3.0.3'
+version '3.0.4'
 
 sourceCompatibility = 17
 
@@ -43,14 +43,9 @@ repositories {
 
 dependencies {
     testImplementation group: 'junit', name: 'junit', version: '4.12'
-    implementation group: 'com.datasonnet', name: 'datasonnet-mapper', version: '3.0.0-RC1'
+    implementation group: 'com.datasonnet', name: 'datasonnet-mapper', version: '3.0.0-RC3'
     implementation group: 'io.github.classgraph', name: 'classgraph', version: '4.8.147'
 }
-/*
-configurations.implementation {
-    exclude group: 'org.slf4j'
-}
- */
 
 gitVersioning {
     branch {

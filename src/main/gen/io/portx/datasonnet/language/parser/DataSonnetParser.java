@@ -3,15 +3,13 @@ package io.portx.datasonnet.language.parser;
 
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiBuilder.Marker;
-
-import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
-
-import com.intellij.lang.parser.GeneratedParserUtilBase;
+import static io.portx.datasonnet.language.psi.DataSonnetTypes.*;
+import static io.portx.datasonnet.language.parser.DataSonnetParserUtil.*;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.tree.TokenSet;
 import com.intellij.lang.PsiParser;
 import com.intellij.lang.LightPsiParser;
-import io.portx.datasonnet.language.psi.DataSonnetTypes;
 
 @SuppressWarnings({"SimplifiableIfStatement", "UnusedAssignment"})
 public class DataSonnetParser implements PsiParser, LightPsiParser {
@@ -41,11 +39,11 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   // IDENTIFIER
   public static boolean IDENTIFIER0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "IDENTIFIER0")) return false;
-    if (!GeneratedParserUtilBase.nextTokenIs(b, DataSonnetTypes.IDENTIFIER)) return false;
+    if (!nextTokenIs(b, IDENTIFIER)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.IDENTIFIER);
-    exit_section_(b, m, DataSonnetTypes.IDENTIFIER_0, r);
+    r = consumeToken(b, IDENTIFIER);
+    exit_section_(b, m, IDENTIFIER_0, r);
     return r;
   }
 
@@ -53,13 +51,13 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   // L_PAREN ( args )? R_PAREN
   public static boolean apply(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "apply")) return false;
-    if (!GeneratedParserUtilBase.nextTokenIs(b, DataSonnetTypes.L_PAREN)) return false;
+    if (!nextTokenIs(b, L_PAREN)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.L_PAREN);
+    r = consumeToken(b, L_PAREN);
     r = r && apply_1(b, l + 1);
-    r = r && GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.R_PAREN);
-    exit_section_(b, m, DataSonnetTypes.APPLY, r);
+    r = r && consumeToken(b, R_PAREN);
+    exit_section_(b, m, APPLY, r);
     return r;
   }
 
@@ -85,7 +83,7 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   public static boolean arg(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "arg")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, DataSonnetTypes.ARG, "<arg>");
+    Marker m = enter_section_(b, l, _NONE_, ARG, "<arg>");
     r = arg_0(b, l + 1);
     r = r && expr(b, l + 1);
     exit_section_(b, l, m, r, false, null);
@@ -104,7 +102,7 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "arg_0_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, DataSonnetTypes.IDENTIFIER, DataSonnetTypes.EQUAL);
+    r = consumeTokens(b, 0, IDENTIFIER, EQUAL);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -114,7 +112,7 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   public static boolean args(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "args")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, DataSonnetTypes.ARGS, "<args>");
+    Marker m = enter_section_(b, l, _NONE_, ARGS, "<args>");
     r = arg(b, l + 1);
     r = r && args_1(b, l + 1);
     r = r && args_2(b, l + 1);
@@ -138,7 +136,7 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "args_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.COMMA);
+    r = consumeToken(b, COMMA);
     r = r && arg(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -147,7 +145,7 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   // ( COMMA )?
   private static boolean args_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "args_2")) return false;
-    GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.COMMA);
+    consumeToken(b, COMMA);
     return true;
   }
 
@@ -155,13 +153,13 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   // L_BRACKET (expr (COMMA expr)* COMMA?)? R_BRACKET
   public static boolean arr(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "arr")) return false;
-    if (!GeneratedParserUtilBase.nextTokenIs(b, DataSonnetTypes.L_BRACKET)) return false;
+    if (!nextTokenIs(b, L_BRACKET)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.L_BRACKET);
+    r = consumeToken(b, L_BRACKET);
     r = r && arr_1(b, l + 1);
-    r = r && GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.R_BRACKET);
-    exit_section_(b, m, DataSonnetTypes.ARR, r);
+    r = r && consumeToken(b, R_BRACKET);
+    exit_section_(b, m, ARR, r);
     return r;
   }
 
@@ -200,7 +198,7 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "arr_1_0_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.COMMA);
+    r = consumeToken(b, COMMA);
     r = r && expr(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -209,7 +207,7 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   // COMMA?
   private static boolean arr_1_0_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "arr_1_0_2")) return false;
-    GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.COMMA);
+    consumeToken(b, COMMA);
     return true;
   }
 
@@ -217,23 +215,23 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   // L_BRACKET expr COMMA? forspec compspec R_BRACKET
   public static boolean arrcomp(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "arrcomp")) return false;
-    if (!GeneratedParserUtilBase.nextTokenIs(b, DataSonnetTypes.L_BRACKET)) return false;
+    if (!nextTokenIs(b, L_BRACKET)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.L_BRACKET);
+    r = consumeToken(b, L_BRACKET);
     r = r && expr(b, l + 1);
     r = r && arrcomp_2(b, l + 1);
     r = r && forspec(b, l + 1);
     r = r && compspec(b, l + 1);
-    r = r && GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.R_BRACKET);
-    exit_section_(b, m, DataSonnetTypes.ARRCOMP, r);
+    r = r && consumeToken(b, R_BRACKET);
+    exit_section_(b, m, ARRCOMP, r);
     return r;
   }
 
   // COMMA?
   private static boolean arrcomp_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "arrcomp_2")) return false;
-    GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.COMMA);
+    consumeToken(b, COMMA);
     return true;
   }
 
@@ -241,13 +239,13 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   // ASSERT expr ( COLON expr )?
   public static boolean assertStmt(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "assertStmt")) return false;
-    if (!GeneratedParserUtilBase.nextTokenIs(b, DataSonnetTypes.ASSERT)) return false;
+    if (!nextTokenIs(b, ASSERT)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.ASSERT);
+    r = consumeToken(b, ASSERT);
     r = r && expr(b, l + 1);
     r = r && assertStmt_2(b, l + 1);
-    exit_section_(b, m, DataSonnetTypes.ASSERT_STMT, r);
+    exit_section_(b, m, ASSERT_STMT, r);
     return r;
   }
 
@@ -263,37 +261,38 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "assertStmt_2_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.COLON);
+    r = consumeToken(b, COLON);
     r = r && expr(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   /* ********************************************************** */
-  // ASTERISK | SLASH | PERCENT | PLUS | MINUS | DOUBLE_LESS | DOUBLE_GREATER | LESS_THAN | LESS_EQUAL | GREATER_THAN | GREATER_EQUAL | DOUBLE_EQUAL | NOT_EQUAL | IN | AND | CARAT | BAR | DOUBLE_AND | DOUBLE_BAR
+  // ASTERISK | SLASH | PERCENT | PLUS | MINUS | DOUBLE_LESS | DOUBLE_GREATER | LESS_THAN | LESS_EQUAL | GREATER_THAN | GREATER_EQUAL | DOUBLE_EQUAL | NOT_EQUAL | IN | AND | CARAT | BAR | DOUBLE_AND | DOUBLE_BAR | DEFAULT
   public static boolean binaryop(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "binaryop")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, DataSonnetTypes.BINARYOP, "<binaryop>");
-    r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.ASTERISK);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.SLASH);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.PERCENT);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.PLUS);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.MINUS);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.DOUBLE_LESS);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.DOUBLE_GREATER);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.LESS_THAN);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.LESS_EQUAL);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.GREATER_THAN);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.GREATER_EQUAL);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.DOUBLE_EQUAL);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.NOT_EQUAL);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.IN);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.AND);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.CARAT);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.BAR);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.DOUBLE_AND);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.DOUBLE_BAR);
+    Marker m = enter_section_(b, l, _NONE_, BINARYOP, "<binaryop>");
+    r = consumeToken(b, ASTERISK);
+    if (!r) r = consumeToken(b, SLASH);
+    if (!r) r = consumeToken(b, PERCENT);
+    if (!r) r = consumeToken(b, PLUS);
+    if (!r) r = consumeToken(b, MINUS);
+    if (!r) r = consumeToken(b, DOUBLE_LESS);
+    if (!r) r = consumeToken(b, DOUBLE_GREATER);
+    if (!r) r = consumeToken(b, LESS_THAN);
+    if (!r) r = consumeToken(b, LESS_EQUAL);
+    if (!r) r = consumeToken(b, GREATER_THAN);
+    if (!r) r = consumeToken(b, GREATER_EQUAL);
+    if (!r) r = consumeToken(b, DOUBLE_EQUAL);
+    if (!r) r = consumeToken(b, NOT_EQUAL);
+    if (!r) r = consumeToken(b, IN);
+    if (!r) r = consumeToken(b, AND);
+    if (!r) r = consumeToken(b, CARAT);
+    if (!r) r = consumeToken(b, BAR);
+    if (!r) r = consumeToken(b, DOUBLE_AND);
+    if (!r) r = consumeToken(b, DOUBLE_BAR);
+    if (!r) r = consumeToken(b, DEFAULT);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
@@ -303,12 +302,12 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   // |	IDENTIFIER0 L_PAREN ( params )? R_PAREN EQUAL expr
   public static boolean bind(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "bind")) return false;
-    if (!GeneratedParserUtilBase.nextTokenIs(b, DataSonnetTypes.IDENTIFIER)) return false;
+    if (!nextTokenIs(b, IDENTIFIER)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = bind_0(b, l + 1);
     if (!r) r = bind_1(b, l + 1);
-    exit_section_(b, m, DataSonnetTypes.BIND, r);
+    exit_section_(b, m, BIND, r);
     return r;
   }
 
@@ -318,7 +317,7 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
     boolean r;
     Marker m = enter_section_(b);
     r = IDENTIFIER0(b, l + 1);
-    r = r && GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.EQUAL);
+    r = r && consumeToken(b, EQUAL);
     r = r && expr(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -330,9 +329,9 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
     boolean r;
     Marker m = enter_section_(b);
     r = IDENTIFIER0(b, l + 1);
-    r = r && GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.L_PAREN);
+    r = r && consumeToken(b, L_PAREN);
     r = r && bind_1_2(b, l + 1);
-    r = r && consumeTokens(b, 0, DataSonnetTypes.R_PAREN, DataSonnetTypes.EQUAL);
+    r = r && consumeTokens(b, 0, R_PAREN, EQUAL);
     r = r && expr(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -360,7 +359,7 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   public static boolean binsuffix(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "binsuffix")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, DataSonnetTypes.BINSUFFIX, "<binsuffix>");
+    Marker m = enter_section_(b, l, _NONE_, BINSUFFIX, "<binsuffix>");
     r = binaryop(b, l + 1);
     r = r && expr(b, l + 1);
     exit_section_(b, l, m, r, false, null);
@@ -371,7 +370,7 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   // ( forspec | ifspec )*
   public static boolean compspec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "compspec")) return false;
-    Marker m = enter_section_(b, l, _NONE_, DataSonnetTypes.COMPSPEC, "<compspec>");
+    Marker m = enter_section_(b, l, _NONE_, COMPSPEC, "<compspec>");
     while (true) {
       int c = current_position_(b);
       if (!compspec_0(b, l + 1)) break;
@@ -395,7 +394,7 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   public static boolean expr(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "expr")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, DataSonnetTypes.EXPR, "<expr>");
+    Marker m = enter_section_(b, l, _NONE_, EXPR, "<expr>");
     r = expr0(b, l + 1);
     r = r && expr_1(b, l + 1);
     exit_section_(b, l, m, r, false, null);
@@ -441,6 +440,7 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   // |	SUPER L_BRACKET expr R_BRACKET
   // |   outerlocal
   // |	IF expr THEN expr ( ELSE expr )?
+  // |	TRY expr ELSE expr
   // |	L_PAREN expr R_PAREN
   // |	unaryop expr
   // |	FUNCTION L_PAREN ( params )? R_PAREN expr
@@ -452,18 +452,18 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   public static boolean expr0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "expr0")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, DataSonnetTypes.EXPR_0, "<expr 0>");
-    r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.NULL);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.TRUE);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.FALSE);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.SELF);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.DOLLAR);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.SINGLE_QUOTED_STRING);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.DOUBLE_QUOTED_STRING);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.VERBATIM_SINGLE_QUOTED_STRING);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.VERBATIM_DOUBLE_QUOTED_STRING);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.TRIPLE_BAR_QUOTED_STRING);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.NUMBER);
+    Marker m = enter_section_(b, l, _NONE_, EXPR_0, "<expr 0>");
+    r = consumeToken(b, NULL);
+    if (!r) r = consumeToken(b, TRUE);
+    if (!r) r = consumeToken(b, FALSE);
+    if (!r) r = consumeToken(b, SELF);
+    if (!r) r = consumeToken(b, DOLLAR);
+    if (!r) r = consumeToken(b, SINGLE_QUOTED_STRING);
+    if (!r) r = consumeToken(b, DOUBLE_QUOTED_STRING);
+    if (!r) r = consumeToken(b, VERBATIM_SINGLE_QUOTED_STRING);
+    if (!r) r = consumeToken(b, VERBATIM_DOUBLE_QUOTED_STRING);
+    if (!r) r = consumeToken(b, TRIPLE_BAR_QUOTED_STRING);
+    if (!r) r = consumeToken(b, NUMBER);
     if (!r) r = obj(b, l + 1);
     if (!r) r = arr(b, l + 1);
     if (!r) r = arrcomp(b, l + 1);
@@ -475,9 +475,10 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
     if (!r) r = expr0_19(b, l + 1);
     if (!r) r = expr0_20(b, l + 1);
     if (!r) r = expr0_21(b, l + 1);
+    if (!r) r = expr0_22(b, l + 1);
     if (!r) r = importop(b, l + 1);
     if (!r) r = importstrop(b, l + 1);
-    if (!r) r = expr0_24(b, l + 1);
+    if (!r) r = expr0_25(b, l + 1);
     if (!r) r = IDENTIFIER0(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
@@ -488,7 +489,7 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "expr0_14")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, DataSonnetTypes.SUPER, DataSonnetTypes.DOT);
+    r = consumeTokens(b, 0, SUPER, DOT);
     r = r && IDENTIFIER0(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -499,9 +500,9 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "expr0_15")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, DataSonnetTypes.SUPER, DataSonnetTypes.L_BRACKET);
+    r = consumeTokens(b, 0, SUPER, L_BRACKET);
     r = r && expr(b, l + 1);
-    r = r && GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.R_BRACKET);
+    r = r && consumeToken(b, R_BRACKET);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -511,9 +512,9 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "expr0_17")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.IF);
+    r = consumeToken(b, IF);
     r = r && expr(b, l + 1);
-    r = r && GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.THEN);
+    r = r && consumeToken(b, THEN);
     r = r && expr(b, l + 1);
     r = r && expr0_17_4(b, l + 1);
     exit_section_(b, m, null, r);
@@ -532,27 +533,40 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "expr0_17_4_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.ELSE);
+    r = consumeToken(b, ELSE);
+    r = r && expr(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // TRY expr ELSE expr
+  private static boolean expr0_18(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "expr0_18")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, TRY);
+    r = r && expr(b, l + 1);
+    r = r && consumeToken(b, ELSE);
     r = r && expr(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // L_PAREN expr R_PAREN
-  private static boolean expr0_18(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "expr0_18")) return false;
+  private static boolean expr0_19(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "expr0_19")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.L_PAREN);
+    r = consumeToken(b, L_PAREN);
     r = r && expr(b, l + 1);
-    r = r && GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.R_PAREN);
+    r = r && consumeToken(b, R_PAREN);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // unaryop expr
-  private static boolean expr0_19(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "expr0_19")) return false;
+  private static boolean expr0_20(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "expr0_20")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = unaryop(b, l + 1);
@@ -562,28 +576,28 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   }
 
   // FUNCTION L_PAREN ( params )? R_PAREN expr
-  private static boolean expr0_20(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "expr0_20")) return false;
+  private static boolean expr0_21(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "expr0_21")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, DataSonnetTypes.FUNCTION, DataSonnetTypes.L_PAREN);
-    r = r && expr0_20_2(b, l + 1);
-    r = r && GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.R_PAREN);
+    r = consumeTokens(b, 0, FUNCTION, L_PAREN);
+    r = r && expr0_21_2(b, l + 1);
+    r = r && consumeToken(b, R_PAREN);
     r = r && expr(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // ( params )?
-  private static boolean expr0_20_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "expr0_20_2")) return false;
-    expr0_20_2_0(b, l + 1);
+  private static boolean expr0_21_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "expr0_21_2")) return false;
+    expr0_21_2_0(b, l + 1);
     return true;
   }
 
   // ( params )
-  private static boolean expr0_20_2_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "expr0_20_2_0")) return false;
+  private static boolean expr0_21_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "expr0_21_2_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = params(b, l + 1);
@@ -592,23 +606,23 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   }
 
   // assertStmt SEMICOLON expr
-  private static boolean expr0_21(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "expr0_21")) return false;
+  private static boolean expr0_22(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "expr0_22")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = assertStmt(b, l + 1);
-    r = r && GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.SEMICOLON);
+    r = r && consumeToken(b, SEMICOLON);
     r = r && expr(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // ERROR expr
-  private static boolean expr0_24(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "expr0_24")) return false;
+  private static boolean expr0_25(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "expr0_25")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.ERROR);
+    r = consumeToken(b, ERROR);
     r = r && expr(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -620,7 +634,7 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   public static boolean field(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "field")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, DataSonnetTypes.FIELD, "<field>");
+    Marker m = enter_section_(b, l, _NONE_, FIELD, "<field>");
     r = field_0(b, l + 1);
     if (!r) r = field_1(b, l + 1);
     exit_section_(b, l, m, r, false, null);
@@ -643,7 +657,7 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   // ( PLUS )?
   private static boolean field_0_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "field_0_1")) return false;
-    GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.PLUS);
+    consumeToken(b, PLUS);
     return true;
   }
 
@@ -653,9 +667,9 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
     boolean r;
     Marker m = enter_section_(b);
     r = fieldname(b, l + 1);
-    r = r && GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.L_PAREN);
+    r = r && consumeToken(b, L_PAREN);
     r = r && field_1_2(b, l + 1);
-    r = r && GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.R_PAREN);
+    r = r && consumeToken(b, R_PAREN);
     r = r && h(b, l + 1);
     r = r && expr(b, l + 1);
     exit_section_(b, m, null, r);
@@ -690,13 +704,13 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   public static boolean fieldname(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "fieldname")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, DataSonnetTypes.FIELDNAME, "<fieldname>");
+    Marker m = enter_section_(b, l, _NONE_, FIELDNAME, "<fieldname>");
     r = IDENTIFIER0(b, l + 1);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.DOUBLE_QUOTED_STRING);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.SINGLE_QUOTED_STRING);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.VERBATIM_DOUBLE_QUOTED_STRING);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.VERBATIM_SINGLE_QUOTED_STRING);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.TRIPLE_BAR_QUOTED_STRING);
+    if (!r) r = consumeToken(b, DOUBLE_QUOTED_STRING);
+    if (!r) r = consumeToken(b, SINGLE_QUOTED_STRING);
+    if (!r) r = consumeToken(b, VERBATIM_DOUBLE_QUOTED_STRING);
+    if (!r) r = consumeToken(b, VERBATIM_SINGLE_QUOTED_STRING);
+    if (!r) r = consumeToken(b, TRIPLE_BAR_QUOTED_STRING);
     if (!r) r = fieldname_6(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
@@ -707,9 +721,9 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "fieldname_6")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.L_BRACKET);
+    r = consumeToken(b, L_BRACKET);
     r = r && expr(b, l + 1);
-    r = r && GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.R_BRACKET);
+    r = r && consumeToken(b, R_BRACKET);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -718,14 +732,14 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   // FOR IDENTIFIER0 IN expr
   public static boolean forspec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "forspec")) return false;
-    if (!GeneratedParserUtilBase.nextTokenIs(b, DataSonnetTypes.FOR)) return false;
+    if (!nextTokenIs(b, FOR)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.FOR);
+    r = consumeToken(b, FOR);
     r = r && IDENTIFIER0(b, l + 1);
-    r = r && GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.IN);
+    r = r && consumeToken(b, IN);
     r = r && expr(b, l + 1);
-    exit_section_(b, m, DataSonnetTypes.FORSPEC, r);
+    exit_section_(b, m, FORSPEC, r);
     return r;
   }
 
@@ -734,10 +748,10 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   public static boolean h(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "h")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, DataSonnetTypes.H, "<h>");
-    r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.COLON);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.COLON2);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.COLON3);
+    Marker m = enter_section_(b, l, _NONE_, H, "<h>");
+    r = consumeToken(b, COLON);
+    if (!r) r = consumeToken(b, COLON2);
+    if (!r) r = consumeToken(b, COLON3);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
@@ -746,12 +760,12 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   // IF expr
   public static boolean ifspec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "ifspec")) return false;
-    if (!GeneratedParserUtilBase.nextTokenIs(b, DataSonnetTypes.IF)) return false;
+    if (!nextTokenIs(b, IF)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.IF);
+    r = consumeToken(b, IF);
     r = r && expr(b, l + 1);
-    exit_section_(b, m, DataSonnetTypes.IFSPEC, r);
+    exit_section_(b, m, IFSPEC, r);
     return r;
   }
 
@@ -759,12 +773,12 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   // IMPORT (DOUBLE_QUOTED_STRING | SINGLE_QUOTED_STRING)
   public static boolean importop(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "importop")) return false;
-    if (!GeneratedParserUtilBase.nextTokenIs(b, DataSonnetTypes.IMPORT)) return false;
+    if (!nextTokenIs(b, IMPORT)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.IMPORT);
+    r = consumeToken(b, IMPORT);
     r = r && importop_1(b, l + 1);
-    exit_section_(b, m, DataSonnetTypes.IMPORTOP, r);
+    exit_section_(b, m, IMPORTOP, r);
     return r;
   }
 
@@ -772,8 +786,8 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   private static boolean importop_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "importop_1")) return false;
     boolean r;
-    r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.DOUBLE_QUOTED_STRING);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.SINGLE_QUOTED_STRING);
+    r = consumeToken(b, DOUBLE_QUOTED_STRING);
+    if (!r) r = consumeToken(b, SINGLE_QUOTED_STRING);
     return r;
   }
 
@@ -781,12 +795,12 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   // IMPORTSTR (DOUBLE_QUOTED_STRING | SINGLE_QUOTED_STRING)
   public static boolean importstrop(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "importstrop")) return false;
-    if (!GeneratedParserUtilBase.nextTokenIs(b, DataSonnetTypes.IMPORTSTR)) return false;
+    if (!nextTokenIs(b, IMPORTSTR)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.IMPORTSTR);
+    r = consumeToken(b, IMPORTSTR);
     r = r && importstrop_1(b, l + 1);
-    exit_section_(b, m, DataSonnetTypes.IMPORTSTROP, r);
+    exit_section_(b, m, IMPORTSTROP, r);
     return r;
   }
 
@@ -794,8 +808,8 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   private static boolean importstrop_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "importstrop_1")) return false;
     boolean r;
-    r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.DOUBLE_QUOTED_STRING);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.SINGLE_QUOTED_STRING);
+    r = consumeToken(b, DOUBLE_QUOTED_STRING);
+    if (!r) r = consumeToken(b, SINGLE_QUOTED_STRING);
     return r;
   }
 
@@ -803,11 +817,11 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   // IN SUPER
   public static boolean insuper(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "insuper")) return false;
-    if (!GeneratedParserUtilBase.nextTokenIs(b, DataSonnetTypes.IN)) return false;
+    if (!nextTokenIs(b, IN)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, DataSonnetTypes.IN, DataSonnetTypes.SUPER);
-    exit_section_(b, m, DataSonnetTypes.INSUPER, r);
+    r = consumeTokens(b, 0, IN, SUPER);
+    exit_section_(b, m, INSUPER, r);
     return r;
   }
 
@@ -816,11 +830,11 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   public static boolean member(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "member")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, DataSonnetTypes.MEMBER, "<member>");
+    Marker m = enter_section_(b, l, _NONE_, MEMBER, "<member>");
     r = objlocal(b, l + 1);
     if (!r) r = assertStmt(b, l + 1);
     if (!r) r = field(b, l + 1);
-    exit_section_(b, l, m, r, false, member_recover_parser_);
+    exit_section_(b, l, m, r, false, DataSonnetParser::member_recover);
     return r;
   }
 
@@ -860,10 +874,8 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   private static boolean member_recover_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "member_recover_0")) return false;
     boolean r;
-    Marker m = enter_section_(b);
     r = consumeToken(b, ",");
     if (!r) r = consumeToken(b, "}");
-    exit_section_(b, m, null, r);
     return r;
   }
 
@@ -872,11 +884,11 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   public static boolean members(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "members")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, DataSonnetTypes.MEMBERS, "<members>");
+    Marker m = enter_section_(b, l, _NONE_, MEMBERS, "<members>");
     r = member(b, l + 1);
     r = r && members_1(b, l + 1);
     r = r && members_2(b, l + 1);
-    exit_section_(b, l, m, r, false, member_list_recover_parser_);
+    exit_section_(b, l, m, r, false, DataSonnetParser::member_list_recover);
     return r;
   }
 
@@ -896,7 +908,7 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "members_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.COMMA);
+    r = consumeToken(b, COMMA);
     r = r && member(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -905,7 +917,7 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   // ( COMMA )?
   private static boolean members_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "members_2")) return false;
-    GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.COMMA);
+    consumeToken(b, COMMA);
     return true;
   }
 
@@ -913,13 +925,13 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   // L_CURLY objinside? R_CURLY
   public static boolean obj(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "obj")) return false;
-    if (!GeneratedParserUtilBase.nextTokenIs(b, DataSonnetTypes.L_CURLY)) return false;
+    if (!nextTokenIs(b, L_CURLY)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.L_CURLY);
+    r = consumeToken(b, L_CURLY);
     r = r && obj_1(b, l + 1);
-    r = r && GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.R_CURLY);
-    exit_section_(b, m, DataSonnetTypes.OBJ, r);
+    r = r && consumeToken(b, R_CURLY);
+    exit_section_(b, m, OBJ, r);
     return r;
   }
 
@@ -934,13 +946,13 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   // L_CURLY objinside R_CURLY
   public static boolean objextend(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "objextend")) return false;
-    if (!GeneratedParserUtilBase.nextTokenIs(b, DataSonnetTypes.L_CURLY)) return false;
+    if (!nextTokenIs(b, L_CURLY)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.L_CURLY);
+    r = consumeToken(b, L_CURLY);
     r = r && objinside(b, l + 1);
-    r = r && GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.R_CURLY);
-    exit_section_(b, m, DataSonnetTypes.OBJEXTEND, r);
+    r = r && consumeToken(b, R_CURLY);
+    exit_section_(b, m, OBJEXTEND, r);
     return r;
   }
 
@@ -950,7 +962,7 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   public static boolean objinside(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "objinside")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, DataSonnetTypes.OBJINSIDE, "<objinside>");
+    Marker m = enter_section_(b, l, _NONE_, OBJINSIDE, "<objinside>");
     r = objinside_0(b, l + 1);
     if (!r) r = members(b, l + 1);
     exit_section_(b, l, m, r, false, null);
@@ -963,9 +975,9 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
     boolean r;
     Marker m = enter_section_(b);
     r = objinside_0_0(b, l + 1);
-    r = r && GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.L_BRACKET);
+    r = r && consumeToken(b, L_BRACKET);
     r = r && expr(b, l + 1);
-    r = r && consumeTokens(b, 0, DataSonnetTypes.R_BRACKET, DataSonnetTypes.COLON);
+    r = r && consumeTokens(b, 0, R_BRACKET, COLON);
     r = r && expr(b, l + 1);
     r = r && objinside_0_6(b, l + 1);
     r = r && forspec(b, l + 1);
@@ -991,7 +1003,7 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
     boolean r;
     Marker m = enter_section_(b);
     r = objlocal(b, l + 1);
-    r = r && GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.COMMA);
+    r = r && consumeToken(b, COMMA);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -1030,7 +1042,7 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "objinside_0_6_0_0_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.COMMA);
+    r = consumeToken(b, COMMA);
     r = r && objlocal(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -1039,7 +1051,7 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   // ( COMMA )?
   private static boolean objinside_0_6_0_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "objinside_0_6_0_1")) return false;
-    GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.COMMA);
+    consumeToken(b, COMMA);
     return true;
   }
 
@@ -1047,12 +1059,12 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   // LOCAL bind
   public static boolean objlocal(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "objlocal")) return false;
-    if (!GeneratedParserUtilBase.nextTokenIs(b, DataSonnetTypes.LOCAL)) return false;
+    if (!nextTokenIs(b, LOCAL)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.LOCAL);
+    r = consumeToken(b, LOCAL);
     r = r && bind(b, l + 1);
-    exit_section_(b, m, DataSonnetTypes.OBJLOCAL, r);
+    exit_section_(b, m, OBJLOCAL, r);
     return r;
   }
 
@@ -1060,15 +1072,15 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   // LOCAL bind ( COMMA bind )* SEMICOLON expr
   public static boolean outerlocal(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "outerlocal")) return false;
-    if (!GeneratedParserUtilBase.nextTokenIs(b, DataSonnetTypes.LOCAL)) return false;
+    if (!nextTokenIs(b, LOCAL)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.LOCAL);
+    r = consumeToken(b, LOCAL);
     r = r && bind(b, l + 1);
     r = r && outerlocal_2(b, l + 1);
-    r = r && GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.SEMICOLON);
+    r = r && consumeToken(b, SEMICOLON);
     r = r && expr(b, l + 1);
-    exit_section_(b, m, DataSonnetTypes.OUTERLOCAL, r);
+    exit_section_(b, m, OUTERLOCAL, r);
     return r;
   }
 
@@ -1088,7 +1100,7 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "outerlocal_2_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.COMMA);
+    r = consumeToken(b, COMMA);
     r = r && bind(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -1098,12 +1110,12 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   // IDENTIFIER0 (EQUAL expr)?
   public static boolean param(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "param")) return false;
-    if (!GeneratedParserUtilBase.nextTokenIs(b, DataSonnetTypes.IDENTIFIER)) return false;
+    if (!nextTokenIs(b, IDENTIFIER)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = IDENTIFIER0(b, l + 1);
     r = r && param_1(b, l + 1);
-    exit_section_(b, m, DataSonnetTypes.PARAM, r);
+    exit_section_(b, m, PARAM, r);
     return r;
   }
 
@@ -1119,7 +1131,7 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "param_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.EQUAL);
+    r = consumeToken(b, EQUAL);
     r = r && expr(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -1129,13 +1141,13 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   // param (COMMA param)* ( COMMA )?
   public static boolean params(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "params")) return false;
-    if (!GeneratedParserUtilBase.nextTokenIs(b, DataSonnetTypes.IDENTIFIER)) return false;
+    if (!nextTokenIs(b, IDENTIFIER)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = param(b, l + 1);
     r = r && params_1(b, l + 1);
     r = r && params_2(b, l + 1);
-    exit_section_(b, m, DataSonnetTypes.PARAMS, r);
+    exit_section_(b, m, PARAMS, r);
     return r;
   }
 
@@ -1155,7 +1167,7 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "params_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.COMMA);
+    r = consumeToken(b, COMMA);
     r = r && param(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -1164,7 +1176,7 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   // ( COMMA )?
   private static boolean params_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "params_2")) return false;
-    GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.COMMA);
+    consumeToken(b, COMMA);
     return true;
   }
 
@@ -1178,12 +1190,12 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   // DOT IDENTIFIER0
   public static boolean select(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "select")) return false;
-    if (!GeneratedParserUtilBase.nextTokenIs(b, DataSonnetTypes.DOT)) return false;
+    if (!nextTokenIs(b, DOT)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.DOT);
+    r = consumeToken(b, DOT);
     r = r && IDENTIFIER0(b, l + 1);
-    exit_section_(b, m, DataSonnetTypes.SELECT, r);
+    exit_section_(b, m, SELECT, r);
     return r;
   }
 
@@ -1191,14 +1203,14 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   // L_BRACKET expr? slicesuffix? R_BRACKET
   public static boolean slice(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "slice")) return false;
-    if (!GeneratedParserUtilBase.nextTokenIs(b, DataSonnetTypes.L_BRACKET)) return false;
+    if (!nextTokenIs(b, L_BRACKET)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.L_BRACKET);
+    r = consumeToken(b, L_BRACKET);
     r = r && slice_1(b, l + 1);
     r = r && slice_2(b, l + 1);
-    r = r && GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.R_BRACKET);
-    exit_section_(b, m, DataSonnetTypes.SLICE, r);
+    r = r && consumeToken(b, R_BRACKET);
+    exit_section_(b, m, SLICE, r);
     return r;
   }
 
@@ -1220,9 +1232,9 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   // COLON ( expr? ( COLON expr? )? )? | COLON2 expr?
   public static boolean slicesuffix(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "slicesuffix")) return false;
-    if (!nextTokenIs(b, "<slicesuffix>", DataSonnetTypes.COLON, DataSonnetTypes.COLON2)) return false;
+    if (!nextTokenIs(b, "<slicesuffix>", COLON, COLON2)) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, DataSonnetTypes.SLICESUFFIX, "<slicesuffix>");
+    Marker m = enter_section_(b, l, _NONE_, SLICESUFFIX, "<slicesuffix>");
     r = slicesuffix_0(b, l + 1);
     if (!r) r = slicesuffix_1(b, l + 1);
     exit_section_(b, l, m, r, false, null);
@@ -1234,7 +1246,7 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "slicesuffix_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.COLON);
+    r = consumeToken(b, COLON);
     r = r && slicesuffix_0_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -1277,7 +1289,7 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "slicesuffix_0_1_0_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.COLON);
+    r = consumeToken(b, COLON);
     r = r && slicesuffix_0_1_0_1_0_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -1295,7 +1307,7 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "slicesuffix_1")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.COLON2);
+    r = consumeToken(b, COLON2);
     r = r && slicesuffix_1_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -1313,23 +1325,13 @@ public class DataSonnetParser implements PsiParser, LightPsiParser {
   public static boolean unaryop(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unaryop")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, DataSonnetTypes.UNARYOP, "<unaryop>");
-    r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.MINUS);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.PLUS);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.EXCLAMATION);
-    if (!r) r = GeneratedParserUtilBase.consumeToken(b, DataSonnetTypes.TILDE);
+    Marker m = enter_section_(b, l, _NONE_, UNARYOP, "<unaryop>");
+    r = consumeToken(b, MINUS);
+    if (!r) r = consumeToken(b, PLUS);
+    if (!r) r = consumeToken(b, EXCLAMATION);
+    if (!r) r = consumeToken(b, TILDE);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
-  static final Parser member_list_recover_parser_ = new Parser() {
-    public boolean parse(PsiBuilder b, int l) {
-      return member_list_recover(b, l + 1);
-    }
-  };
-  static final Parser member_recover_parser_ = new Parser() {
-    public boolean parse(PsiBuilder b, int l) {
-      return member_recover(b, l + 1);
-    }
-  };
 }

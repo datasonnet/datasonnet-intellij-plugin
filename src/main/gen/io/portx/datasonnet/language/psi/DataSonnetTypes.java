@@ -5,7 +5,6 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.PsiElement;
 import com.intellij.lang.ASTNode;
 import io.portx.datasonnet.language.psi.impl.*;
-import io.portx.datasonnet.language.psi.impl.*;
 
 public interface DataSonnetTypes {
 
@@ -54,6 +53,7 @@ public interface DataSonnetTypes {
   IElementType COLON2 = new DataSonnetTokenType("COLON2");
   IElementType COLON3 = new DataSonnetTokenType("COLON3");
   IElementType COMMA = new DataSonnetTokenType("COMMA");
+  IElementType DEFAULT = new DataSonnetTokenType("DEFAULT");
   IElementType DOLLAR = new DataSonnetTokenType("DOLLAR");
   IElementType DOT = new DataSonnetTokenType("DOT");
   IElementType DOUBLE_AND = new DataSonnetTokenType("DOUBLE_AND");
@@ -101,6 +101,7 @@ public interface DataSonnetTypes {
   IElementType TILDE = new DataSonnetTokenType("TILDE");
   IElementType TRIPLE_BAR_QUOTED_STRING = new DataSonnetTokenType("TRIPLE_BAR_QUOTED_STRING");
   IElementType TRUE = new DataSonnetTokenType("TRUE");
+  IElementType TRY = new DataSonnetTokenType("TRY");
   IElementType VERBATIM_DOUBLE_QUOTED_STRING = new DataSonnetTokenType("VERBATIM_DOUBLE_QUOTED_STRING");
   IElementType VERBATIM_SINGLE_QUOTED_STRING = new DataSonnetTokenType("VERBATIM_SINGLE_QUOTED_STRING");
 

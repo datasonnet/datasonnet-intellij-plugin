@@ -1,5 +1,6 @@
 {
   parserClass="io.portx.datasonnet.language.parser.DataSonnetParser"
+  parserUtilClass="io.portx.datasonnet.language.parser.DataSonnetParserUtil"
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
 
