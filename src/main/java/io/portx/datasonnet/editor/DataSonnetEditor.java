@@ -65,6 +65,7 @@ import io.portx.datasonnet.language.DataSonnetFileType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jps.model.java.JavaResourceRootType;
+import org.jetbrains.yaml.YAMLLanguage;
 
 import javax.swing.*;
 import java.awt.*;
@@ -85,7 +86,6 @@ import java.util.Map;
 public class DataSonnetEditor implements FileEditor {
 
     private Project project;
-    //private final Module module;
 
     private final TextEditorImpl textEditor;
 
@@ -120,15 +120,12 @@ public class DataSonnetEditor implements FileEditor {
 
     public DataSonnetEditor(@NotNull Project project, @NotNull VirtualFile virtualFile, final TextEditorImpl psiAwareEditor) {
         this.project = project;
-        this.textEditor = psiAwareEditor; //new PsiAwareTextEditorImpl(project, virtualFile, provider);
-
-        //this.module = ApplicationManager.getApplication().runReadAction((Computable<Module>) () -> ModuleUtilCore.findModuleForFile(virtualFile, project));
+        this.textEditor = psiAwareEditor;
 
         gui = new DataSonnetEditorUI(textEditor);
 
         inputTabs = new JBTabsPaneImpl(project, SwingConstants.TOP, this);
         inputTabs.getTabs().getPresentation().setSideComponentVertical(true);
-        //inputTabs.getTabs().getPresentation().setEmptyText("No inputs available for the current scenario.\nAdd new input by clicking the + button.");
 
         gui.getSourcePanel().add(inputTabs.getComponent(), BorderLayout.CENTER);
 
@@ -473,6 +470,9 @@ public class DataSonnetEditor implements FileEditor {
         } else if ("application/xml".equals(mimeType)) {
             icon = AllIcons.FileTypes.Xml;
             language = XMLLanguage.INSTANCE;
+        } else if ("application/x-yaml".equals(mimeType)) {
+            icon = AllIcons.FileTypes.Yaml;
+            language = YAMLLanguage.INSTANCE;
         } else {
             icon = AllIcons.FileTypes.Text;
             language = PlainTextLanguage.INSTANCE;
@@ -515,10 +515,23 @@ public class DataSonnetEditor implements FileEditor {
             Document doc = editor.getDocument();
             PsiDocumentManager psiDocumentManager = PsiDocumentManager.getInstance(project);
             if (psiDocumentManager.isUncommited(doc)) {
-                psiDocumentManager.commitDocument(doc);
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    try {
+                        psiDocumentManager.commitDocument(doc);
+                        WriteCommandAction.runWriteCommandAction(project, () -> {
+                            PsiFile previewPsiFile = psiDocumentManager.getPsiFile(doc);
+                            CodeStyleManager.getInstance(project).reformat(previewPsiFile);
+                        });
+                    } catch (Throwable e) {
+                        logger.error(e);
+                    }
+                });
             }
-            PsiFile previewPsiFile = psiDocumentManager.getPsiFile(doc);
-            CodeStyleManager.getInstance(project).reformat(previewPsiFile);
+
+            if (!psiDocumentManager.isUncommited(doc)) {
+                PsiFile previewPsiFile = psiDocumentManager.getPsiFile(doc);
+                CodeStyleManager.getInstance(project).reformat(previewPsiFile);
+            }
         }
 
         outputTabs.getTabs().getPresentation().setSideComponentVertical(true);
@@ -698,6 +711,7 @@ public class DataSonnetEditor implements FileEditor {
             DefaultActionGroup group = new DefaultActionGroup();
 
             group.add(new ToggleMimeType("JSON", "application/json"));
+            group.add(new ToggleMimeType("YAML", "application/x-yaml"));
             group.add(new ToggleMimeType("XML", "application/xml"));
             group.add(new ToggleMimeType("CSV", "application/csv"));
             group.add(new ToggleMimeType("Plain Text", "text/plain"));
@@ -732,7 +746,7 @@ public class DataSonnetEditor implements FileEditor {
 
         @Override
         public @NotNull ActionUpdateThread getActionUpdateThread() {
-            return ActionUpdateThread.BGT;
+            return ActionUpdateThread.EDT;
         }
 
         class ToggleMimeType extends ToggleAction {
@@ -745,6 +759,7 @@ public class DataSonnetEditor implements FileEditor {
             public void update(@NotNull final AnActionEvent e) {
                 super.update(e);
                 e.getPresentation().setEnabled(true);
+                e.getPresentation().setKeepPopupOnPerform(KeepPopupOnPerform.Never);
             }
 
             @Override
@@ -760,6 +775,11 @@ public class DataSonnetEditor implements FileEditor {
                 e.getPresentation().setIcon(state ? AllIcons.Actions.Checked : null);
                 DataSonnetEditor.this.outputMimeType = MediaType.valueOf(e.getPresentation().getDescription());
                 DataSonnetEditor.this.runPreview(true);
+            }
+
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.EDT;
             }
         }
     }

@@ -82,6 +82,9 @@ public class AddInputDialog extends DialogWrapper {
                 case JSON:
                     setFileContent(inputFile, "{\n  \"a\": 1\n}");
                     break;
+                case YAML:
+                    setFileContent(inputFile, "hello: world");
+                    break;
                 case XML:
                     setFileContent(inputFile, "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n<element></element>");
                     break;
@@ -139,7 +142,7 @@ public class AddInputDialog extends DialogWrapper {
     }
 
     private enum DataFormat {
-        JSON("json"), XML("xml"), CSV("csv"), Text("txt");
+        JSON("json"), YAML("yaml"), XML("xml"), CSV("csv"), Text("txt");
 
         final String extension;
 

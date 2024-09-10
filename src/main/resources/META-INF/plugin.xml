@@ -10,6 +10,12 @@
     <idea-version since-build="233.*"/>
 
     <change-notes><![CDATA[
+    <h1>Version 3.0.5</h1>
+      <ul>
+       <li>Compatibility with IntelliJ 2024.*</li>
+       <li>YAML format support</li>
+       <li>Minor bug fixes</li>
+=      </ul>
     <h1>Version 3.0.3</h1>
       <ul>
        <li>Compatibility with IntelliJ 2023.3.1</li>
@@ -32,6 +38,7 @@
 
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.xml</depends>
+    <depends>org.jetbrains.plugins.yaml</depends>
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.xdebugger</depends>
     <depends>com.intellij.modules.java</depends>

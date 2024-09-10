@@ -9,7 +9,7 @@ apply plugin: 'java'
 apply plugin: 'org.jetbrains.intellij'
 
 group 'com.datasonnet'
-version '3.0.4'
+version '3.0.5'
 
 sourceCompatibility = 17
 
@@ -69,7 +69,7 @@ intellij {
     version = ideaVersion
     downloadSources = true
     type = project.hasProperty('intellij_type') ? project.intellij_type : 'IC'
-    plugins = ['java']
+    plugins = ['java','yaml']
 }
 // patchPluginXml {
 //     changeNotes """
