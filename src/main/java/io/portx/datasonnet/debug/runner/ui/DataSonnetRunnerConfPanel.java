@@ -20,6 +20,7 @@ package io.portx.datasonnet.debug.runner.ui;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.LabeledComponent;
+import com.intellij.openapi.ui.TextBrowseFolderListener;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -50,14 +51,15 @@ public class DataSonnetRunnerConfPanel implements PanelWithAnchor {
     public DataSonnetRunnerConfPanel(@NotNull Project project) {
         this.project = project;
         dsScriptFile.getComponent().addBrowseFolderListener(
-                "Select DataSonnet Mapping File", "", project,
-                new FileChooserDescriptor(true, false, false, false, false, false) {
-                    @Override
-                    public boolean isFileSelectable(@Nullable VirtualFile file) {
-                        if (!super.isFileSelectable(file)) return false;
-                        return file.getFileType() instanceof DataSonnetFileType;
-                    }
-                });
+//                "Select DataSonnet Mapping File", "", project,
+                new TextBrowseFolderListener(
+                    new FileChooserDescriptor(true, false, false, false, false, false) {
+                        @Override
+                        public boolean isFileSelectable(@Nullable VirtualFile file) {
+                            if (!super.isFileSelectable(file)) return false;
+                            return file.getFileType() instanceof DataSonnetFileType;
+                        }
+                    }, project));
 
         dsScriptFile.getComponent().getTextField().getDocument().addDocumentListener(new DocumentListener() {
             @Override

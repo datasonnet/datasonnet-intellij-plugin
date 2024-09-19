@@ -7,7 +7,7 @@ import io.portx.datasonnet.language.DataSonnetIcon;
 public class CreateNewFileAction extends CreateFileAction implements DumbAware {
 
     public CreateNewFileAction() {
-        super("DataSonnet File", "Create New DataSonnet File.", DataSonnetIcon.FILE);
+        super(() -> "DataSonnet File", () -> "Create New DataSonnet File.", () -> DataSonnetIcon.FILE);
     }
 
     @Override
