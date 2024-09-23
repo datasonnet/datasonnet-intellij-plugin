@@ -117,7 +117,7 @@ public class DataSonnetEngine {
                             Constructor constructor = clazz.getDeclaredConstructor();
                             lib = (Library) constructor.newInstance();
                         } catch (Exception e2) {
-                            LOGGER.info("Error creating Java DataSonnet library instance: " + e2.getMessage(), e2);
+                            LOGGER.info("Error creating Java DataSonnet library instance: " + e2.getMessage());
                             lib = null;
                         }
                     }
