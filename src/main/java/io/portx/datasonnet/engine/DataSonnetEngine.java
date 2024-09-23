@@ -112,12 +112,12 @@ public class DataSonnetEngine {
                     try { //First see if it's a static Scala class
                         lib = (Library) clazz.getDeclaredField("MODULE$").get(null);
                     } catch (Exception e) { //See if it has defaut constructor
-                        LOGGER.error("Datasonnet library is not static Scala class. Calling Constructor");
+                        LOGGER.info("Datasonnet library is not static Scala class. Calling Constructor");
                         try {
                             Constructor constructor = clazz.getDeclaredConstructor();
                             lib = (Library) constructor.newInstance();
                         } catch (Exception e2) {
-                            LOGGER.error("Error creating Java DataSonnet library instance: " + e2.getMessage(), e2);
+                            LOGGER.info("Error creating Java DataSonnet library instance: " + e2.getMessage(), e2);
                             lib = null;
                         }
                     }
