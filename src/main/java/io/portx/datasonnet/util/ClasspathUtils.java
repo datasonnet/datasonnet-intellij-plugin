@@ -1,6 +1,5 @@
 package io.portx.datasonnet.util;
 
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
@@ -12,7 +11,6 @@ import com.intellij.psi.util.CachedValueProvider;
 import com.intellij.psi.util.CachedValuesManager;
 import com.intellij.psi.util.ParameterizedCachedValue;
 import com.intellij.psi.util.ParameterizedCachedValueProvider;
-import io.portx.datasonnet.engine.DataSonnetEngine;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -23,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class ClasspathUtils {
-
     private static final Key<ParameterizedCachedValue<List<URL>, Module>> URLS_KEY = Key.create("MODULE.URLS");
 
     private static final ClasspathUtils classpathUtils = new ClasspathUtils();
@@ -90,6 +87,7 @@ public final class ClasspathUtils {
                     URL url = nextEntry.endsWith(".jar") ? URI.create("jar:file://" + nextEntry + "!/").toURL() : URI.create("file://" + nextEntry).toURL();
                     loaderUrls.add(url);
                 } catch (Exception e) {
+
                 }
             }
 
@@ -104,6 +102,7 @@ public final class ClasspathUtils {
                 try {
                     loaderUrls.add(URI.create(nextUrlString).toURL());
                 } catch (Exception e) {
+
                 }
             }
 
