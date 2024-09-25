@@ -9,7 +9,7 @@ apply plugin: 'java'
 apply plugin: 'org.jetbrains.intellij'
 
 group 'com.datasonnet'
-version '3.0.6'
+version '3.0.7'
 
 sourceCompatibility = 17
 

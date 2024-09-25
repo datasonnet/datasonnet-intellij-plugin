@@ -1,5 +1,6 @@
 package io.portx.datasonnet.util;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
@@ -11,8 +12,10 @@ import com.intellij.psi.util.CachedValueProvider;
 import com.intellij.psi.util.CachedValuesManager;
 import com.intellij.psi.util.ParameterizedCachedValue;
 import com.intellij.psi.util.ParameterizedCachedValueProvider;
+import io.portx.datasonnet.engine.DataSonnetEngine;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -20,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class ClasspathUtils {
+
     private static final Key<ParameterizedCachedValue<List<URL>, Module>> URLS_KEY = Key.create("MODULE.URLS");
 
     private static final ClasspathUtils classpathUtils = new ClasspathUtils();
@@ -77,19 +81,22 @@ public final class ClasspathUtils {
 
             String fullClasspath = OrderEnumerator.orderEntries(module).recursively().getPathsList().getPathsString();
 
-            String[] cpEntries = fullClasspath.split(":");
+            // Fix for not parsing full classpath correctly on Windows.
+            String[] cpEntries = fullClasspath.split(File.pathSeparator);
             for (String nextEntry : cpEntries) {
                 try {
+                    // URL does not accept '\' which is the path separator on Windows.
+                    nextEntry = nextEntry.replaceAll("\\\\", "/");
                     URL url = nextEntry.endsWith(".jar") ? URI.create("jar:file://" + nextEntry + "!/").toURL() : URI.create("file://" + nextEntry).toURL();
                     loaderUrls.add(url);
                 } catch (Exception e) {
-
                 }
             }
 
             CompilerModuleExtension extension = CompilerModuleExtension.getInstance(module);
             String[] outputRootUrls = extension.getOutputRootUrls(false);
             for (String nextUrlString : outputRootUrls) {
+                nextUrlString = nextUrlString.replaceAll("\\\\", "/");
                 if (!nextUrlString.endsWith("/")) {
                     nextUrlString = nextUrlString + "/";
                 }
@@ -97,7 +104,6 @@ public final class ClasspathUtils {
                 try {
                     loaderUrls.add(URI.create(nextUrlString).toURL());
                 } catch (Exception e) {
-
                 }
             }
 

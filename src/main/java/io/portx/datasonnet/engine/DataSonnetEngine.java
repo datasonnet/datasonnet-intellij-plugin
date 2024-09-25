@@ -36,8 +36,6 @@ import java.util.*;
 
 public class DataSonnetEngine {
 
-    private static final Logger LOGGER = Logger.getInstance(DataSonnetEngine.class);
-
     private final VirtualFile mappingFile;
     private final Scenario scenario;
     private final Project project;
@@ -108,21 +106,17 @@ public class DataSonnetEngine {
             try {
                 for (Class clazz : scanLibraries()) {
                     Library lib = null;
-                    LOGGER.info("Loading DataSonnet library: " + clazz.getName());
                     try { //First see if it's a static Scala class
                         lib = (Library) clazz.getDeclaredField("MODULE$").get(null);
                     } catch (Exception e) { //See if it has defaut constructor
-                        LOGGER.info("Datasonnet library is not static Scala class. Calling Constructor");
                         try {
                             Constructor constructor = clazz.getDeclaredConstructor();
                             lib = (Library) constructor.newInstance();
                         } catch (Exception e2) {
-                            LOGGER.info("Error creating Java DataSonnet library instance: " + e2.getMessage());
                             lib = null;
                         }
                     }
                     if (lib != null) {
-                        LOGGER.info("Adding library: " + lib.getClass().getName());
                         builder = builder.withLibrary(lib);
                     }
                 }
@@ -219,10 +213,8 @@ public class DataSonnetEngine {
             ScanResult scanResult = new ClassGraph().enableAllInfo().overrideClassLoaders(projectClassLoader).scan();
             ClassInfoList libs = scanResult.getSubclasses("com.datasonnet.spi.Library").filter(classInfo -> classInfo.isPublic() && !classInfo.isAbstract() && !classInfo.getName().endsWith(".CML") && //Exclude Camel library
                     !"com.datasonnet".equals(classInfo.getPackageName())); //Exclude default Datasonnet libraries
-            LOGGER.info("Found " + libs.size() + " Datasonnet libraries");
             return libs.loadClasses();
         } catch (Exception e) {
-            LOGGER.error("Error scanning libraries: " + e.getMessage(), e);
             return new ArrayList<>();
         }
     }
