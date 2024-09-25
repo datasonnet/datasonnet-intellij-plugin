@@ -11,7 +11,6 @@ import com.datasonnet.spi.Library;
 import com.intellij.codeInspection.AbstractDependencyVisitor;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
