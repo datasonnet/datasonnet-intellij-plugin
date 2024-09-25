@@ -210,12 +210,6 @@ public class DataSonnetEngine {
             ClassLoader projectClassLoader = ClasspathUtils.getProjectClassLoader(project, this.getClass().getClassLoader());
 
             ScanResult scanResult = new ClassGraph().enableAllInfo().overrideClassLoaders(projectClassLoader).scan();
-
-            scanResult.getAllClasses().filter(classInfo -> classInfo.getSimpleName().equalsIgnoreCase("StdXLibrary")).forEach(classInfo -> {
-                LOGGER.info("Found class: " + classInfo.getName());
-                LOGGER.info("Extends: " + classInfo.getSuperclass().getName());
-            });
-
             ClassInfoList libs = scanResult.getSubclasses("com.datasonnet.spi.Library").filter(classInfo -> classInfo.isPublic() && !classInfo.isAbstract() && !classInfo.getName().endsWith(".CML") && //Exclude Camel library
                     !"com.datasonnet".equals(classInfo.getPackageName())); //Exclude default Datasonnet libraries
             return libs.loadClasses();
