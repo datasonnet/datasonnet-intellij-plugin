@@ -19,6 +19,8 @@ public class AutoSyncAction extends ToggleAction {
     public AutoSyncAction(DataSonnetEditor editor) {
         super("Auto Refresh", "Toggle Auto Refresh Mapping On/Off", autosyncIcon);
         this.editor = editor;
+        // TODO Make default false
+        // TODO Make auto-sync configurable
         setSelected(null, true);
     }
 

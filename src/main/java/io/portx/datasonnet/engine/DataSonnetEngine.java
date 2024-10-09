@@ -68,8 +68,14 @@ public class DataSonnetEngine {
         com.intellij.openapi.editor.Document document = ApplicationManager.getApplication().runReadAction((Computable<com.intellij.openapi.editor.Document>) () -> FileDocumentManager.getInstance().getDocument(mappingFile));
         String mappingScript = document.getText();
 
+
+        // TODO: The camel functions should be added AFTER the header and maybe even imports.
+        // TODO: Add proper support for adding exchange headers and properties. Currently, it's just a placeholder which returns nothing.
+        // TODO: Add support for different mimetypes in the exchangeProperty function
         String camelFunctions = "local cml = { exchangeProperty(str): exchangeProperty[str], header(str): header[str], properties(str): properties[str] };\n";
         String dataSonnetScript = camelFunctions + mappingScript;
+
+
 
         String payload = "{}";
 

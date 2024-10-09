@@ -6,6 +6,8 @@ import java.util.List;
 
 public class DataSonnetProjectSettings implements Serializable {
 
+    // TODO Make auto-sync configurable.
+    // TODO Add default template for new file with custom content.
     private List<String> dataSonnetLibraryPaths;
 
     public DataSonnetProjectSettings() {
