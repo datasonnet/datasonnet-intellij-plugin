@@ -83,6 +83,8 @@ public final class ClasspathUtils {
             String[] cpEntries = fullClasspath.split(File.pathSeparator);
             for (String nextEntry : cpEntries) {
                 try {
+                    // URL does not accept '\' which is the path separator on Windows.
+                    nextEntry = nextEntry.replaceAll("\\\\", "/");
                     URL url = nextEntry.endsWith(".jar") ? URI.create("jar:file://" + nextEntry + "!/").toURL() : URI.create("file://" + nextEntry).toURL();
                     loaderUrls.add(url);
                 } catch (Exception e) {
@@ -93,8 +95,7 @@ public final class ClasspathUtils {
             CompilerModuleExtension extension = CompilerModuleExtension.getInstance(module);
             String[] outputRootUrls = extension.getOutputRootUrls(false);
             for (String nextUrlString : outputRootUrls) {
-                // URI does not accept backslashes. Windows paths are returned with backslashes, so we need to
-                // replace them with forward slashes.
+                // URL does not accept '\' which is the path separator on Windows.
                 nextUrlString = nextUrlString.replaceAll("\\\\", "/");
                 if (!nextUrlString.endsWith("/")) {
                     nextUrlString = nextUrlString + "/";
