@@ -20,10 +20,11 @@ public class DataSonnetProjectSettings implements Serializable {
 
     private String defaultTemplate;
     private List<String> dataSonnetLibraryPaths;
+    private boolean autoRefresh = true; // Default to true for backwards compatibility.
 
     public DataSonnetProjectSettings() {
         defaultTemplate = DEFAULT_TEMPLATE;
-        dataSonnetLibraryPaths = new ArrayList<String>();
+        dataSonnetLibraryPaths = new ArrayList<>();
     }
 
     /**
@@ -52,5 +53,22 @@ public class DataSonnetProjectSettings implements Serializable {
         this.dataSonnetLibraryPaths = dataSonnetLibraryPaths;
     }
 
+    /**
+     * Gets whether to automatically sync the DataSonnet mappings. The default is {@code false}.
+     *
+     * @return Whether to automatically sync the DataSonnet mappings.
+     */
+    public boolean getAutoRefresh() {
+        return autoRefresh;
+    }
+
+    /**
+     * Sets whether to automatically sync the DataSonnet mappings.
+     *
+     * @param autoRefresh Whether to automatically sync the DataSonnet mappings.
+     */
+    public void setAutoRefresh(boolean autoRefresh) {
+        this.autoRefresh = autoRefresh;
+    }
 
 }
