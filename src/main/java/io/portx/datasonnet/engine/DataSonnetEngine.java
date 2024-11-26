@@ -66,10 +66,16 @@ public class DataSonnetEngine {
 
     public com.datasonnet.document.Document runDataSonnetMapping() {
         com.intellij.openapi.editor.Document document = ApplicationManager.getApplication().runReadAction((Computable<com.intellij.openapi.editor.Document>) () -> FileDocumentManager.getInstance().getDocument(mappingFile));
-        String mappingScript = document.getText();
 
-        String camelFunctions = "local cml = { exchangeProperty(str): exchangeProperty[str], header(str): header[str], properties(str): properties[str] };\n";
-        String dataSonnetScript = camelFunctions + mappingScript;
+        String mappingScript = document.getText().trim();
+        String camelFunctions = "\nlocal cml = { exchangeProperty(str): exchangeProperty[str], header(str): header[str], properties(str): properties[str] };\n";
+        String headers = "";
+
+        if (mappingScript.startsWith("/**")) {
+            headers = mappingScript.substring(0, mappingScript.indexOf("*/") + 2);
+            mappingScript = mappingScript.replace(headers, "");
+        }
+        String dataSonnetScript = headers + camelFunctions + mappingScript;
 
         String payload = "{}";
 
