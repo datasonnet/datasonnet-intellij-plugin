@@ -32,8 +32,12 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class DataSonnetEngine {
+
+    private final Pattern pattern = Pattern.compile("(?s)^\\s*(/\\*\\* DataSonnet.*?\\*/)");
 
     private final VirtualFile mappingFile;
     private final Scenario scenario;
@@ -67,9 +71,7 @@ public class DataSonnetEngine {
     public com.datasonnet.document.Document runDataSonnetMapping() {
         com.intellij.openapi.editor.Document document = ApplicationManager.getApplication().runReadAction((Computable<com.intellij.openapi.editor.Document>) () -> FileDocumentManager.getInstance().getDocument(mappingFile));
         String mappingScript = document.getText();
-
-        String camelFunctions = "local cml = { exchangeProperty(str): exchangeProperty[str], header(str): header[str], properties(str): properties[str] };\n";
-        String dataSonnetScript = camelFunctions + mappingScript;
+        String dataSonnetScript = addCamelFunctions(mappingScript);
 
         String payload = "{}";
 
@@ -140,6 +142,32 @@ public class DataSonnetEngine {
         } catch (Exception e) {
             return new DefaultDocument(e.getMessage() != null ? e.getMessage() : e.toString(), MediaTypes.TEXT_PLAIN);
         }
+    }
+
+    /**
+     * Add Camel functions to the DataSonnet script. If the script already contains a header, the functions are
+     * added after the header.
+     *
+     * @param mappingScript The DataSonnet script.
+     * @return The DataSonnet script with the Camel functions added.
+     */
+    private @NotNull String addCamelFunctions(String mappingScript) {
+        String dataSonnetScript;
+
+        String camelFunctions = "local cml = { exchangeProperty(str): exchangeProperty[str], header(str): header[str], properties(str): properties[str] };\n";
+
+        // Regular expression to find the DataSonnet header
+        Matcher matcher = pattern.matcher(mappingScript);
+
+        if (matcher.find()) {
+            // Insert camelFunctions after the header
+            int headerEnd = matcher.end();
+            dataSonnetScript = mappingScript.substring(0, headerEnd) + "\n" + camelFunctions + mappingScript.substring(headerEnd);
+        } else {
+            // No header found, prepend camelFunctions
+            dataSonnetScript = camelFunctions + mappingScript;
+        }
+        return dataSonnetScript;
     }
 
     @NotNull
