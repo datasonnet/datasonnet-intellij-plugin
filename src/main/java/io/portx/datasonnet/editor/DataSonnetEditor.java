@@ -404,7 +404,8 @@ public class DataSonnetEditor implements FileEditor {
                 Document document = this.textEditor.getEditor().getDocument();
 
                 try {
-                    String errLine = preview.split("\n")[1];
+                    // Just to be sure we'll split on all possible line endings.
+                    String errLine = preview.split("\n|\r|\r\n")[1];
                     String line = errLine.substring(errLine.indexOf("line"), errLine.indexOf("column"));
                     String column = errLine.substring(errLine.indexOf("column"));
 
@@ -495,7 +496,8 @@ public class DataSonnetEditor implements FileEditor {
                 app.runWriteAction(new Runnable() {
                     @Override
                     public void run() {
-                        currentEditor.getDocument().setText(contents);
+                        // On Windows, the line separators are \r\n, but the editor expects \n.
+                        currentEditor.getDocument().setText(StringUtil.convertLineSeparators(contents));
                     }
                 });
             }
