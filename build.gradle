@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.jetbrains.intellij' version '1.13.3'
+    id 'org.jetbrains.intellij' version '1.17.4'
     id "org.datlowe.maven-publish-auth" version "2.0.2"
     id 'me.qoomon.git-versioning' version '1.2.3'
 }
@@ -9,7 +9,7 @@ apply plugin: 'java'
 apply plugin: 'org.jetbrains.intellij'
 
 group 'com.datasonnet'
-version '3.0.6'
+version '3.0.7'
 
 sourceCompatibility = 17
 
@@ -43,7 +43,7 @@ repositories {
 
 dependencies {
     testImplementation group: 'junit', name: 'junit', version: '4.12'
-    implementation group: 'com.datasonnet', name: 'datasonnet-mapper', version: '3.0.0-RC3'
+    implementation group: 'com.datasonnet', name: 'datasonnet-mapper', version: '3.0.0'
     implementation group: 'io.github.classgraph', name: 'classgraph', version: '4.8.147'
 }
 
@@ -69,7 +69,7 @@ intellij {
     version = ideaVersion
     downloadSources = true
     type = project.hasProperty('intellij_type') ? project.intellij_type : 'IC'
-    plugins = ['java','yaml']
+    plugins = ['java','yaml','com.intellij.modules.json']
 }
 // patchPluginXml {
 //     changeNotes """

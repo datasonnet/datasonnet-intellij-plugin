@@ -10,22 +10,26 @@
     <idea-version since-build="233.*"/>
 
     <change-notes><![CDATA[
+    <h1>Version 3.0.7</h1>
+      <ul>
+       <li>DataSonnet 3.0.0</li>
+      </ul>
     <h1>Version 3.0.5</h1>
       <ul>
        <li>Compatibility with IntelliJ 2024.*</li>
        <li>YAML format support</li>
        <li>Minor bug fixes</li>
-=      </ul>
+      </ul>
     <h1>Version 3.0.3</h1>
       <ul>
        <li>Compatibility with IntelliJ 2023.3.1</li>
        <li>Minor bug fixes</li>
-=      </ul>
+      </ul>
     <h1>Version 3.0.2</h1>
       <ul>
        <li>Improved compatibility with latest versions of IDEA</li>
        <li>Additional DataSonnet libraries search paths implemented</li>
-=      </ul>
+      </ul>
     <h1>Version 3.0.0</h1>
       <ul>
        <li>Preview editor pane</li>
