@@ -21,6 +21,8 @@ public class DataSonnetSettingsPanel {
     private JPanel myProjectSettingsPanel;
     private JBList myDataSonnetPathList;
     private JPanel mySearchPathPanel;
+    private JPanel myTemplatePanel;
+    private JTextArea myTemplateTextArea;
 
     private DataSonnetProjectSettingsComponent myProjectSettingsComponent;
 
@@ -59,18 +61,27 @@ public class DataSonnetSettingsPanel {
     }
 
     public boolean isModified() {
-        return !Objects.equals(myDataSonnetPathsModel.getItems(), myProjectSettingsComponent.getState().getDataSonnetLibraryPaths());
-
+        final DataSonnetProjectSettings settings = myProjectSettingsComponent.getState();
+        return  !Objects.equals(myTemplateTextArea.getText(), settings.getDefaultTemplate()) ||
+                !Objects.equals(myDataSonnetPathsModel.getItems(), settings.getDataSonnetLibraryPaths());
     }
 
     public void apply() {
+        final DataSonnetProjectSettings settings = myProjectSettingsComponent.getState();
+
+        // Apply the default template for a new DataSonnet file
+        settings.setDefaultTemplate(myTemplateTextArea.getText());
+
+        // Apply the DataSonnet library paths
         java.util.List<String> dataSonnetPaths = new ArrayList<String>();
         dataSonnetPaths.addAll(myDataSonnetPathsModel.getItems());
-        myProjectSettingsComponent.getState().setDataSonnetLibraryPaths(dataSonnetPaths);
+        settings.setDataSonnetLibraryPaths(dataSonnetPaths);
     }
 
     public void reset() {
-        myDataSonnetPathsModel.replaceAll(myProjectSettingsComponent.getState().getDataSonnetLibraryPaths());
+        final DataSonnetProjectSettings settings = myProjectSettingsComponent.getState();
+        myTemplateTextArea.setText(settings.getDefaultTemplate());
+        myDataSonnetPathsModel.replaceAll(settings.getDataSonnetLibraryPaths());
     }
 
     public Color getDefaultValueColor() {

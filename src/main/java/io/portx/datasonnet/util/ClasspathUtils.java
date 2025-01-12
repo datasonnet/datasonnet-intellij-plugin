@@ -13,6 +13,7 @@ import com.intellij.psi.util.ParameterizedCachedValue;
 import com.intellij.psi.util.ParameterizedCachedValueProvider;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -77,9 +78,13 @@ public final class ClasspathUtils {
 
             String fullClasspath = OrderEnumerator.orderEntries(module).recursively().getPathsList().getPathsString();
 
-            String[] cpEntries = fullClasspath.split(":");
+            // Windows uses semicolons as the path separator and Linux uses colons. We need to split the classpath
+            // based on the correct separator.
+            String[] cpEntries = fullClasspath.split(File.pathSeparator);
             for (String nextEntry : cpEntries) {
                 try {
+                    // URL does not accept '\' which is the path separator on Windows.
+                    nextEntry = nextEntry.replaceAll("\\\\", "/");
                     URL url = nextEntry.endsWith(".jar") ? URI.create("jar:file://" + nextEntry + "!/").toURL() : URI.create("file://" + nextEntry).toURL();
                     loaderUrls.add(url);
                 } catch (Exception e) {
@@ -90,6 +95,8 @@ public final class ClasspathUtils {
             CompilerModuleExtension extension = CompilerModuleExtension.getInstance(module);
             String[] outputRootUrls = extension.getOutputRootUrls(false);
             for (String nextUrlString : outputRootUrls) {
+                // URL does not accept '\' which is the path separator on Windows.
+                nextUrlString = nextUrlString.replaceAll("\\\\", "/");
                 if (!nextUrlString.endsWith("/")) {
                     nextUrlString = nextUrlString + "/";
                 }
