@@ -1,15 +1,16 @@
 plugins {
     id 'java'
-    id 'org.jetbrains.intellij' version '1.17.4'
     id "org.datlowe.maven-publish-auth" version "2.0.2"
     id 'me.qoomon.git-versioning' version '1.2.3'
+    id "org.jetbrains.intellij.platform" version "2.5.0"
+//    id "org.jetbrains.intellij.platform.migration" version "2.5.0"
 }
 
 apply plugin: 'java'
-apply plugin: 'org.jetbrains.intellij'
+apply plugin: 'org.jetbrains.intellij.platform'
 
 group 'com.datasonnet'
-version '3.0.7'
+version '3.0.8'
 
 sourceCompatibility = 17
 
@@ -39,12 +40,20 @@ repositories {
             releasesOnly()
         }
     }
+    intellijPlatform {
+        defaultRepositories()
+    }
 }
 
 dependencies {
     testImplementation group: 'junit', name: 'junit', version: '4.12'
     implementation group: 'com.datasonnet', name: 'datasonnet-mapper', version: '3.0.0'
     implementation group: 'io.github.classgraph', name: 'classgraph', version: '4.8.147'
+
+    intellijPlatform {
+        intellijIdeaCommunity '2025.1'
+        bundledPlugins('com.intellij.java','org.jetbrains.plugins.yaml','com.intellij.modules.json')
+    }
 }
 
 gitVersioning {
@@ -65,18 +74,11 @@ gitVersioning {
     }
 }
 
-intellij {
-    version = ideaVersion
-    downloadSources = true
-    type = project.hasProperty('intellij_type') ? project.intellij_type : 'IC'
-    plugins = ['java','yaml','com.intellij.modules.json']
-}
-// patchPluginXml {
-//     changeNotes """
-//       Add change notes here.<br>
-//       <em>most HTML tags may be used</em>"""
-// }
-patchPluginXml {
-    sinceBuild = "242"
-    untilBuild = "250.*"
+intellijPlatform {
+    pluginConfiguration {
+        ideaVersion {
+            sinceBuild = "250"
+            untilBuild = "260.*"
+        }
+    }
 }
